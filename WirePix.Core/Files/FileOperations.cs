@@ -17,12 +17,16 @@ namespace WirePix.Core.Files
 
         public static string UniqueName(string path, string sourcePath, bool alwaysUnique = false)
         {
-            var candidate = path;
+            string candidate = path;
             var index = 1;
             while (File.Exists(candidate))
             {
-                if (!alwaysUnique && Verify(Hash(File.OpenRead(sourcePath)), candidate)) break;
-                var extension = Path.GetExtension(path);
+                if (!alwaysUnique && Verify(Hash(File.OpenRead(sourcePath)), candidate))
+                {
+                    break;
+                }
+
+                string extension = Path.GetExtension(path);
                 candidate = Path.Combine(Path.GetDirectoryName(candidate) ?? string.Empty, Path.GetFileNameWithoutExtension(path) + "(" + index++ + ")" + extension);
             }
 

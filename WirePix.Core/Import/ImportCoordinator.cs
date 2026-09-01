@@ -12,32 +12,34 @@ using WirePix.Core.Imaging;
 
 namespace WirePix.Core.Import
 {
-    public sealed class ImportCoordinator
+    public sealed class ImportCoordinator(string tempFolder, string logFolder = null)
     {
         private const int MaxAttempts = 5;
-        private readonly string _tempFolder;
-        private readonly FileLogger _logger;
-        private readonly ThumbnailGenerator _thumbnails = new ThumbnailGenerator();
+        private readonly string _tempFolder = tempFolder ?? throw new ArgumentNullException(nameof(tempFolder));
+        private readonly FileLogger _logger = logFolder == null ? null : new FileLogger(logFolder);
+        private readonly ThumbnailGenerator _thumbnails = new();
 
-        public ImportCoordinator(string tempFolder, string logFolder = null)
-        {
-            _tempFolder = tempFolder ?? throw new ArgumentNullException(nameof(tempFolder));
-            _logger = logFolder == null ? null : new FileLogger(logFolder);
-        }
-
-        public Task<ImportPlan> CreatePlanAsync(IImportDevice device, DownloadSettings settings, IProgress<ImportProgress> progress = null, CancellationToken cancellationToken = default)
+        public static Task<ImportPlan> CreatePlanAsync(
+            IImportDevice device,
+            DownloadSettings settings,
+            IProgress<ImportProgress> progress = null,
+            CancellationToken cancellationToken = default)
         {
             return Task.Run(() => CreatePlan(device, settings, progress, cancellationToken), cancellationToken);
         }
 
-        private ImportPlan CreatePlan(IImportDevice device, DownloadSettings settings, IProgress<ImportProgress> progress, CancellationToken token)
+        private static ImportPlan CreatePlan(
+            IImportDevice device,
+            DownloadSettings settings,
+            IProgress<ImportProgress> progress,
+            CancellationToken token)
         {
             var files = new List<ImportFile>();
             progress?.Report(new ImportProgress(ImportStage.Searching, 0, 0));
             device.Connect();
             try
             {
-                foreach (var drive in device.GetDrives() ?? Array.Empty<ImportDrive>())
+                foreach (ImportDrive drive in device.GetDrives() ?? [])
                     FindMediaFiles(device, drive.RootPath, files, progress, token);
             }
             finally
@@ -49,29 +51,46 @@ namespace WirePix.Core.Import
             if (settings?.Date != null && settings.Date.Start != default)
             {
                 progress?.Report(new ImportProgress(ImportStage.Filtering, 0, files.Count));
-                var end = settings.Date.End.Date.AddDays(1);
+                DateTime end = settings.Date.End.Date.AddDays(1);
                 selected = files.Where(f => EffectiveDate(f) >= settings.Date.Start && EffectiveDate(f) < end);
             }
 
-            var result = selected.OrderBy(f => EffectiveDate(f)).ThenBy(f => f.Name).ToList();
-            return new ImportPlan { Files = result, TotalBytes = result.Sum(x => x.Length), Date = settings?.Date };
+            List<ImportFile> result =
+            [
+                .. selected.OrderBy(EffectiveDate)
+                           .ThenBy(f => f.Name)
+            ];
+
+            return new ImportPlan
+            {
+                Files = result,
+                TotalBytes = result.Sum(x => x.Length),
+                Date = settings?.Date
+            };
         }
 
-        private void FindMediaFiles(IImportDevice device, string path, List<ImportFile> result, IProgress<ImportProgress> progress, CancellationToken token)
+        private static void FindMediaFiles(
+            IImportDevice device,
+            string path,
+            List<ImportFile> result,
+            IProgress<ImportProgress> progress,
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            var directories = (device.EnumerateDirectories(path) ?? Enumerable.Empty<string>()).ToList();
-            var dcim = directories.FirstOrDefault(x => string.Equals(Path.GetFileName(x.TrimEnd('\\', '/')), "DCIM", StringComparison.OrdinalIgnoreCase));
+            List<string> directories = [.. device.EnumerateDirectories(path) ?? []];
+            string dcim = directories.FirstOrDefault(x =>
+                string.Equals(Path.GetFileName(x.TrimEnd('\\', '/')), "DCIM", StringComparison.OrdinalIgnoreCase));
+
             if (dcim != null)
             {
                 path = dcim;
             }
             else
             {
-                foreach (var child in directories)
+                foreach (string child in directories)
                 {
-                    var name = Path.GetFileName(child.TrimEnd('\\', '/'));
-                    if (!string.IsNullOrEmpty(name) && !name.StartsWith(".", StringComparison.Ordinal))
+                    string name = Path.GetFileName(child.TrimEnd('\\', '/'));
+                    if (!string.IsNullOrEmpty(name) && !name.StartsWith('.'))
                     {
                         FindMediaFiles(device, child, result, progress, token);
                     }
@@ -83,31 +102,48 @@ namespace WirePix.Core.Import
             EnumerateDirectory(device, path, result, progress, token);
         }
 
-        private void EnumerateDirectory(IImportDevice device, string path, List<ImportFile> result, IProgress<ImportProgress> progress, CancellationToken token)
+        private static void EnumerateDirectory(
+            IImportDevice device,
+            string path,
+            List<ImportFile> result,
+            IProgress<ImportProgress> progress,
+            CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
-            foreach (var file in device.EnumerateFiles(path) ?? Enumerable.Empty<ImportFile>())
+            foreach (ImportFile file in device.EnumerateFiles(path) ?? [])
             {
                 result.Add(file);
                 progress?.Report(new ImportProgress(ImportStage.Searching, result.Count, 0, file.FullName));
             }
 
-            foreach (var child in device.EnumerateDirectories(path) ?? Enumerable.Empty<string>())
+            foreach (string child in device.EnumerateDirectories(path) ?? [])
             {
-                var name = Path.GetFileName(child.TrimEnd('\\', '/'));
-                if (!string.IsNullOrEmpty(name) && !name.StartsWith(".", StringComparison.Ordinal))
+                string name = Path.GetFileName(child.TrimEnd('\\', '/'));
+                if (!string.IsNullOrEmpty(name) && !name.StartsWith('.'))
                 {
                     EnumerateDirectory(device, child, result, progress, token);
                 }
             }
         }
 
-        public Task<ImportResult> ExecuteAsync(IImportDevice device, ImportPlan plan, DownloadSettings settings, NamingContext naming, IProgress<ImportProgress> progress = null, CancellationToken cancellationToken = default)
+        public Task<ImportResult> ExecuteAsync(
+            IImportDevice device,
+            ImportPlan plan,
+            DownloadSettings settings,
+            NamingContext naming,
+            IProgress<ImportProgress> progress = null,
+            CancellationToken cancellationToken = default)
         {
             return Task.Run(() => Execute(device, plan, settings, naming, progress, cancellationToken), cancellationToken);
         }
 
-        private ImportResult Execute(IImportDevice device, ImportPlan plan, DownloadSettings settings, NamingContext naming, IProgress<ImportProgress> progress, CancellationToken token)
+        private ImportResult Execute(
+            IImportDevice device,
+            ImportPlan plan,
+            DownloadSettings settings,
+            NamingContext naming,
+            IProgress<ImportProgress> progress,
+            CancellationToken token)
         {
             var result = new ImportResult { FilesTotal = plan?.Files?.Count ?? 0 };
             if (plan?.Files == null || plan.Files.Count == 0)
@@ -124,16 +160,16 @@ namespace WirePix.Core.Import
                 for (var index = 0; index < plan.Files.Count; index++)
                 {
                     token.ThrowIfCancellationRequested();
-                    var file = plan.Files[index];
+                    ImportFile file = plan.Files[index];
                     progress?.Report(new ImportProgress(ImportStage.Downloading, index, plan.Files.Count, file.FullName));
-                    var temp = Path.Combine(_tempFolder, Guid.NewGuid().ToString("N"));
+                    string temp = Path.Combine(_tempFolder, Guid.NewGuid().ToString("N"));
                     try
                     {
                         byte[] originalHash = null;
                         if (settings.CheckFiles)
                         {
-                            using (var stream = device.OpenRead(file))
-                                originalHash = FileOperations.Hash(stream);
+                            using Stream stream = device.OpenRead(file);
+                            originalHash = FileOperations.Hash(stream);
                         }
 
                         var downloaded = false;
@@ -148,15 +184,19 @@ namespace WirePix.Core.Import
                             throw new IOException("Downloaded file failed hash verification.");
                         }
 
-                        if (originalHash == null)
-                        {
-                            originalHash = FileOperations.Hash(File.OpenRead(temp));
-                        }
+                        originalHash ??= FileOperations.Hash(File.OpenRead(temp));
 
-                        var context = new NamingContext { File = file, DeviceName = naming?.DeviceName ?? device.Name, Manufacturer = naming?.Manufacturer ?? device.Manufacturer, Culture = naming?.Culture };
-                        var relativeFolder = NameTemplate.EvaluateFolders(settings.Paths.FolderTags, context);
-                        var relativeName = NameTemplate.Evaluate(settings.Paths.FileTags, context) + Path.GetExtension(file.Name);
-                        var relativePath = Path.Combine(relativeFolder ?? string.Empty, relativeName);
+                        var context = new NamingContext
+                        {
+                            File = file,
+                            DeviceName = naming?.DeviceName ?? device.Name,
+                            Manufacturer = naming?.Manufacturer ?? device.Manufacturer,
+                            Culture = naming?.Culture
+                        };
+
+                        string relativeFolder = NameTemplate.EvaluateFolders(settings.Paths.FolderTags, context);
+                        string relativeName = NameTemplate.Evaluate(settings.Paths.FileTags, context) + Path.GetExtension(file.Name);
+                        string relativePath = Path.Combine(relativeFolder ?? string.Empty, relativeName);
                         if (settings.Thumbnail)
                         {
                             progress?.Report(new ImportProgress(ImportStage.GeneratingThumbnail, index, plan.Files.Count, file.FullName));
@@ -164,9 +204,9 @@ namespace WirePix.Core.Import
 
                         if (settings.Thumbnail && ThumbnailGenerator.IsImage(temp))
                         {
-                            var thumbnailPath = Path.Combine(settings.Paths.Thumbnail ?? string.Empty, relativePath);
+                            string thumbnailPath = Path.Combine(settings.Paths.Thumbnail ?? string.Empty, relativePath);
                             thumbnailPath = Path.Combine(Path.GetDirectoryName(thumbnailPath) ?? string.Empty, Path.GetFileNameWithoutExtension(thumbnailPath) + "(" + Path.GetExtension(thumbnailPath).TrimStart('.') + ").jpg");
-                            _thumbnails.Generate(temp, thumbnailPath, settings.ThumbnailSettings, BitConverter.ToString(originalHash).Replace("-", string.Empty).ToLowerInvariant());
+                            ThumbnailGenerator.Generate(temp, thumbnailPath, settings.ThumbnailSettings, Convert.ToHexStringLower(originalHash));
                         }
 
                         if (!SaveToRoots(settings, relativePath, temp, originalHash, file.FullName))
@@ -183,7 +223,7 @@ namespace WirePix.Core.Import
                     catch (Exception ex)
                     {
                         result.Errors++;
-                        _logger?.Add(ex.ToString(), LogType.ERROR, nameof(Execute));
+                        _logger?.Add(ex.ToString(), LogType.Error, nameof(Execute));
                     }
                     finally
                     {
@@ -194,7 +234,7 @@ namespace WirePix.Core.Import
                     }
                 }
 
-                foreach (var source in toDelete)
+                foreach (string source in toDelete)
                 {
                     progress?.Report(new ImportProgress(ImportStage.Deleting, result.Deleted, toDelete.Count, source));
                     device.Delete(source);
@@ -213,14 +253,14 @@ namespace WirePix.Core.Import
 
         private static bool SaveToRoots(DownloadSettings settings, string relativePath, string temp, byte[] hash, string original)
         {
-            foreach (var root in new[] { settings.Paths.Root, settings.Paths.Backup })
+            foreach (string root in new[] { settings.Paths.Root, settings.Paths.Backup })
             {
                 if (string.IsNullOrEmpty(root))
                 {
                     return true;
                 }
 
-                var destination = Path.Combine(root, relativePath);
+                string destination = Path.Combine(root, relativePath);
                 if (File.Exists(destination))
                 {
                     destination = FileOperations.UniqueName(destination, temp);

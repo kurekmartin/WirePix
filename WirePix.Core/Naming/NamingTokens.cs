@@ -27,19 +27,27 @@ namespace WirePix.Core.Naming
         public bool UseTagLanguage { get; init; }
     }
 
-    public static class NameTemplate
+    public static partial class NameTemplate
     {
         public static List<string> Parse(string template)
         {
             var result = new List<string>();
             while (!string.IsNullOrEmpty(template))
             {
-                var match = Regex.Match(template, @"\{.*?\}");
-                var token = match.Success ? match.Value : Regex.Match(template, @"[^\{]*").Value;
-                if (match.Success && token.Length < template.Length && template[token.Length] == '(') token += Regex.Match(template, @"\(.*?\)").Value;
-                if (token.Length == 0) break;
+                Match match = TokenRegex().Match(template);
+                string token = match.Success ? match.Value : FreeTextRegex().Match(template).Value;
+                if (match.Success && token.Length < template.Length && template[token.Length] == '(')
+                {
+                    token += TagParameterRegex().Match(template).Value;
+                }
+
+                if (token.Length == 0)
+                {
+                    break;
+                }
+
                 result.Add(token);
-                template = template.Substring(token.Length);
+                template = template[token.Length..];
             }
 
             return result;
@@ -47,15 +55,30 @@ namespace WirePix.Core.Naming
 
         public static string Evaluate(IEnumerable<string> tags, NamingContext context)
         {
-            if (context == null) return string.Empty;
-            var file = context.File;
-            var date = file == null ? default : FileExif.GetDateTimeOriginal(file.FullName);
-            if (date == default && file != null) date = file.CreationTime != default ? file.CreationTime : file.DateAuthored != default ? file.DateAuthored : file.LastWriteTime;
-            var culture = context.Culture ?? CultureInfo.CurrentCulture;
-            var values = new List<string>();
-            foreach (var tag in tags ?? Enumerable.Empty<string>())
+            if (context == null)
             {
-                var code = RemoveParameter(tag);
+                return string.Empty;
+            }
+
+            ImportFile file = context.File;
+            DateTime date = file == null ? default : FileExif.GetDateTimeOriginal(file.FullName);
+            if (date == default && file != null)
+            {
+                if (file.CreationTime != default)
+                {
+                    date = file.CreationTime;
+                }
+                else
+                {
+                    date = file.DateAuthored != default ? file.DateAuthored : file.LastWriteTime;
+                }
+            }
+
+            CultureInfo culture = context.Culture ?? CultureInfo.CurrentCulture;
+            var values = new List<string>();
+            foreach (string tag in tags ?? [])
+            {
+                string code = RemoveParameter(tag);
                 switch (code)
                 {
                     case NamingTokens.CustomText:
@@ -115,9 +138,32 @@ namespace WirePix.Core.Naming
             return string.Concat(values);
         }
 
-        public static string EvaluateFolders(IEnumerable<IEnumerable<string>> folders, NamingContext context) => Path.Combine((folders ?? Enumerable.Empty<IEnumerable<string>>()).Select(x => Evaluate(x, context)).ToArray());
-        public static string RemoveParameter(string tag) => string.Join(string.Empty, (tag ?? string.Empty).TakeWhile(c => c != '('));
-        public static string GetParameter(string tag) => Regex.Match(tag ?? string.Empty, @"(?<=\().+?(?=\))").Value;
+        public static string EvaluateFolders(
+            IEnumerable<IEnumerable<string>> folders,
+            NamingContext context) =>
+            Path.Combine((folders ?? [])
+                         .Select(x =>
+                             Evaluate(x, context))
+                         .ToArray());
+
+        public static string RemoveParameter(string tag) => string.Join(string.Empty, (tag ?? string.Empty)
+            .TakeWhile(c => c != '('));
+
+        public static string GetParameter(string tag) => TagParameterContentRegex()
+                                                         .Match(tag ?? string.Empty).Value;
+
         public static bool IsValidFileName(string text) => !string.IsNullOrEmpty(text) && text.IndexOfAny(Path.GetInvalidFileNameChars()) < 0;
+
+        [GeneratedRegex(@"\{.*?\}")]
+        private static partial Regex TokenRegex();
+
+        [GeneratedRegex(@"[^\{]*")]
+        private static partial Regex FreeTextRegex();
+
+        [GeneratedRegex(@"\(.*?\)")]
+        private static partial Regex TagParameterRegex();
+
+        [GeneratedRegex(@"(?<=\().+?(?=\))")]
+        private static partial Regex TagParameterContentRegex();
     }
 }

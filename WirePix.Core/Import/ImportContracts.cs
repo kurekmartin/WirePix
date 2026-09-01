@@ -49,24 +49,20 @@ namespace WirePix.Core.Import
         Completed
     }
 
-    public readonly struct ImportProgress
+    public readonly struct ImportProgress(
+        ImportStage stage,
+        int completed,
+        int total,
+        string currentFile = null,
+        long bytesCompleted = 0,
+        long bytesTotal = 0)
     {
-        public ImportProgress(ImportStage stage, int completed, int total, string currentFile = null, long bytesCompleted = 0, long bytesTotal = 0)
-        {
-            Stage = stage;
-            Completed = completed;
-            Total = total;
-            CurrentFile = currentFile;
-            BytesCompleted = bytesCompleted;
-            BytesTotal = bytesTotal;
-        }
-
-        public ImportStage Stage { get; }
-        public int Completed { get; }
-        public int Total { get; }
-        public string CurrentFile { get; }
-        public long BytesCompleted { get; }
-        public long BytesTotal { get; }
+        public ImportStage Stage { get; } = stage;
+        public int Completed { get; } = completed;
+        public int Total { get; } = total;
+        public string CurrentFile { get; } = currentFile;
+        public long BytesCompleted { get; } = bytesCompleted;
+        public long BytesTotal { get; } = bytesTotal;
     }
 
     public sealed class ImportPlan

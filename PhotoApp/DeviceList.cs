@@ -89,14 +89,14 @@ namespace PhotoApp
 
             foreach (MediaDevice device in devices)
             {
-                var deviceInfo = DeviceInfo.Where(d => d.ID == device.DeviceId);
+                var deviceInfo = DeviceInfo.Where(d => d.Id == device.DeviceId);
                 if (deviceInfo.Count() == 0)
                 {
                     DeviceInfo.Add(new DeviceInfo(device.Description, device.DeviceId, connected: true));
                 }
                 else
                 {
-                    var deviceOnline = DeviceInfo.First(d => d.ID == device.DeviceId);
+                    var deviceOnline = DeviceInfo.First(d => d.Id == device.DeviceId);
                     deviceOnline.Connected = true;
                 }
             }
@@ -120,8 +120,8 @@ namespace PhotoApp
         {
             if (index > -1)
             {
-                var newDevice = MediaDevice.GetDevices().First(d => d.DeviceId == ConnectedDevicesInfo.ElementAt(index).ID);
-                if(SelectedDevice == null || newDevice.DeviceId != SelectedDevice.ID)
+                var newDevice = MediaDevice.GetDevices().First(d => d.DeviceId == ConnectedDevicesInfo.ElementAt(index).Id);
+                if(SelectedDevice == null || newDevice.DeviceId != SelectedDevice.Id)
                 {
                     _selectedDevice = new Device(newDevice);
                 }
@@ -148,7 +148,7 @@ namespace PhotoApp
             {
                 if (ConnectedDevicesInfo.Count() > 0 && _selectedDevice != null)
                 {
-                    return ConnectedDevicesInfo.First(d => d.ID == _selectedDevice.ID);
+                    return ConnectedDevicesInfo.First(d => d.Id == _selectedDevice.Id);
                 }
                 else
                     return new DeviceInfo();
@@ -162,7 +162,7 @@ namespace PhotoApp
             {
                 if (_selectedDevice != null)
                 {
-                    return ConnectedDevicesInfo.ToList().FindIndex(d => d.ID == _selectedDevice.ID);
+                    return ConnectedDevicesInfo.ToList().FindIndex(d => d.Id == _selectedDevice.Id);
                 }
                 return -1;
             }

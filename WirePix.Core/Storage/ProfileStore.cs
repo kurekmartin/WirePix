@@ -6,21 +6,19 @@ using WirePix.Core.Models;
 
 namespace WirePix.Core.Storage
 {
-    public sealed class ProfileStore
+    public sealed class ProfileStore(string directory)
     {
-        private readonly string _directory;
-
-        public ProfileStore(string directory)
-        {
-            _directory = directory ?? throw new ArgumentNullException(nameof(directory));
-        }
+        private readonly string _directory = directory ?? throw new ArgumentNullException(nameof(directory));
 
         public void Save(string profileName, DownloadSettings settings, SaveOptions options = null)
         {
             settings.SaveOptions = options ?? settings.SaveOptions;
             Directory.CreateDirectory(_directory);
-            var ignore = new XmlAttributes();
-            ignore.XmlIgnore = true;
+            var ignore = new XmlAttributes
+            {
+                XmlIgnore = true
+            };
+
             var overrides = new XmlAttributeOverrides();
             if (!settings.SaveOptions.Root)
             {
@@ -61,13 +59,13 @@ namespace WirePix.Core.Storage
             }
 
             var serializer = new XmlSerializer(typeof(DownloadSettings), overrides);
-            using var writer = File.CreateText(Path.Combine(_directory, profileName + ".xml"));
+            using StreamWriter writer = File.CreateText(Path.Combine(_directory, profileName + ".xml"));
             serializer.Serialize(writer, settings);
         }
 
         public bool Load(string profileName, DownloadSettings target)
         {
-            var path = Path.Combine(_directory, profileName + ".xml");
+            string path = Path.Combine(_directory, profileName + ".xml");
             if (!File.Exists(path) || !IsValid(profileName))
             {
                 return false;
@@ -76,47 +74,51 @@ namespace WirePix.Core.Storage
             try
             {
                 var serializer = new XmlSerializer(typeof(DownloadSettings));
-                using var stream = File.OpenRead(path);
+                using FileStream stream = File.OpenRead(path);
                 var loaded = (DownloadSettings)serializer.Deserialize(stream);
-                if (loaded.SaveOptions.Root)
+                if (loaded is not null)
                 {
-                    target.Paths.Root = loaded.Paths.Root;
+                    if (loaded.SaveOptions.Root)
+                    {
+                        target.Paths.Root = loaded.Paths.Root;
+                    }
+
+                    if (loaded.SaveOptions.FolderStruct)
+                    {
+                        target.Paths.FolderTags = loaded.Paths.FolderTags;
+                    }
+
+                    if (loaded.SaveOptions.FileStruct)
+                    {
+                        target.Paths.FileTags = loaded.Paths.FileTags;
+                    }
+
+                    if (loaded.SaveOptions.Backup)
+                    {
+                        target.Paths.Backup = loaded.Paths.Backup;
+                        target.Backup = loaded.Backup;
+                    }
+
+                    if (loaded.SaveOptions.Thumbnails)
+                    {
+                        target.Paths.Thumbnail = loaded.Paths.Thumbnail;
+                        target.Thumbnail = loaded.Thumbnail;
+                        target.ThumbnailSettings = loaded.ThumbnailSettings;
+                    }
+
+                    if (loaded.SaveOptions.FileCheck)
+                    {
+                        target.CheckFiles = loaded.CheckFiles;
+                    }
+
+                    if (loaded.SaveOptions.DeleteFiles)
+                    {
+                        target.DeleteFiles = loaded.DeleteFiles;
+                    }
+
+                    target.SaveOptions = loaded.SaveOptions;
                 }
 
-                if (loaded.SaveOptions.FolderStruct)
-                {
-                    target.Paths.FolderTags = loaded.Paths.FolderTags;
-                }
-
-                if (loaded.SaveOptions.FileStruct)
-                {
-                    target.Paths.FileTags = loaded.Paths.FileTags;
-                }
-
-                if (loaded.SaveOptions.Backup)
-                {
-                    target.Paths.Backup = loaded.Paths.Backup;
-                    target.Backup = loaded.Backup;
-                }
-
-                if (loaded.SaveOptions.Thumbnails)
-                {
-                    target.Paths.Thumbnail = loaded.Paths.Thumbnail;
-                    target.Thumbnail = loaded.Thumbnail;
-                    target.ThumbnailSettings = loaded.ThumbnailSettings;
-                }
-
-                if (loaded.SaveOptions.FileCheck)
-                {
-                    target.CheckFiles = loaded.CheckFiles;
-                }
-
-                if (loaded.SaveOptions.DeleteFiles)
-                {
-                    target.DeleteFiles = loaded.DeleteFiles;
-                }
-
-                target.SaveOptions = loaded.SaveOptions;
                 target.SaveOptions.FileName = profileName;
                 return true;
             }
@@ -128,7 +130,7 @@ namespace WirePix.Core.Storage
 
         public bool IsValid(string profileName)
         {
-            var path = Path.Combine(_directory, profileName + ".xml");
+            string path = Path.Combine(_directory, profileName + ".xml");
             if (!File.Exists(path))
             {
                 return false;
@@ -136,7 +138,7 @@ namespace WirePix.Core.Storage
 
             try
             {
-                using var stream = File.OpenRead(path);
+                using FileStream stream = File.OpenRead(path);
                 using var reader = XmlReader.Create(stream);
                 return new XmlSerializer(typeof(DownloadSettings)).CanDeserialize(reader);
             }
@@ -148,13 +150,13 @@ namespace WirePix.Core.Storage
 
         public void Delete(string profileName)
         {
-            var path = Path.Combine(_directory, profileName + ".xml");
+            string path = Path.Combine(_directory, profileName + ".xml");
             if (File.Exists(path))
             {
                 File.Delete(path);
             }
         }
 
-        public string[] GetProfiles() => Directory.Exists(_directory) ? Directory.GetFiles(_directory, "*.xml") : Array.Empty<string>();
+        public string[] GetProfiles() => Directory.Exists(_directory) ? Directory.GetFiles(_directory, "*.xml") : [];
     }
 }

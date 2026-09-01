@@ -1,8 +1,8 @@
-﻿using MetadataExtractor;
-using MetadataExtractor.Formats.Exif;
-using System;
+﻿using System;
 using System.Globalization;
 using System.Linq;
+using MetadataExtractor;
+using MetadataExtractor.Formats.Exif;
 
 namespace WirePix.Core.Metadata
 {
@@ -12,18 +12,31 @@ namespace WirePix.Core.Metadata
         {
             try
             {
-                var directory = ImageMetadataReader.ReadMetadata(path).OfType<ExifSubIfdDirectory>().FirstOrDefault();
-                var value = directory?.GetDescription(ExifDirectoryBase.TagDateTimeOriginal);
+                ExifSubIfdDirectory directory = ImageMetadataReader.ReadMetadata(path)
+                                                                   .OfType<ExifSubIfdDirectory>()
+                                                                   .FirstOrDefault();
+                string value = directory?.GetDescription(ExifDirectoryBase.TagDateTimeOriginal);
                 return value == null ? default : DateTime.ParseExact(value, "yyyy:MM:dd HH:mm:ss", CultureInfo.InvariantCulture);
             }
-            catch { return default; }
+            catch
+            {
+                return default;
+            }
         }
+
         public static string GetManufacturer(string path) => GetDescription(path, d => d.GetDescription(ExifDirectoryBase.TagMake));
         public static string GetModel(string path) => GetDescription(path, d => d.GetDescription(ExifDirectoryBase.TagModel));
+
         private static string GetDescription(string path, Func<ExifIfd0Directory, string> selector)
         {
-            try { return selector(ImageMetadataReader.ReadMetadata(path).OfType<ExifIfd0Directory>().FirstOrDefault()); }
-            catch { return string.Empty; }
+            try
+            {
+                return selector(ImageMetadataReader.ReadMetadata(path).OfType<ExifIfd0Directory>().FirstOrDefault());
+            }
+            catch
+            {
+                return string.Empty;
+            }
         }
     }
 }

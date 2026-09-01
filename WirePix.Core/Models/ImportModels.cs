@@ -8,32 +8,34 @@ namespace WirePix.Core.Models
 {
     public enum DownloadSelect
     {
-        lastBackup,
-        dateRange
+        LastBackup,
+        DateRange
     }
 
     public enum ThumbnailSelect
     {
-        longerSide,
-        shorterSide
+        LongerSide,
+        ShorterSide
     }
 
     public sealed class PathStruct : ObservableObject
     {
         private string _root = string.Empty, _backup = string.Empty, _thumbnail = string.Empty;
-        private List<List<string>> _folderTags = new List<List<string>>();
-        private List<string> _fileTags = new List<string>();
+        private List<List<string>> _folderTags = [];
+        private List<string> _fileTags = [];
 
         public string Root
         {
             get => _root;
             set
             {
-                if (value != _root)
+                if (value == _root)
                 {
-                    _root = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                _root = value;
+                OnPropertyChanged();
             }
         }
 
@@ -42,11 +44,13 @@ namespace WirePix.Core.Models
             get => _folderTags;
             set
             {
-                if (value != _folderTags)
+                if (value == _folderTags)
                 {
-                    _folderTags = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                _folderTags = value;
+                OnPropertyChanged();
             }
         }
 
@@ -55,11 +59,13 @@ namespace WirePix.Core.Models
             get => _fileTags;
             set
             {
-                if (value != _fileTags)
+                if (value == _fileTags)
                 {
-                    _fileTags = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                _fileTags = value;
+                OnPropertyChanged();
             }
         }
 
@@ -68,11 +74,13 @@ namespace WirePix.Core.Models
             get => _backup;
             set
             {
-                if (value != _backup)
+                if (value == _backup)
                 {
-                    _backup = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                _backup = value;
+                OnPropertyChanged();
             }
         }
 
@@ -81,19 +89,19 @@ namespace WirePix.Core.Models
             get => _thumbnail;
             set
             {
-                if (value != _thumbnail)
+                if (value == _thumbnail)
                 {
-                    _thumbnail = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                _thumbnail = value;
+                OnPropertyChanged();
             }
         }
     }
 
     public sealed class DateRange : ObservableObject
     {
-        private DateTime _start, _end;
-
         public DateRange()
         {
             Start = End = DateTime.Now.Date;
@@ -101,27 +109,31 @@ namespace WirePix.Core.Models
 
         public DateTime Start
         {
-            get => _start;
+            get;
             set
             {
-                if (value != _start)
+                if (value == field)
                 {
-                    _start = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public DateTime End
         {
-            get => _end;
+            get;
             set
             {
-                if (value != _end)
+                if (value == field)
                 {
-                    _end = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
@@ -133,142 +145,156 @@ namespace WirePix.Core.Models
 
     public sealed class Thumbnails : ObservableObject
     {
-        private ThumbnailSelect _selected;
-        private int _value;
-
         public ThumbnailSelect Selected
         {
-            get => _selected;
+            get;
             set
             {
-                if (value != _selected)
+                if (value == field)
                 {
-                    _selected = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public int Value
         {
-            get => _value;
+            get;
             set
             {
-                if (value != _value)
+                if (value == field)
                 {
-                    _value = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
     }
 
     public sealed class SaveOptions : ObservableObject
     {
-        private string _fileName = string.Empty;
-        private bool _root, _folderStruct, _fileStruct, _backup, _thumbnails, _fileCheck, _deleteFiles;
-
         [XmlIgnore] public string FileName
         {
-            get => _fileName;
+            get;
             set
             {
-                if (value != _fileName)
+                if (value == field)
                 {
-                    _fileName = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
-        }
+        } = string.Empty;
 
         public bool Root
         {
-            get => _root;
+            get;
             set
             {
-                if (value != _root)
+                if (value == field)
                 {
-                    _root = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool FolderStruct
         {
-            get => _folderStruct;
+            get;
             set
             {
-                if (value != _folderStruct)
+                if (value == field)
                 {
-                    _folderStruct = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool FileStruct
         {
-            get => _fileStruct;
+            get;
             set
             {
-                if (value != _fileStruct)
+                if (value == field)
                 {
-                    _fileStruct = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool Backup
         {
-            get => _backup;
+            get;
             set
             {
-                if (value != _backup)
+                if (value == field)
                 {
-                    _backup = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool Thumbnails
         {
-            get => _thumbnails;
+            get;
             set
             {
-                if (value != _thumbnails)
+                if (value == field)
                 {
-                    _thumbnails = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool FileCheck
         {
-            get => _fileCheck;
+            get;
             set
             {
-                if (value != _fileCheck)
+                if (value == field)
                 {
-                    _fileCheck = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool DeleteFiles
         {
-            get => _deleteFiles;
+            get;
             set
             {
-                if (value != _deleteFiles)
+                if (value == field)
                 {
-                    _deleteFiles = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
@@ -277,90 +303,100 @@ namespace WirePix.Core.Models
 
     public sealed class DownloadSettings : ObservableObject
     {
-        private bool _checkFiles, _deleteFiles, _backup, _thumbnail;
-        private DownloadSelect _downloadSelect = DownloadSelect.lastBackup;
-        public PathStruct Paths { get; set; } = new PathStruct();
-        [XmlIgnore] public DateRange Date { get; set; } = new DateRange();
-        public Thumbnails ThumbnailSettings { get; set; } = new Thumbnails();
-        public SaveOptions SaveOptions = new SaveOptions();
+        public PathStruct Paths { get; set; } = new();
+        [XmlIgnore] public DateRange Date { get; set; } = new();
+        public Thumbnails ThumbnailSettings { get; set; } = new();
+        public SaveOptions SaveOptions = new();
 
         public bool CheckFiles
         {
-            get => _checkFiles;
+            get;
             set
             {
-                if (value != _checkFiles)
+                if (value == field)
                 {
-                    _checkFiles = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool DeleteFiles
         {
-            get => _deleteFiles;
+            get;
             set
             {
-                if (value != _deleteFiles)
+                if (value == field)
                 {
-                    _deleteFiles = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool Backup
         {
-            get => _backup;
+            get;
             set
             {
-                if (value != _backup)
+                if (value == field)
                 {
-                    _backup = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         public bool Thumbnail
         {
-            get => _thumbnail;
+            get;
             set
             {
-                if (value != _thumbnail)
+                if (value == field)
                 {
-                    _thumbnail = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
         [XmlIgnore] public DownloadSelect DownloadSelect
         {
-            get => _downloadSelect;
+            get;
             set
             {
-                if (value != _downloadSelect)
+                if (value == field)
                 {
-                    _downloadSelect = value;
-                    OnPropertyChanged();
+                    return;
                 }
-            }
-        }
 
-        [XmlIgnore] public static string ProfileDirectory { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WirePix", "Profiles");
+                field = value;
+                OnPropertyChanged();
+            }
+        } = DownloadSelect.LastBackup;
+
+        [XmlIgnore]
+        public static string ProfileDirectory { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WirePix", "Profiles");
+
         public void Save(SaveOptions options = null) => new ProfileStore(ProfileDirectory).Save(SaveOptions.FileName, this, options);
         public bool Load(string profileName) => new ProfileStore(ProfileDirectory).Load(profileName, this);
-        public bool IsValid(string profileName) => new ProfileStore(ProfileDirectory).IsValid(profileName);
+        public static bool IsValid(string profileName) => new ProfileStore(ProfileDirectory).IsValid(profileName);
         public static void Delete(string profileName) => new ProfileStore(ProfileDirectory).Delete(profileName);
     }
 
     public sealed class DeviceInfo : ObservableObject
     {
-        private string _name = string.Empty, _originalName = string.Empty;
+        private string _name = string.Empty;
+        private string _originalName = string.Empty;
         private bool _connected;
-        private DateTime _lastBackup;
 
         public DeviceInfo()
         {
@@ -369,37 +405,44 @@ namespace WirePix.Core.Models
         public DeviceInfo(string name, string id, DateTime lastBackup = default, bool connected = false)
         {
             _originalName = _name = name;
-            ID = id;
+            Id = id;
             LastBackup = lastBackup;
             _connected = connected;
         }
 
-        public string ID { get; set; }
+        public string Id { get; set; }
 
         public string Name
         {
             get => _name;
             set
             {
-                if (value != _name)
+                if (value == _name)
                 {
-                    _name = value;
-                    OnPropertyChanged();
-                    if (_originalName == string.Empty) _originalName = _name;
+                    return;
+                }
+
+                _name = value;
+                OnPropertyChanged();
+                if (_originalName == string.Empty)
+                {
+                    _originalName = _name;
                 }
             }
         }
 
         public DateTime LastBackup
         {
-            get => _lastBackup;
+            get;
             set
             {
-                if (value != _lastBackup)
+                if (value == field)
                 {
-                    _lastBackup = value;
-                    OnPropertyChanged();
+                    return;
                 }
+
+                field = value;
+                OnPropertyChanged();
             }
         }
 
@@ -408,11 +451,16 @@ namespace WirePix.Core.Models
             get => _connected;
             set
             {
-                if (value != _connected)
+                if (value == _connected)
                 {
-                    _connected = value;
-                    OnPropertyChanged();
-                    if (!_connected && _name == string.Empty) _name = _originalName;
+                    return;
+                }
+
+                _connected = value;
+                OnPropertyChanged();
+                if (!_connected && _name == string.Empty)
+                {
+                    _name = _originalName;
                 }
             }
         }
