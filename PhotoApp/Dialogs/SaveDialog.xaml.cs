@@ -1,8 +1,8 @@
-﻿using WirePix.Core.Models;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using PhotoApp.Properties;
 
 namespace PhotoApp.Dialogs
 {
@@ -42,7 +42,7 @@ namespace PhotoApp.Dialogs
             {
                 tbError.Text = Properties.Resources.InvalidFilename;
             }
-            else if (File.Exists(Path.Combine(Application.Current.Resources[Properties.Keys.ProfilesFolder].ToString(), $"{tb.Text}.xml")))
+            else if (File.Exists(Path.Combine(Application.Current.Resources[Keys.ProfilesFolder].ToString(), $"{tb.Text}.xml")))
             {
                 tbError.Text = Properties.Resources.FileExists_Overwrite;
             }

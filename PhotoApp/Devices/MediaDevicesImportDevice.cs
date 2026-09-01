@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using MediaDevices;
-using WirePix.Core.Import;
+using WirePix.Core.Import.Contracts;
 
 namespace PhotoApp.Devices
 {

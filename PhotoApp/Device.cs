@@ -9,7 +9,8 @@ using MediaDevices;
 using PhotoApp.Devices;
 using PhotoApp.Properties;
 using WirePix.Core.Import;
-using WirePix.Core.Naming;
+using WirePix.Core.Import.Contracts;
+using WirePix.Core.Naming.Templates;
 
 namespace PhotoApp
 {

@@ -5,10 +5,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WirePix.Core.Files;
-using WirePix.Core.Models;
-using WirePix.Core.Naming;
-using WirePix.Core.Storage;
+using WirePix.Core.Import.Contracts;
+using WirePix.Core.Models.Settings;
+using WirePix.Core.Naming.Templates;
 using WirePix.Core.Imaging;
+using WirePix.Core.Logging;
 
 namespace WirePix.Core.Import
 {

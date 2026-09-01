@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using ImageMagick;
-using WirePix.Core.Models;
+using WirePix.Core.Models.Settings;
 
 namespace WirePix.Core.Imaging
 {

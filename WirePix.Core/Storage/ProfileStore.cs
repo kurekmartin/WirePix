@@ -2,7 +2,7 @@
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using WirePix.Core.Models;
+using WirePix.Core.Models.Settings;
 
 namespace WirePix.Core.Storage
 {
