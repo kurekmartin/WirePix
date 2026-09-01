@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Windows.Data;
 
-namespace PhotoApp
-{
-    public class EnumCompare : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return value?.Equals(parameter);
-        }
+namespace PhotoApp;
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
-        {
-            return value?.Equals(true) == true ? parameter : Binding.DoNothing;
-        }
+public class EnumCompare : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+        return value?.Equals(parameter);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+        return value?.Equals(true) == true ? parameter : Binding.DoNothing;
     }
 }

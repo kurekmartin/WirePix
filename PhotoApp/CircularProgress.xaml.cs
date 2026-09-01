@@ -1,15 +1,14 @@
 ﻿using System.Windows.Controls;
 
-namespace PhotoApp
+namespace PhotoApp;
+
+/// <summary>
+/// Interakční logika pro CircularProgress.xaml
+/// </summary>
+public partial class CircularProgress : UserControl
 {
-    /// <summary>
-    /// Interakční logika pro CircularProgress.xaml
-    /// </summary>
-    public partial class CircularProgress : UserControl
+    public CircularProgress()
     {
-        public CircularProgress()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

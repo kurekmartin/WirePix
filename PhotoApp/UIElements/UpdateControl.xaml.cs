@@ -10,135 +10,134 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace PhotoApp.UIElements
+namespace PhotoApp.UIElements;
+
+public partial class UpdateControl : UserControl, INotifyPropertyChanged
 {
-    public partial class UpdateControl : UserControl, INotifyPropertyChanged
+    private string _versionInfo = "";
+    private string _error = "";
+    private Release _release;
+    public Release Release
     {
-        private string _versionInfo = "";
-        private string _error = "";
-        private Release _release;
-        public Release Release
+        set
         {
-            set
+            if (value != null)
             {
-                if (value != null)
-                {
-                    _release = value;
-                    spDownloadUpdate.Visibility = Visibility.Visible;
-                }
+                _release = value;
+                spDownloadUpdate.Visibility = Visibility.Visible;
             }
         }
-        public string VersionInfo
+    }
+    public string VersionInfo
+    {
+        get => _versionInfo;
+        set
         {
-            get => _versionInfo;
-            set
+            _versionInfo = value;
+            OnPropertyChanged();
+        }
+    }
+    public string Error
+    {
+        get => _error;
+        set
+        {
+            if (value != null)
             {
-                _versionInfo = value;
+                _error = value;
                 OnPropertyChanged();
             }
         }
-        public string Error
+    }
+    public bool Downloading { get; private set; } = false;
+    private static readonly string _tmpFolder = System.Windows.Application.Current.Resources[Properties.Keys.TempFolder].ToString();
+    private string downloadFile;
+    private WebClient WebClient = new WebClient();
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    public event EventHandler DownloadingChanged;
+    private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    public UpdateControl()
+    {
+        InitializeComponent();
+        DataContext = this;
+        WebClient.DownloadFileCompleted += WebClient_DownloadFileCompleted;
+    }
+
+    private void WebClient_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+    {
+        if (e.Cancelled)
         {
-            get => _error;
-            set
+            var file = new FileInfo(downloadFile);
+            if (file.Exists)
             {
-                if (value != null)
-                {
-                    _error = value;
-                    OnPropertyChanged();
-                }
+                file.Delete();
             }
         }
-        public bool Downloading { get; private set; } = false;
-        private static readonly string _tmpFolder = System.Windows.Application.Current.Resources[Properties.Keys.TempFolder].ToString();
-        private string downloadFile;
-        private WebClient WebClient = new WebClient();
+    }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public event EventHandler DownloadingChanged;
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    private async void btnAutoUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        Error = "";
+        if (_release != null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public UpdateControl()
-        {
-            InitializeComponent();
-            DataContext = this;
-            WebClient.DownloadFileCompleted += WebClient_DownloadFileCompleted;
-        }
-
-        private void WebClient_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            if (e.Cancelled)
+            if (!Downloading)
             {
-                var file = new FileInfo(downloadFile);
-                if (file.Exists)
+                SetDownloadingStatus(true);
+                var asset = _release.Assets.FirstOrDefault(a => a.Name.EndsWith(".msi"));
+                downloadFile = Path.Combine(_tmpFolder, asset.Name);
+
+                MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(btnAutoUpdate, true);
+                try
                 {
-                    file.Delete();
+                    await WebClient.DownloadFileTaskAsync(new Uri(asset.BrowserDownloadUrl), downloadFile);
                 }
-            }
-        }
-
-        private async void btnAutoUpdate_Click(object sender, RoutedEventArgs e)
-        {
-            Error = "";
-            if (_release != null)
-            {
-                if (!Downloading)
+                catch (WebException ex)
                 {
-                    SetDownloadingStatus(true);
-                    var asset = _release.Assets.FirstOrDefault(a => a.Name.EndsWith(".msi"));
-                    downloadFile = Path.Combine(_tmpFolder, asset.Name);
-
-                    MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(btnAutoUpdate, true);
-                    try
+                    if (ex.Status != WebExceptionStatus.RequestCanceled)
                     {
-                        await WebClient.DownloadFileTaskAsync(new Uri(asset.BrowserDownloadUrl), downloadFile);
-                    }
-                    catch (WebException ex)
-                    {
-                        if (ex.Status != WebExceptionStatus.RequestCanceled)
-                        {
-                            Error = ex.Message;
-                        }
-                    }
-
-                    SetDownloadingStatus(false);
-                    MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(btnAutoUpdate, false);
-
-                    if (File.Exists(downloadFile))
-                    {
-                        ShellLauncher.Open(downloadFile);
-                        System.Windows.Application.Current.Shutdown();
+                        Error = ex.Message;
                     }
                 }
-                else
-                {
-                    SetDownloadingStatus(false);
-                    WebClient.CancelAsync();
-                }
-            }
-        }
-        private void btnManualUpdate_Click(object sender, RoutedEventArgs e)
-        {
-            ShellLauncher.Open(_release.HtmlUrl);
-        }
 
-        private void SetDownloadingStatus(bool status)
-        {
-            Downloading = status;
-            DownloadingChanged(this, EventArgs.Empty);
-            if (status)
-            {
-                btnAutoUpdateIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.CancelCircleOutline;
-                btnAutoUpdateText.Text = "Zrušit";
+                SetDownloadingStatus(false);
+                MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(btnAutoUpdate, false);
+
+                if (File.Exists(downloadFile))
+                {
+                    ShellLauncher.Open(downloadFile);
+                    System.Windows.Application.Current.Shutdown();
+                }
             }
             else
             {
-                btnAutoUpdateIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.DownloadCircleOutline;
-                btnAutoUpdateText.Text = "Nainstalovat";
+                SetDownloadingStatus(false);
+                WebClient.CancelAsync();
             }
+        }
+    }
+    private void btnManualUpdate_Click(object sender, RoutedEventArgs e)
+    {
+        ShellLauncher.Open(_release.HtmlUrl);
+    }
+
+    private void SetDownloadingStatus(bool status)
+    {
+        Downloading = status;
+        DownloadingChanged(this, EventArgs.Empty);
+        if (status)
+        {
+            btnAutoUpdateIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.CancelCircleOutline;
+            btnAutoUpdateText.Text = "Zrušit";
+        }
+        else
+        {
+            btnAutoUpdateIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.DownloadCircleOutline;
+            btnAutoUpdateText.Text = "Nainstalovat";
         }
     }
 }

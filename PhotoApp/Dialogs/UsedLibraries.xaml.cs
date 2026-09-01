@@ -14,46 +14,45 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PhotoApp.Dialogs
+namespace PhotoApp.Dialogs;
+
+/// <summary>
+/// Interaction logic for UsedLibraries.xaml
+/// </summary>
+public partial class UsedLibraries : UserControl
 {
-    /// <summary>
-    /// Interaction logic for UsedLibraries.xaml
-    /// </summary>
-    public partial class UsedLibraries : UserControl
+    public UsedLibraries()
     {
-        public UsedLibraries()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
+    }
 
-        private void btnMagickNET_Click(object sender, RoutedEventArgs e)
-        {
-            ShellLauncher.Open("https://github.com/dlemstra/Magick.NET");
-        }
+    private void btnMagickNET_Click(object sender, RoutedEventArgs e)
+    {
+        ShellLauncher.Open("https://github.com/dlemstra/Magick.NET");
+    }
 
-        private void btnMaterialDesign_Click(object sender, RoutedEventArgs e)
-        {
-            ShellLauncher.Open("https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit");
-        }
+    private void btnMaterialDesign_Click(object sender, RoutedEventArgs e)
+    {
+        ShellLauncher.Open("https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit");
+    }
 
-        private void btnMetadataExtractor_Click(object sender, RoutedEventArgs e)
-        {
-            ShellLauncher.Open("https://github.com/drewnoakes/metadata-extractor-dotnet");
-        }
+    private void btnMetadataExtractor_Click(object sender, RoutedEventArgs e)
+    {
+        ShellLauncher.Open("https://github.com/drewnoakes/metadata-extractor-dotnet");
+    }
 
-        private void btnOctokit_Click(object sender, RoutedEventArgs e)
-        {
-            ShellLauncher.Open("https://github.com/octokit/octokit.net");
-        }
+    private void btnOctokit_Click(object sender, RoutedEventArgs e)
+    {
+        ShellLauncher.Open("https://github.com/octokit/octokit.net");
+    }
 
-        private void btnUsbEvents_Click(object sender, RoutedEventArgs e)
-        {
-            ShellLauncher.Open("https://github.com/Jinjinov/Usb.Events");
-        }
+    private void btnUsbEvents_Click(object sender, RoutedEventArgs e)
+    {
+        ShellLauncher.Open("https://github.com/Jinjinov/Usb.Events");
+    }
 
-        private void btnMediaDevices_Click(object sender, RoutedEventArgs e)
-        {
-            ShellLauncher.Open("https://github.com/Bassman2/MediaDevices");
-        }
+    private void btnMediaDevices_Click(object sender, RoutedEventArgs e)
+    {
+        ShellLauncher.Open("https://github.com/Bassman2/MediaDevices");
     }
 }

@@ -1,16 +1,15 @@
 using System.Diagnostics;
 
-namespace PhotoApp
+namespace PhotoApp;
+
+internal static class ShellLauncher
 {
-    internal static class ShellLauncher
+    public static void Open(string target)
     {
-        public static void Open(string target)
+        Process.Start(new ProcessStartInfo
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = target,
-                UseShellExecute = true
-            });
-        }
+            FileName = target,
+            UseShellExecute = true
+        });
     }
 }

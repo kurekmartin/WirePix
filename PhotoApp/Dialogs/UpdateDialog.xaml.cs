@@ -14,39 +14,38 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace PhotoApp.Dialogs
+namespace PhotoApp.Dialogs;
+
+/// <summary>
+/// Interaction logic for UpdateDialog.xaml
+/// </summary>
+public partial class UpdateDialog : UserControl
 {
-    /// <summary>
-    /// Interaction logic for UpdateDialog.xaml
-    /// </summary>
-    public partial class UpdateDialog : UserControl
+    private MainWindow mainWindow;
+    public UpdateDialog(MainWindow window, Release release)
     {
-        private MainWindow mainWindow;
-        public UpdateDialog(MainWindow window, Release release)
-        {
-            InitializeComponent();
-            mainWindow = window;
-            var version = Version.Parse(release.TagName.Replace("v", ""));
-            ucUpdate.VersionInfo = $"{Properties.Resources.Update_NewVersionAvailable} ({version})";
-            ucUpdate.Release = release;
-            ucUpdate.DownloadingChanged += UcUpdate_DownloadingChanged;
-        }
+        InitializeComponent();
+        mainWindow = window;
+        var version = Version.Parse(release.TagName.Replace("v", ""));
+        ucUpdate.VersionInfo = $"{Properties.Resources.Update_NewVersionAvailable} ({version})";
+        ucUpdate.Release = release;
+        ucUpdate.DownloadingChanged += UcUpdate_DownloadingChanged;
+    }
 
-        private void UcUpdate_DownloadingChanged(object sender, EventArgs e)
+    private void UcUpdate_DownloadingChanged(object sender, EventArgs e)
+    {
+        if (ucUpdate.Downloading)
         {
-            if (ucUpdate.Downloading)
-            {
-                btnOK.IsEnabled = false;
-            }
-            else
-            {
-                btnOK.IsEnabled = true;
-            }
+            btnOK.IsEnabled = false;
         }
+        else
+        {
+            btnOK.IsEnabled = true;
+        }
+    }
 
-        private void btnOK_Click(object sender, RoutedEventArgs e)
-        {
-            mainWindow.DialogClose(this, null);
-        }
+    private void btnOK_Click(object sender, RoutedEventArgs e)
+    {
+        mainWindow.DialogClose(this, null);
     }
 }
