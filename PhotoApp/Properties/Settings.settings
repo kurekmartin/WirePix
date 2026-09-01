@@ -1,33 +1,33 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="PhotoApp.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="MaxTags" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">6</Value>
-    </Setting>
-    <Setting Name="DarkMode" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="CheckUpdateOnStartup" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-    <Setting Name="Language" Type="System.String" Scope="User">
-      <Value Profile="(Default)">system</Value>
-    </Setting>
-    <Setting Name="LastVersion" Type="System.String" Scope="User">
-      <Value Profile="(Default)">0.5.0</Value>
-    </Setting>
-    <Setting Name="MaxLogs" Type="System.Int32" Scope="Application">
-      <Value Profile="(Default)">50</Value>
-    </Setting>
-    <Setting Name="TagLanguage" Type="System.String" Scope="User">
-      <Value Profile="(Default)">system</Value>
-    </Setting>
-    <Setting Name="UseDifferentLangForTags" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
-    </Setting>
-    <Setting Name="UpdateSettings" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">True</Value>
-    </Setting>
-  </Settings>
+    <Profiles/>
+    <Settings>
+        <Setting Name="MaxTags" Type="System.Int32" Scope="Application">
+            <Value Profile="(Default)">6</Value>
+        </Setting>
+        <Setting Name="DarkMode" Type="System.Boolean" Scope="User">
+            <Value Profile="(Default)">False</Value>
+        </Setting>
+        <Setting Name="CheckUpdateOnStartup" Type="System.Boolean" Scope="User">
+            <Value Profile="(Default)">True</Value>
+        </Setting>
+        <Setting Name="Language" Type="System.String" Scope="User">
+            <Value Profile="(Default)">system</Value>
+        </Setting>
+        <Setting Name="LastVersion" Type="System.String" Scope="User">
+            <Value Profile="(Default)">0.5.0</Value>
+        </Setting>
+        <Setting Name="MaxLogs" Type="System.Int32" Scope="Application">
+            <Value Profile="(Default)">50</Value>
+        </Setting>
+        <Setting Name="TagLanguage" Type="System.String" Scope="User">
+            <Value Profile="(Default)">system</Value>
+        </Setting>
+        <Setting Name="UseDifferentLangForTags" Type="System.Boolean" Scope="User">
+            <Value Profile="(Default)">False</Value>
+        </Setting>
+        <Setting Name="UpdateSettings" Type="System.Boolean" Scope="User">
+            <Value Profile="(Default)">True</Value>
+        </Setting>
+    </Settings>
 </SettingsFile>

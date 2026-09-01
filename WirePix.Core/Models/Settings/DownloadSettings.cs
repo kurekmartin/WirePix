@@ -88,10 +88,25 @@ public sealed class DownloadSettings : ObservableObject
     } = DownloadSelect.LastBackup;
 
     [XmlIgnore]
-    public static string ProfileDirectory { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "WirePix", "Profiles");
+    public static string ProfileDirectory { get; set; } = Path.Combine(path1: Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData), path2: "WirePix", path3: "Profiles");
 
-    public void Save(SaveOptions options = null) => new ProfileStore(ProfileDirectory).Save(SaveOptions.FileName, this, options);
-    public bool Load(string profileName) => new ProfileStore(ProfileDirectory).Load(profileName, this);
-    public static bool IsValid(string profileName) => new ProfileStore(ProfileDirectory).IsValid(profileName);
-    public static void Delete(string profileName) => new ProfileStore(ProfileDirectory).Delete(profileName);
+    public void Save(SaveOptions options = null)
+    {
+        new ProfileStore(directory: ProfileDirectory).Save(profileName: SaveOptions.FileName, settings: this, options: options);
+    }
+
+    public bool Load(string profileName)
+    {
+        return new ProfileStore(directory: ProfileDirectory).Load(profileName: profileName, target: this);
+    }
+
+    public static bool IsValid(string profileName)
+    {
+        return new ProfileStore(directory: ProfileDirectory).IsValid(profileName: profileName);
+    }
+
+    public static void Delete(string profileName)
+    {
+        new ProfileStore(directory: ProfileDirectory).Delete(profileName: profileName);
+    }
 }

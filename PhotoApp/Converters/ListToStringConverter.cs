@@ -5,12 +5,12 @@ using System.Windows.Data;
 
 namespace PhotoApp.Converters;
 
-class ListToStringConverter : IValueConverter
+internal class ListToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        List<string> list = (List<string>)value;
-        return string.Join("\n", list.ToArray());
+        var list = (List<string>)value;
+        return string.Join(separator: "\n", value: list.ToArray());
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

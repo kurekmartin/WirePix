@@ -29,9 +29,9 @@ public sealed class Device
 
     public Device(MediaDevice mediaDevice)
     {
-        _source = new MediaDevicesImportDevice(mediaDevice);
+        _source = new MediaDevicesImportDevice(device: mediaDevice);
         ResourceDictionary resources = Application.Current.Resources;
-        _coordinator = new ImportCoordinator(resources[Keys.TempFolder].ToString(), resources[Keys.LogsFolder].ToString());
+        _coordinator = new ImportCoordinator(tempFolder: resources[key: Keys.TempFolder].ToString(), logFolder: resources[key: Keys.LogsFolder].ToString());
     }
 
     public string Id => _source.Id;
@@ -55,12 +55,12 @@ public sealed class Device
         }
     }
 
-    public int FileSearchStatus => _plan == null ? DEVICE_FILES_SEARCHING : (_plan.Files.Count > 0 ? DEVICE_FILES_READY : DEVICE_FILES_ERROR);
+    public int FileSearchStatus => _plan == null ? DEVICE_FILES_SEARCHING : _plan.Files.Count > 0 ? DEVICE_FILES_READY : DEVICE_FILES_ERROR;
 
     public List<string> MediaDirectories =>
     [
         .. _source.GetDrives()
-                  .Select(x => x.RootPath)
+                  .Select(selector: x => x.RootPath)
     ];
 
     public double[] Space
@@ -89,7 +89,11 @@ public sealed class Device
         try
         {
             _source.Connect();
-            foreach (ImportDrive drive in _source.GetDrives()) CollectTypes(drive.RootPath);
+            foreach (ImportDrive drive in _source.GetDrives())
+            {
+                CollectTypes(path: drive.RootPath);
+            }
+
             _source.Disconnect();
         }
         catch
@@ -102,16 +106,19 @@ public sealed class Device
 
     private void CollectTypes(string path)
     {
-        foreach (ImportFile file in _source.EnumerateFiles(path) ?? [])
+        foreach (ImportFile file in _source.EnumerateFiles(path: path) ?? [])
         {
-            string ext = Path.GetExtension(file.Name).ToUpperInvariant();
-            if (!_fileTypes.Contains(ext))
+            string ext = Path.GetExtension(path: file.Name).ToUpperInvariant();
+            if (!_fileTypes.Contains(item: ext))
             {
-                _fileTypes.Add(ext);
+                _fileTypes.Add(item: ext);
             }
         }
 
-        foreach (string child in _source.EnumerateDirectories(path) ?? []) CollectTypes(child);
+        foreach (string child in _source.EnumerateDirectories(path: path) ?? [])
+        {
+            CollectTypes(path: child);
+        }
     }
 
     public int FilesToDownload => FilesToCopyCount;
@@ -120,9 +127,9 @@ public sealed class Device
     {
         try
         {
-            _plan = ImportCoordinator.CreatePlanAsync(_source, settings, new Progress<ImportProgress>(p => Report(worker, p)), CancellationToken.None).GetAwaiter().GetResult();
+            _plan = ImportCoordinator.CreatePlanAsync(device: _source, settings: settings, progress: new Progress<ImportProgress>(handler: p => Report(worker: worker, p: p)), cancellationToken: CancellationToken.None).GetAwaiter().GetResult();
             FilesTotal = _plan.Files.Count;
-            e.Result = new WorkerResult(MainWindow.RESULT_OK, TaskType.FindFiles);
+            e.Result = new WorkerResult(code: MainWindow.RESULT_OK, task: TaskType.FindFiles);
         }
         catch (OperationCanceledException)
         {
@@ -130,7 +137,7 @@ public sealed class Device
         }
         catch
         {
-            e.Result = new WorkerResult(MainWindow.RESULT_ERROR, TaskType.FindFiles);
+            e.Result = new WorkerResult(code: MainWindow.RESULT_ERROR, task: TaskType.FindFiles);
         }
     }
 
@@ -140,7 +147,7 @@ public sealed class Device
         {
             if (_plan == null || _plan.Date != settings.Date)
             {
-                GetFilesByDate(worker, e, settings);
+                GetFilesByDate(worker: worker, e: e, settings: settings);
             }
 
             if (e.Cancel)
@@ -148,11 +155,11 @@ public sealed class Device
                 return;
             }
 
-            ImportResult result = _coordinator.ExecuteAsync(_source, _plan, settings, new NamingContext(), new Progress<ImportProgress>(p => Report(worker, p))).GetAwaiter().GetResult();
+            ImportResult result = _coordinator.ExecuteAsync(device: _source, plan: _plan, settings: settings, naming: new NamingContext(), progress: new Progress<ImportProgress>(handler: p => Report(worker: worker, p: p))).GetAwaiter().GetResult();
             FilesDoneCount = result.FilesDone;
             Errors = result.Errors;
             FilesTotal = result.FilesTotal;
-            e.Result = new WorkerResult(MainWindow.RESULT_OK, TaskType.CopyFiles);
+            e.Result = new WorkerResult(code: MainWindow.RESULT_OK, task: TaskType.CopyFiles);
         }
         catch (OperationCanceledException)
         {
@@ -160,7 +167,7 @@ public sealed class Device
         }
         catch
         {
-            e.Result = new WorkerResult(MainWindow.RESULT_ERROR, TaskType.CopyFiles);
+            e.Result = new WorkerResult(code: MainWindow.RESULT_ERROR, task: TaskType.CopyFiles);
         }
     }
 
@@ -180,18 +187,18 @@ public sealed class Device
             ImportStage.Deleting => Resources.DeviceDeletingFilesTask,
             _ => Resources.DeviceSortingFile
         };
-        worker.ReportProgress(p.Total == 0
+        worker.ReportProgress(percentProgress: p.Total == 0
                 ? 0
                 : p.Completed * 100 / p.Total,
-            new ProgressUpdateArgs
+            userState: new ProgressUpdateArgs
             {
                 taskName = task,
                 currentTask = p.CurrentFile ?? string.Empty,
                 progressText = p.Total == 0
                     ? string.Empty
-                    : string.Format(Resources.DeviceFilesDoneCount,
-                        p.Completed,
-                        p.Total),
+                    : string.Format(format: Resources.DeviceFilesDoneCount,
+                        arg0: p.Completed,
+                        arg1: p.Total),
                 indeterminateTask = p.Total == 0
             });
     }

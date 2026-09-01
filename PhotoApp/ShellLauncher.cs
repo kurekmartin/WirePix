@@ -6,7 +6,7 @@ internal static class ShellLauncher
 {
     public static void Open(string target)
     {
-        Process.Start(new ProcessStartInfo
+        Process.Start(startInfo: new ProcessStartInfo
         {
             FileName = target,
             UseShellExecute = true

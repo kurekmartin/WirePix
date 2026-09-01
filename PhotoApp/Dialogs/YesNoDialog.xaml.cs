@@ -12,6 +12,7 @@ public partial class YesNoDialog : UserControl
     public static int RESULT_YES = 1;
     public static int RESULT_NO = 0;
     private MainWindow _mainWindow;
+
     public YesNoDialog(MainWindow window, string text, int requestCode)
     {
         InitializeComponent();
@@ -22,6 +23,6 @@ public partial class YesNoDialog : UserControl
 
     private void btnYes_Click(object sender, RoutedEventArgs e)
     {
-        _mainWindow.DialogClose(this, RESULT_YES, MainWindow.RESULT_OK, _requestCode);
+        _mainWindow.DialogClose(sender: this, result: RESULT_YES, resultCode: MainWindow.RESULT_OK, requestCode: _requestCode);
     }
 }

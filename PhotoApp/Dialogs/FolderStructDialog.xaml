@@ -1,24 +1,23 @@
 ﻿<UserControl x:Class="PhotoApp.Dialogs.FolderStructDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PhotoApp.Dialogs"
-             xmlns:p ="clr-namespace:PhotoApp.Properties"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:p="clr-namespace:PhotoApp.Properties"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:PhotoApp.Converters"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <converters:TagToValue x:Key="TagToValueConverter"/>
-        <converters:IndexToMargin x:Key="IndexToMarginConverter"/>
-        <converters:TagCodeToLabel x:Key="CodeToLabelConverter"/>
-        <CollectionViewSource x:Key="folderStructure" Source="{Binding Path=FolderStructure}" />
+        <converters:TagToValue x:Key="TagToValueConverter" />
+        <converters:IndexToMargin x:Key="IndexToMarginConverter" />
+        <converters:TagCodeToLabel x:Key="CodeToLabelConverter" />
     </UserControl.Resources>
 
     <materialDesign:Card>
         <StackPanel Orientation="Vertical">
             <materialDesign:ColorZone Mode="PrimaryMid" CornerRadius="5,5,0,0">
-                <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Text="{x:Static p:Resources.FolderStructure}" Padding="5" TextAlignment="Center"/>
+                <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                           Text="{x:Static p:Resources.FolderStructure}" Padding="5" TextAlignment="Center" />
             </materialDesign:ColorZone>
 
             <StackPanel Margin="15,20">
@@ -26,39 +25,42 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                   Text="{x:Static p:Resources.Tags}" VerticalAlignment="Center"
-                                   Padding="5,12"/>
-                            <ListBox ItemsSource="{Binding SelectedFolder.Tags}" d:ItemsSource="{d:SampleData ItemCount=3}"
-                                 Style="{StaticResource MaterialDesignChoiceChipPrimaryOutlineListBox}"
-                                 SelectionChanged="TagSelectionChanged"
-                                 SelectedIndex="{Binding SelectedTagIndex, Mode=TwoWay}"
-                                 VerticalAlignment="Center">
+                                       Text="{x:Static p:Resources.Tags}" VerticalAlignment="Center"
+                                       Padding="5,12" />
+                            <ListBox ItemsSource="{Binding SelectedFolder.Tags}"
+                                     d:ItemsSource="{d:SampleData ItemCount=3}"
+                                     Style="{StaticResource MaterialDesignChoiceChipPrimaryOutlineListBox}"
+                                     SelectionChanged="TagSelectionChanged"
+                                     SelectedIndex="{Binding SelectedTagIndex, Mode=TwoWay}"
+                                     VerticalAlignment="Center">
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding .,Converter={StaticResource CodeToLabelConverter}}"
-                                               Margin="5,0"/>
+                                                   Margin="5,0" />
                                     </DataTemplate>
                                 </ListBox.ItemTemplate>
                             </ListBox>
                         </StackPanel>
-                        <StackPanel x:Name="spFileName" Visibility="Visible" d:Visibility="Visible" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5">
-                            <materialDesign:PackIcon 
-                                Kind="FolderOutline" 
-                                VerticalAlignment="Center" 
-                                Width="22" 
+                        <StackPanel x:Name="spFileName" Visibility="Visible" d:Visibility="Visible"
+                                    Orientation="Horizontal" VerticalAlignment="Center" Margin="0,5">
+                            <materialDesign:PackIcon
+                                Kind="FolderOutline"
+                                VerticalAlignment="Center"
+                                Width="22"
                                 Height="22"
-                                Margin="5,0"/>
-                            <ItemsControl ItemsSource="{Binding SelectedFolder.Tags}" d:ItemsSource="{d:SampleData ItemCount=3}">
+                                Margin="5,0" />
+                            <ItemsControl ItemsSource="{Binding SelectedFolder.Tags}"
+                                          d:ItemsSource="{d:SampleData ItemCount=3}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal"/>
+                                        <StackPanel Orientation="Horizontal" />
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding ., Converter={StaticResource TagToValueConverter}}"
                                                    Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                                   VerticalAlignment="Center"/>
+                                                   VerticalAlignment="Center" />
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -67,15 +69,18 @@
                 </materialDesign:Card>
 
                 <StackPanel HorizontalAlignment="Center">
-                    <StackPanel x:Name="spControls" Orientation="Horizontal" Grid.Column="0" Grid.Row="1" MinHeight="50">
-                        <Button x:Name="btnDeleteTag" Content="{x:Static p:Resources.TagDelete}" Height="Auto" VerticalAlignment="Center" Margin="5,7" Click="btnDeleteTag_Click"/>
-                        <Button x:Name="btnDeleteFolder" Content="{x:Static p:Resources.FolderDelete}" Height="Auto" VerticalAlignment="Center" Margin="5,0" Click="btnDeleteFolder_Click"/>
-                        <ComboBox x:Name="cbGroupSelect" Width="Auto" Margin="20,0" VerticalAlignment="Center" SelectionChanged="ComboBox_SelectionChanged"
+                    <StackPanel x:Name="spControls" Orientation="Horizontal" MinHeight="50">
+                        <Button x:Name="btnDeleteTag" Content="{x:Static p:Resources.TagDelete}" Height="Auto"
+                                VerticalAlignment="Center" Margin="5,7" Click="btnDeleteTag_Click" />
+                        <Button x:Name="btnDeleteFolder" Content="{x:Static p:Resources.FolderDelete}" Height="Auto"
+                                VerticalAlignment="Center" Margin="5,0" Click="btnDeleteFolder_Click" />
+                        <ComboBox x:Name="cbGroupSelect" Width="Auto" Margin="20,0" VerticalAlignment="Center"
+                                  SelectionChanged="ComboBox_SelectionChanged"
                                   d:ItemsSource="{d:SampleData}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding ButtonLabel}"
-                                               Tag="{Binding Code}"/>
+                                               Tag="{Binding Code}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
                         </ComboBox>
@@ -86,49 +91,49 @@
                                  VerticalAlignment="Center"
                                  materialDesign:HintAssist.Hint="{x:Static p:Resources.TagCustomText}"
                                  PreviewTextInput="tbCustomText_PreviewTextInput"
-                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}" 
+                                 Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                  TextChanged="tbCustomText_TextChanged"
-                                 MinWidth="100"/>
+                                 MinWidth="100" />
                     </StackPanel>
                     <TextBlock x:Name="tbControlsError"
                                Style="{StaticResource MaterialDesignBody2TextBlock}"
                                Foreground="Red"
                                d:Text="Error"
-                               Margin="5,12,5,0"/>
+                               Margin="5,12,5,0" />
 
 
                     <Grid x:Name="grdMain" HorizontalAlignment="Center" Margin="0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <ItemsControl ItemsSource="{Binding Buttons}" d:ItemsSource="{d:SampleData ItemCount=4}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Columns="{Binding ButtonGridSize.X}" 
+                                    <UniformGrid Columns="{Binding ButtonGridSize.X}"
                                                  Rows="{Binding ButtonGridSize.Y}"
                                                  VerticalAlignment="Top"
-                                                 HorizontalAlignment="Stretch"/>
+                                                 HorizontalAlignment="Stretch" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <GroupBox Header="{Binding groupName}"
-                                          Margin="5">
+                                              Margin="5">
                                         <ItemsControl ItemsSource="{Binding buttons}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
                                                     <StackPanel Orientation="Horizontal"
-                                                            HorizontalAlignment="Center"/>
+                                                                HorizontalAlignment="Center" />
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
                                                     <Button Content="{Binding btnText}"
-                                                        Tag="{Binding insertValue}"
-                                                        Click="Button_Click"
-                                                        Height="Auto"
-                                                        Margin="5,0"/>
+                                                            Tag="{Binding insertValue}"
+                                                            Click="Button_Click"
+                                                            Height="Auto"
+                                                            Margin="5,0" />
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -139,7 +144,7 @@
                         <ListBox ItemsSource="{Binding FolderStructure}" d:ItemsSource="{d:SampleData ItemCount=5}"
                                  SelectedIndex="{Binding SelectedFolderIndex, Mode=TwoWay}"
                                  SelectionChanged="FolderSelectionChanged"
-                                 Grid.Column="1"                                  
+                                 Grid.Column="1"
                                  Grid.Row="1"
                                  HorizontalAlignment="Left"
                                  VerticalAlignment="Top"
@@ -149,19 +154,20 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
                                         <materialDesign:PackIcon Kind="FolderOutline"
-                                                                 Margin="{Binding Index, Converter={StaticResource IndexToMarginConverter}}"/>
+                                                                 Margin="{Binding Index, Converter={StaticResource IndexToMarginConverter}}" />
                                         <ItemsControl ItemsSource="{Binding Tags}">
                                             <ItemsControl.ItemsPanel>
                                                 <ItemsPanelTemplate>
-                                                    <StackPanel Orientation="Horizontal" 
-                                                                Margin="5,0"/>
+                                                    <StackPanel Orientation="Horizontal"
+                                                                Margin="5,0" />
                                                 </ItemsPanelTemplate>
                                             </ItemsControl.ItemsPanel>
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
-                                                    <TextBlock Text="{Binding ., Converter={StaticResource TagToValueConverter}}"
-                                                               Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock
+                                                        Text="{Binding ., Converter={StaticResource TagToValueConverter}}"
+                                                        Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                                        VerticalAlignment="Center" />
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
@@ -172,28 +178,31 @@
                                 <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
                                     <Style.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="{StaticResource PrimaryHueMidBrush}"/>
+                                            <Setter Property="Background" Value="{StaticResource PrimaryHueMidBrush}" />
                                         </Trigger>
                                     </Style.Triggers>
                                     <Style.Resources>
-                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="Transparent"/>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                                         Color="Transparent" />
                                     </Style.Resources>
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>
                     </Grid>
-                    <TextBlock x:Name="tbError" Text="" Margin="15,5,15,0" Foreground="#DDC90000" Style="{StaticResource MaterialDesignBody2TextBlock}"/>
+                    <TextBlock x:Name="tbError" Text="" Margin="15,5,15,0" Foreground="#DDC90000"
+                               Style="{StaticResource MaterialDesignBody2TextBlock}" />
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button x:Name="btnCancel" 
-                                Content="{x:Static p:Resources.Cancel}" 
-                                Margin="15,5" 
-                                Click="btnCancel_Click" 
+                        <Button x:Name="btnCancel"
+                                Content="{x:Static p:Resources.Cancel}"
+                                Margin="15,5"
+                                Click="btnCancel_Click"
                                 MaxWidth="150"
-                                Style="{StaticResource MaterialDesignOutlinedButton}"/>
-                        <Button x:Name="btnDone" Content="{x:Static p:Resources.Done}" Margin="15,5" Click="btnDone_Click" MaxWidth="150"/>
-                        
+                                Style="{StaticResource MaterialDesignOutlinedButton}" />
+                        <Button x:Name="btnDone" Content="{x:Static p:Resources.Done}" Margin="15,5"
+                                Click="btnDone_Click" MaxWidth="150" />
+
                     </StackPanel>
-                    
+
                 </StackPanel>
             </StackPanel>
         </StackPanel>

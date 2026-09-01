@@ -8,12 +8,12 @@ namespace WirePix.Core.Storage;
 
 public sealed class ProfileStore(string directory)
 {
-    private readonly string _directory = directory ?? throw new ArgumentNullException(nameof(directory));
+    private readonly string _directory = directory ?? throw new ArgumentNullException(paramName: nameof(directory));
 
     public void Save(string profileName, DownloadSettings settings, SaveOptions options = null)
     {
         settings.SaveOptions = options ?? settings.SaveOptions;
-        Directory.CreateDirectory(_directory);
+        Directory.CreateDirectory(path: _directory);
         var ignore = new XmlAttributes
         {
             XmlIgnore = true
@@ -22,60 +22,60 @@ public sealed class ProfileStore(string directory)
         var overrides = new XmlAttributeOverrides();
         if (!settings.SaveOptions.Root)
         {
-            overrides.Add(typeof(PathStruct), nameof(PathStruct.Root), ignore);
+            overrides.Add(type: typeof(PathStruct), member: nameof(PathStruct.Root), attributes: ignore);
         }
 
         if (!settings.SaveOptions.FolderStruct)
         {
-            overrides.Add(typeof(PathStruct), nameof(PathStruct.FolderTags), ignore);
+            overrides.Add(type: typeof(PathStruct), member: nameof(PathStruct.FolderTags), attributes: ignore);
         }
 
         if (!settings.SaveOptions.FileStruct)
         {
-            overrides.Add(typeof(PathStruct), nameof(PathStruct.FileTags), ignore);
+            overrides.Add(type: typeof(PathStruct), member: nameof(PathStruct.FileTags), attributes: ignore);
         }
 
         if (!settings.SaveOptions.Backup)
         {
-            overrides.Add(typeof(DownloadSettings), nameof(DownloadSettings.Backup), ignore);
-            overrides.Add(typeof(PathStruct), nameof(PathStruct.Backup), ignore);
+            overrides.Add(type: typeof(DownloadSettings), member: nameof(DownloadSettings.Backup), attributes: ignore);
+            overrides.Add(type: typeof(PathStruct), member: nameof(PathStruct.Backup), attributes: ignore);
         }
 
         if (!settings.SaveOptions.Thumbnails)
         {
-            overrides.Add(typeof(PathStruct), nameof(PathStruct.Thumbnail), ignore);
-            overrides.Add(typeof(DownloadSettings), nameof(DownloadSettings.Thumbnail), ignore);
-            overrides.Add(typeof(DownloadSettings), nameof(DownloadSettings.ThumbnailSettings), ignore);
+            overrides.Add(type: typeof(PathStruct), member: nameof(PathStruct.Thumbnail), attributes: ignore);
+            overrides.Add(type: typeof(DownloadSettings), member: nameof(DownloadSettings.Thumbnail), attributes: ignore);
+            overrides.Add(type: typeof(DownloadSettings), member: nameof(DownloadSettings.ThumbnailSettings), attributes: ignore);
         }
 
         if (!settings.SaveOptions.FileCheck)
         {
-            overrides.Add(typeof(DownloadSettings), nameof(DownloadSettings.CheckFiles), ignore);
+            overrides.Add(type: typeof(DownloadSettings), member: nameof(DownloadSettings.CheckFiles), attributes: ignore);
         }
 
         if (!settings.SaveOptions.DeleteFiles)
         {
-            overrides.Add(typeof(DownloadSettings), nameof(DownloadSettings.DeleteFiles), ignore);
+            overrides.Add(type: typeof(DownloadSettings), member: nameof(DownloadSettings.DeleteFiles), attributes: ignore);
         }
 
-        var serializer = new XmlSerializer(typeof(DownloadSettings), overrides);
-        using StreamWriter writer = File.CreateText(Path.Combine(_directory, profileName + ".xml"));
-        serializer.Serialize(writer, settings);
+        var serializer = new XmlSerializer(type: typeof(DownloadSettings), overrides: overrides);
+        using StreamWriter writer = File.CreateText(path: Path.Combine(path1: _directory, path2: profileName + ".xml"));
+        serializer.Serialize(textWriter: writer, o: settings);
     }
 
     public bool Load(string profileName, DownloadSettings target)
     {
-        string path = Path.Combine(_directory, profileName + ".xml");
-        if (!File.Exists(path) || !IsValid(profileName))
+        string path = Path.Combine(path1: _directory, path2: profileName + ".xml");
+        if (!File.Exists(path: path) || !IsValid(profileName: profileName))
         {
             return false;
         }
 
         try
         {
-            var serializer = new XmlSerializer(typeof(DownloadSettings));
-            using FileStream stream = File.OpenRead(path);
-            var loaded = (DownloadSettings)serializer.Deserialize(stream);
+            var serializer = new XmlSerializer(type: typeof(DownloadSettings));
+            using FileStream stream = File.OpenRead(path: path);
+            var loaded = (DownloadSettings)serializer.Deserialize(stream: stream);
             if (loaded is not null)
             {
                 if (loaded.SaveOptions.Root)
@@ -130,17 +130,17 @@ public sealed class ProfileStore(string directory)
 
     public bool IsValid(string profileName)
     {
-        string path = Path.Combine(_directory, profileName + ".xml");
-        if (!File.Exists(path))
+        string path = Path.Combine(path1: _directory, path2: profileName + ".xml");
+        if (!File.Exists(path: path))
         {
             return false;
         }
 
         try
         {
-            using FileStream stream = File.OpenRead(path);
-            using var reader = XmlReader.Create(stream);
-            return new XmlSerializer(typeof(DownloadSettings)).CanDeserialize(reader);
+            using FileStream stream = File.OpenRead(path: path);
+            using var reader = XmlReader.Create(input: stream);
+            return new XmlSerializer(type: typeof(DownloadSettings)).CanDeserialize(xmlReader: reader);
         }
         catch
         {
@@ -150,12 +150,15 @@ public sealed class ProfileStore(string directory)
 
     public void Delete(string profileName)
     {
-        string path = Path.Combine(_directory, profileName + ".xml");
-        if (File.Exists(path))
+        string path = Path.Combine(path1: _directory, path2: profileName + ".xml");
+        if (File.Exists(path: path))
         {
-            File.Delete(path);
+            File.Delete(path: path);
         }
     }
 
-    public string[] GetProfiles() => Directory.Exists(_directory) ? Directory.GetFiles(_directory, "*.xml") : [];
+    public string[] GetProfiles()
+    {
+        return Directory.Exists(path: _directory) ? Directory.GetFiles(path: _directory, searchPattern: "*.xml") : [];
+    }
 }

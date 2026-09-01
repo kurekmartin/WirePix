@@ -22,11 +22,12 @@ namespace PhotoApp.Dialogs;
 public partial class UpdateDialog : UserControl
 {
     private MainWindow mainWindow;
+
     public UpdateDialog(MainWindow window, Release release)
     {
         InitializeComponent();
         mainWindow = window;
-        var version = Version.Parse(release.TagName.Replace("v", ""));
+        Version version = Version.Parse(input: release.TagName.Replace(oldValue: "v", newValue: ""));
         ucUpdate.VersionInfo = $"{Properties.Resources.Update_NewVersionAvailable} ({version})";
         ucUpdate.Release = release;
         ucUpdate.DownloadingChanged += UcUpdate_DownloadingChanged;
@@ -46,6 +47,6 @@ public partial class UpdateDialog : UserControl
 
     private void btnOK_Click(object sender, RoutedEventArgs e)
     {
-        mainWindow.DialogClose(this, null);
+        mainWindow.DialogClose(sender: this, result: null);
     }
 }

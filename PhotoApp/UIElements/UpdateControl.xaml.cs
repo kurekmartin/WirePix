@@ -17,6 +17,7 @@ public partial class UpdateControl : UserControl, INotifyPropertyChanged
     private string _versionInfo = "";
     private string _error = "";
     private Release _release;
+
     public Release Release
     {
         set
@@ -28,6 +29,7 @@ public partial class UpdateControl : UserControl, INotifyPropertyChanged
             }
         }
     }
+
     public string VersionInfo
     {
         get => _versionInfo;
@@ -37,6 +39,7 @@ public partial class UpdateControl : UserControl, INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
     public string Error
     {
         get => _error;
@@ -49,16 +52,18 @@ public partial class UpdateControl : UserControl, INotifyPropertyChanged
             }
         }
     }
+
     public bool Downloading { get; private set; } = false;
-    private static readonly string _tmpFolder = System.Windows.Application.Current.Resources[Properties.Keys.TempFolder].ToString();
+    private static readonly string _tmpFolder = System.Windows.Application.Current.Resources[key: Properties.Keys.TempFolder].ToString();
     private string downloadFile;
-    private WebClient WebClient = new WebClient();
+    private WebClient WebClient = new();
 
     public event PropertyChangedEventHandler PropertyChanged;
     public event EventHandler DownloadingChanged;
+
     private void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(sender: this, e: new PropertyChangedEventArgs(propertyName: propertyName));
     }
 
     public UpdateControl()
@@ -72,7 +77,7 @@ public partial class UpdateControl : UserControl, INotifyPropertyChanged
     {
         if (e.Cancelled)
         {
-            var file = new FileInfo(downloadFile);
+            var file = new FileInfo(fileName: downloadFile);
             if (file.Exists)
             {
                 file.Delete();
@@ -87,14 +92,14 @@ public partial class UpdateControl : UserControl, INotifyPropertyChanged
         {
             if (!Downloading)
             {
-                SetDownloadingStatus(true);
-                var asset = _release.Assets.FirstOrDefault(a => a.Name.EndsWith(".msi"));
-                downloadFile = Path.Combine(_tmpFolder, asset.Name);
+                SetDownloadingStatus(status: true);
+                ReleaseAsset asset = _release.Assets.FirstOrDefault(predicate: a => a.Name.EndsWith(value: ".msi"));
+                downloadFile = Path.Combine(path1: _tmpFolder, path2: asset.Name);
 
-                MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(btnAutoUpdate, true);
+                MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(element: btnAutoUpdate, isIndicatorVisible: true);
                 try
                 {
-                    await WebClient.DownloadFileTaskAsync(new Uri(asset.BrowserDownloadUrl), downloadFile);
+                    await WebClient.DownloadFileTaskAsync(address: new Uri(uriString: asset.BrowserDownloadUrl), fileName: downloadFile);
                 }
                 catch (WebException ex)
                 {
@@ -104,31 +109,32 @@ public partial class UpdateControl : UserControl, INotifyPropertyChanged
                     }
                 }
 
-                SetDownloadingStatus(false);
-                MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(btnAutoUpdate, false);
+                SetDownloadingStatus(status: false);
+                MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(element: btnAutoUpdate, isIndicatorVisible: false);
 
-                if (File.Exists(downloadFile))
+                if (File.Exists(path: downloadFile))
                 {
-                    ShellLauncher.Open(downloadFile);
+                    ShellLauncher.Open(target: downloadFile);
                     System.Windows.Application.Current.Shutdown();
                 }
             }
             else
             {
-                SetDownloadingStatus(false);
+                SetDownloadingStatus(status: false);
                 WebClient.CancelAsync();
             }
         }
     }
+
     private void btnManualUpdate_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open(_release.HtmlUrl);
+        ShellLauncher.Open(target: _release.HtmlUrl);
     }
 
     private void SetDownloadingStatus(bool status)
     {
         Downloading = status;
-        DownloadingChanged(this, EventArgs.Empty);
+        DownloadingChanged(sender: this, e: EventArgs.Empty);
         if (status)
         {
             btnAutoUpdateIcon.Kind = MaterialDesignThemes.Wpf.PackIconKind.CancelCircleOutline;

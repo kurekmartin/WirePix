@@ -1,10 +1,9 @@
 ﻿<UserControl x:Class="PhotoApp.Dialogs.AppInfoDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PhotoApp.Dialogs"
-             xmlns:p ="clr-namespace:PhotoApp.Properties"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:p="clr-namespace:PhotoApp.Properties"
              xmlns:UI="clr-namespace:PhotoApp.UIElements"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" Width="Auto" Height="Auto">
@@ -12,31 +11,39 @@
         <Grid>
             <StackPanel Orientation="Vertical">
                 <materialDesign:ColorZone Mode="PrimaryMid" CornerRadius="5,5,0,0">
-                    <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Text="{x:Static p:Resources.About}" Padding="5" TextAlignment="Center"/>
+                    <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                               Text="{x:Static p:Resources.About}" Padding="5" TextAlignment="Center" />
                 </materialDesign:ColorZone>
-                <StackPanel Orientation="Vertical" Margin="10,10,10,5" >
+                <StackPanel Orientation="Vertical" Margin="10,10,10,5">
                     <DockPanel Margin="0,0,0,5" HorizontalAlignment="Stretch">
-                        <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="{x:Static p:Resources.AppVersion}" FontWeight="Bold"/>
-                        <TextBlock Text=":" VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"/>
-                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}" Text="{Binding Path=Version, Source={x:Static Application.Current}}" d:Text="1.0.0" VerticalAlignment="Center" Margin="5,0"/>
-                        <Button x:Name="btnCheckUpdate" Content="{x:Static p:Resources.CheckUpdates}" Click="btnCheckUpdate_Click"
-                            Style="{StaticResource MaterialDesignRaisedButton}"
-                            materialDesign:ButtonProgressAssist.Value="-1"
-                            materialDesign:ButtonProgressAssist.IsIndicatorVisible="False"
-                            materialDesign:ButtonProgressAssist.IsIndeterminate="True"
-                            HorizontalAlignment="Right" Margin="10,0,0,0"/>
+                        <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                   Text="{x:Static p:Resources.AppVersion}" FontWeight="Bold" />
+                        <TextBlock Text=":" VerticalAlignment="Center"
+                                   Style="{StaticResource MaterialDesignBody2TextBlock}" />
+                        <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                   Text="{Binding Path=Version, Source={x:Static Application.Current}}" d:Text="1.0.0"
+                                   VerticalAlignment="Center" Margin="5,0" />
+                        <Button x:Name="btnCheckUpdate" Content="{x:Static p:Resources.CheckUpdates}"
+                                Click="btnCheckUpdate_Click"
+                                Style="{StaticResource MaterialDesignRaisedButton}"
+                                materialDesign:ButtonProgressAssist.Value="-1"
+                                materialDesign:ButtonProgressAssist.IsIndicatorVisible="False"
+                                materialDesign:ButtonProgressAssist.IsIndeterminate="True"
+                                HorizontalAlignment="Right" Margin="10,0,0,0" />
                     </DockPanel>
-                    <UI:UpdateControl x:Name="ucUpdate" DownloadingChanged="ucUpdate_DownloadingChanged"/>
+                    <UI:UpdateControl x:Name="ucUpdate" DownloadingChanged="ucUpdate_DownloadingChanged" />
                     <DockPanel Margin="0,5">
                         <TextBlock Text="{x:Static p:Resources.Contact}"
-                               FontWeight="Bold"
-                               Style="{StaticResource MaterialDesignBody2TextBlock}"/>
-                        <TextBlock Text=":" VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"/>
+                                   FontWeight="Bold"
+                                   Style="{StaticResource MaterialDesignBody2TextBlock}" />
+                        <TextBlock Text=":" VerticalAlignment="Center"
+                                   Style="{StaticResource MaterialDesignBody2TextBlock}" />
                         <TextBlock x:Name="tbEmail"
-                               Text="martinkurek.dev@gmail.com"
-                               HorizontalAlignment="Right"
-                               ToolTip="{x:Static p:Resources.CopyToClipboard}"                               
-                               Style="{StaticResource MaterialDesignBody2TextBlock}" MouseLeftButtonDown="tbEmail_MouseLeftButtonDown"/>
+                                   Text="martinkurek.dev@gmail.com"
+                                   HorizontalAlignment="Right"
+                                   ToolTip="{x:Static p:Resources.CopyToClipboard}"
+                                   Style="{StaticResource MaterialDesignBody2TextBlock}"
+                                   MouseLeftButtonDown="tbEmail_MouseLeftButtonDown" />
                     </DockPanel>
 
                     <UniformGrid Margin="0,5" HorizontalAlignment="Center" Columns="3">
@@ -46,10 +53,11 @@
                                 HorizontalContentAlignment="Left">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="FileDocumentOutline"
-                                                     Height="Auto"
-                                                     Width="Auto"
-                                                     VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Static p:Resources.License}" Margin="5,0,0,0" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                         Height="Auto"
+                                                         Width="Auto"
+                                                         VerticalAlignment="Center" />
+                                <TextBlock Text="{x:Static p:Resources.License}" Margin="5,0,0,0"
+                                           TextAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                         <Button x:Name="btnShowCode"
@@ -58,58 +66,61 @@
                                 HorizontalContentAlignment="Left">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="CodeBraces"
-                                                     Height="Auto"
-                                                     Width="Auto"
-                                                     VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Static p:Resources.SourceCode}" Margin="5,0,0,0" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                         Height="Auto"
+                                                         Width="Auto"
+                                                         VerticalAlignment="Center" />
+                                <TextBlock Text="{x:Static p:Resources.SourceCode}" Margin="5,0,0,0"
+                                           TextAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                         <Button x:Name="btnLibraries"
-                                Style="{StaticResource MaterialDesignFlatButton}" 
+                                Style="{StaticResource MaterialDesignFlatButton}"
                                 Click="btnLibraries_Click"
                                 HorizontalContentAlignment="Left">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="FileCodeOutline"
-                                                     Height="Auto"
-                                                     Width="Auto"
-                                                     VerticalAlignment="Center"/>
+                                                         Height="Auto"
+                                                         Width="Auto"
+                                                         VerticalAlignment="Center" />
                                 <TextBlock Text="{x:Static p:Resources.LibrariesUsed}"
-                                           Margin="5,0,0,0" TextAlignment="Center" VerticalAlignment="Center"/>
+                                           Margin="5,0,0,0" TextAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                         <Button x:Name="btnShowChangelog"
-                                Style="{StaticResource MaterialDesignFlatButton}" 
+                                Style="{StaticResource MaterialDesignFlatButton}"
                                 Click="btnShowChangelog_Click"
                                 HorizontalContentAlignment="Left">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="TextBoxOutline"
                                                          Height="Auto"
                                                          Width="Auto"
-                                                         VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Static p:Resources.Changelog}" Margin="5,0,0,0" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                         VerticalAlignment="Center" />
+                                <TextBlock Text="{x:Static p:Resources.Changelog}" Margin="5,0,0,0"
+                                           TextAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                         <Button x:Name="btnShowAppdata"
-                                Style="{StaticResource MaterialDesignFlatButton}" 
+                                Style="{StaticResource MaterialDesignFlatButton}"
                                 Click="btnShowAppdata_Click"
                                 HorizontalContentAlignment="Left">
                             <StackPanel Orientation="Horizontal">
                                 <materialDesign:PackIcon Kind="FolderOutline"
                                                          Height="Auto"
                                                          Width="Auto"
-                                                         VerticalAlignment="Center"/>
-                                <TextBlock Text="{x:Static p:Resources.ShowAppdataFolder}" Margin="5,0,0,0" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                         VerticalAlignment="Center" />
+                                <TextBlock Text="{x:Static p:Resources.ShowAppdataFolder}" Margin="5,0,0,0"
+                                           TextAlignment="Center" VerticalAlignment="Center" />
                             </StackPanel>
                         </Button>
                     </UniformGrid>
                 </StackPanel>
 
-                <Button x:Name="btnOK" Content="{x:Static p:Resources.OK}" Margin="15,5,15,10" Grid.Row="1"
-                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+                <Button x:Name="btnOK" Content="{x:Static p:Resources.OK}" Margin="15,5,15,10"
+                        Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" />
             </StackPanel>
 
             <materialDesign:Snackbar x:Name="SnackBar"
-                                     MessageQueue="{materialDesign:MessageQueue}"/>
+                                     MessageQueue="{materialDesign:MessageQueue}" />
         </Grid>
     </materialDesign:Card>
 

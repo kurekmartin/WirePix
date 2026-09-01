@@ -16,10 +16,10 @@ internal class TagCodeToLabel : IValueConverter
         if (value is string)
         {
             tag = code = value as string;
-            if (tag.Contains("("))
+            if (tag.Contains(value: "("))
             {
-                code = Tags.RemoveParameter(tag);
-                return $"{Tags.GetTag(code: code).VisibleText}({Tags.GetParameter(tag)})";
+                code = Tags.RemoveParameter(tag: tag);
+                return $"{Tags.GetTag(code: code).VisibleText}({Tags.GetParameter(visibleText: tag)})";
             }
             else
             {

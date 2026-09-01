@@ -11,6 +11,7 @@ namespace PhotoApp.Dialogs;
 public partial class AppFeedbackDialog : UserControl
 {
     private MainWindow mainWindow;
+
     public AppFeedbackDialog(MainWindow window)
     {
         InitializeComponent();
@@ -19,27 +20,27 @@ public partial class AppFeedbackDialog : UserControl
 
     private void btnOK_Click(object sender, RoutedEventArgs e)
     {
-        mainWindow.DialogClose(this, null);
+        mainWindow.DialogClose(sender: this, result: null);
     }
+
     private void btnSendFeedback_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://forms.gle/D5HTruypWjfqEToq6");
+        ShellLauncher.Open(target: "https://forms.gle/D5HTruypWjfqEToq6");
     }
 
     private void btnShowDumpFiles_Click(object sender, RoutedEventArgs e)
     {
-        string crashRepFolder = Application.Current.Resources[Properties.Keys.CrashReportsFolder].ToString();
+        var crashRepFolder = Application.Current.Resources[key: Properties.Keys.CrashReportsFolder].ToString();
 
-        var dir = new DirectoryInfo(crashRepFolder);
-        var file = dir.GetFiles().OrderByDescending(f => f.CreationTime).FirstOrDefault();
+        var dir = new DirectoryInfo(path: crashRepFolder);
+        FileInfo file = dir.GetFiles().OrderByDescending(keySelector: f => f.CreationTime).FirstOrDefault();
         if (file != null)
         {
-            System.Diagnostics.Process.Start("explorer.exe", "/select," + file.FullName);
+            System.Diagnostics.Process.Start(fileName: "explorer.exe", arguments: "/select," + file.FullName);
         }
         else
         {
-            System.Diagnostics.Process.Start("explorer.exe", dir.FullName);
+            System.Diagnostics.Process.Start(fileName: "explorer.exe", arguments: dir.FullName);
         }
-
     }
 }

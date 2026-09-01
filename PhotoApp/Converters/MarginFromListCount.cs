@@ -7,12 +7,12 @@ using System.Windows.Data;
 
 namespace PhotoApp.Converters;
 
-class MarginFromListCount : IValueConverter
+internal class MarginFromListCount : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        Thickness margin = new Thickness(0, 0, 0, 0);
-        CollectionViewSource itemSource = parameter as CollectionViewSource;
+        var margin = new Thickness(left: 0, top: 0, right: 0, bottom: 0);
+        var itemSource = parameter as CollectionViewSource;
         var items = itemSource.Source as ObservableCollection<ObservableCollection<string>>;
         if (items != null)
         {
@@ -21,7 +21,7 @@ class MarginFromListCount : IValueConverter
         else
         {
             var itemsList = itemSource.Source as List<List<string>>;
-            if(itemsList != null)
+            if (itemsList != null)
             {
                 margin.Left = itemsList.Count * 10;
             }

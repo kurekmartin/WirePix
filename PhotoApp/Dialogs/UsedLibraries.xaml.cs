@@ -28,31 +28,31 @@ public partial class UsedLibraries : UserControl
 
     private void btnMagickNET_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://github.com/dlemstra/Magick.NET");
+        ShellLauncher.Open(target: "https://github.com/dlemstra/Magick.NET");
     }
 
     private void btnMaterialDesign_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit");
+        ShellLauncher.Open(target: "https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit");
     }
 
     private void btnMetadataExtractor_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://github.com/drewnoakes/metadata-extractor-dotnet");
+        ShellLauncher.Open(target: "https://github.com/drewnoakes/metadata-extractor-dotnet");
     }
 
     private void btnOctokit_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://github.com/octokit/octokit.net");
+        ShellLauncher.Open(target: "https://github.com/octokit/octokit.net");
     }
 
     private void btnUsbEvents_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://github.com/Jinjinov/Usb.Events");
+        ShellLauncher.Open(target: "https://github.com/Jinjinov/Usb.Events");
     }
 
     private void btnMediaDevices_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://github.com/Bassman2/MediaDevices");
+        ShellLauncher.Open(target: "https://github.com/Bassman2/MediaDevices");
     }
 }

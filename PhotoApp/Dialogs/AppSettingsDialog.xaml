@@ -1,10 +1,9 @@
 ﻿<UserControl x:Class="PhotoApp.Dialogs.AppSettingsDialog"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PhotoApp.Dialogs"
-             xmlns:p ="clr-namespace:PhotoApp.Properties"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:p="clr-namespace:PhotoApp.Properties"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" Width="Auto" Height="Auto" Loaded="UserControl_Loaded">
     <UserControl.Resources>
@@ -13,62 +12,66 @@
     <materialDesign:Card>
         <StackPanel Orientation="Vertical">
             <materialDesign:ColorZone Mode="PrimaryMid" CornerRadius="5,5,0,0">
-                <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Text="{x:Static p:Resources.Settings}" Padding="5" TextAlignment="Center"/>
+                <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                           Text="{x:Static p:Resources.Settings}" Padding="5" TextAlignment="Center" />
             </materialDesign:ColorZone>
-            <StackPanel Orientation="Vertical" Margin="10" >
+            <StackPanel Orientation="Vertical" Margin="10">
                 <DockPanel Margin="0,0,0,5">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="{x:Static p:Resources.DarkMode}" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="{x:Static p:Resources.DarkMode}" FontWeight="Bold" />
                     <CheckBox x:Name="cbDarkMode"
                               Margin="5,0"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}"
                               IsChecked="{Binding DarkMode, Mode=OneTime}"
-                              VerticalAlignment="Center" 
+                              VerticalAlignment="Center"
                               HorizontalAlignment="Right"
-                              Checked="cbDarkMode_Changed" Unchecked="cbDarkMode_Changed"/>
+                              Checked="cbDarkMode_Changed" Unchecked="cbDarkMode_Changed" />
                 </DockPanel>
 
                 <DockPanel Margin="0,0,0,5">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="{x:Static p:Resources.StartupUpdateCheck}" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="{x:Static p:Resources.StartupUpdateCheck}" FontWeight="Bold" />
                     <CheckBox x:Name="cbCheckNewVersion"
                               Margin="5,0"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}"
                               IsChecked="{Binding CheckUpdateOnStartup, Mode=OneTime}"
                               VerticalAlignment="Center"
                               HorizontalAlignment="Right"
-                              Checked="cbCheckNewVersion_Checked" Unchecked="cbCheckNewVersion_Checked"/>
+                              Checked="cbCheckNewVersion_Checked" Unchecked="cbCheckNewVersion_Checked" />
                 </DockPanel>
 
                 <DockPanel Margin="0,0,0,5">
-                    <TextBlock  Text="{x:Static p:Resources.Language}"                                
-                                Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                FontWeight="Bold"
-                                VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static p:Resources.Language}"
+                               Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center" />
                     <ComboBox x:Name="cbLanguages"
                               Margin="5,0"
-                              HorizontalAlignment="Right" SelectionChanged="cbLanguages_SelectionChanged"/>
+                              HorizontalAlignment="Right" SelectionChanged="cbLanguages_SelectionChanged" />
                 </DockPanel>
 
                 <DockPanel Margin="0,0,0,5">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" 
-                               Text="{x:Static p:Resources.UseDifferentLanguageForTags}" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="{x:Static p:Resources.UseDifferentLanguageForTags}" FontWeight="Bold" />
                     <CheckBox x:Name="cbDifferentLanguageForTags"
                               Margin="5,0"
                               IsChecked="{Binding UseDifferentLangForTags, Mode=OneTime}"
                               Style="{StaticResource MaterialDesignSwitchToggleButton}"
                               VerticalAlignment="Center"
-                              HorizontalAlignment="Right" Checked="cbDifferentLanguageForTags_Checked" Unchecked="cbDifferentLanguageForTags_Checked"/>
+                              HorizontalAlignment="Right" Checked="cbDifferentLanguageForTags_Checked"
+                              Unchecked="cbDifferentLanguageForTags_Checked" />
                 </DockPanel>
 
                 <DockPanel x:Name="dpTagLanguages" Margin="15,0,0,5"
                            Visibility="{Binding ElementName=cbDifferentLanguageForTags, Path=IsChecked,Converter={StaticResource BoolToVisConverter},UpdateSourceTrigger=PropertyChanged}">
-                    <TextBlock  Text="{x:Static p:Resources.TagLanguage}"                                
-                                Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                FontWeight="Bold"
-                                VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Static p:Resources.TagLanguage}"
+                               Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center" />
                     <ComboBox x:Name="cbTagLanguages"
                               Margin="5,0"
-                              HorizontalAlignment="Right" 
-                              SelectionChanged="cbTagLanguages_SelectionChanged"/>
+                              HorizontalAlignment="Right"
+                              SelectionChanged="cbTagLanguages_SelectionChanged" />
                 </DockPanel>
             </StackPanel>
 
@@ -82,17 +85,17 @@
                            d:Text="info"
                            TextWrapping="WrapWithOverflow"
                            Padding="0,0,20,0"
-                           Margin="0,0,0,0"/>
+                           Margin="0,0,0,0" />
                 <Button x:Name="btnRestart"
                         ToolTip="{x:Static p:Resources.RestartApp}"
                         HorizontalAlignment="Right" VerticalAlignment="Center" Click="btnRestart_Click"
                         Style="{StaticResource MaterialDesignFloatingActionButton}"
                         Width="25" Height="25" Margin="0,0,0,0" Panel.ZIndex="1" DockPanel.Dock="Right">
-                    <materialDesign:PackIcon Kind="Restart" Width="15" Height="15"/>
+                    <materialDesign:PackIcon Kind="Restart" Width="15" Height="15" />
                 </Button>
             </DockPanel>
-            
-            <Button x:Name="btnOK" Content="{x:Static p:Resources.OK}" Margin="15,10" Grid.Row="1" Click="btnOK_Click"/>
+
+            <Button x:Name="btnOK" Content="{x:Static p:Resources.OK}" Margin="15,10" Click="btnOK_Click" />
         </StackPanel>
     </materialDesign:Card>
 

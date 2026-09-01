@@ -4,13 +4,13 @@ using System.Windows.Data;
 
 namespace PhotoApp.Converters;
 
-class TimeSpanToString : IValueConverter
+internal class TimeSpanToString : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        TimeSpan time = (TimeSpan)value;
-        string timeString = "";
-        if (time.Ticks == 0 || time.Ticks<0)
+        var time = (TimeSpan)value;
+        var timeString = "";
+        if (time.Ticks == 0 || time.Ticks < 0)
         {
             timeString = Properties.Resources.RemainingTime_Calculating;
         }
@@ -21,16 +21,20 @@ class TimeSpanToString : IValueConverter
             {
                 timeString += time.Days + $"{Properties.Resources.RemainingTime_Days} ";
             }
+
             if (time.Hours > 0)
             {
                 timeString += time.Hours + $"{Properties.Resources.RemainingTime_Hours} ";
             }
+
             if (time.Minutes > 0)
             {
                 timeString += time.Minutes + $"{Properties.Resources.RemainingTime_Minutes} ";
             }
+
             timeString += time.Seconds + $"{Properties.Resources.RemainingTime_Seconds} ";
         }
+
         return timeString;
     }
 

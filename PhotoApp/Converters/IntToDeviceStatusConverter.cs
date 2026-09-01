@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace PhotoApp.Converters;
 
-class IntToDeviceStatusConverter : IValueConverter
+internal class IntToDeviceStatusConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
@@ -19,8 +19,8 @@ class IntToDeviceStatusConverter : IValueConverter
         {
             return Properties.Resources.DeviceStatus_Unknown;
         }
-
     }
+
     public object ConvertBack(object value, Type targetTypes, object parameter, System.Globalization.CultureInfo culture)
     {
         throw new NotImplementedException();

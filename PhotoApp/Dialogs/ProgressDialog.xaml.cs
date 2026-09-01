@@ -13,10 +13,10 @@ namespace PhotoApp;
 public partial class ProgressDialog : UserControl, INotifyPropertyChanged
 {
     private MainWindow mainWindow;
-    public TimeSpan timeRemain { get; private set; } = new TimeSpan();
-    private TimeSpan lastReportTime = new TimeSpan();
+    public TimeSpan timeRemain { get; private set; } = new();
+    private TimeSpan lastReportTime = new();
     private bool countdownRunning = false;
-    private readonly object lockTime = new object();
+    private readonly object lockTime = new();
 
     public ProgressDialog(MainWindow window)
     {
@@ -29,7 +29,7 @@ public partial class ProgressDialog : UserControl, INotifyPropertyChanged
         lblCurrentTask.Text = taskName;
     }
 
-    public void SetCurrentProgress(string progressMessage, int progress, TimeSpan time = new TimeSpan())
+    public void SetCurrentProgress(string progressMessage, int progress, TimeSpan time = new())
     {
         pbProgress.IsIndeterminate = false;
         lblProgress.Text = progressMessage;
@@ -40,7 +40,8 @@ public partial class ProgressDialog : UserControl, INotifyPropertyChanged
             {
                 timeRemain = lastReportTime = time;
             }
-            OnPropertyChanged("timeRemain");
+
+            OnPropertyChanged(propertyName: "timeRemain");
         }
 
         lblTime.Visibility = Visibility.Visible;
@@ -66,19 +67,20 @@ public partial class ProgressDialog : UserControl, INotifyPropertyChanged
         pbProgress.IsIndeterminate = true;
         lblTime.Visibility = Visibility.Collapsed;
     }
+
     private async void Countdown()
     {
-        TimeSpan sec = new TimeSpan(0, 0, 1);
+        var sec = new TimeSpan(hours: 0, minutes: 0, seconds: 1);
         countdownRunning = true;
-        var countdown = Task.Run(() =>
+        Task countdown = Task.Run(action: () =>
         {
             while (timeRemain.TotalSeconds > 0)
             {
-                System.Threading.Thread.Sleep(1000);
+                System.Threading.Thread.Sleep(millisecondsTimeout: 1000);
                 lock (lockTime)
                 {
-                    timeRemain = timeRemain.Subtract(sec);
-                    OnPropertyChanged("timeRemain");
+                    timeRemain = timeRemain.Subtract(ts: sec);
+                    OnPropertyChanged(propertyName: "timeRemain");
                 }
             }
         });
@@ -94,7 +96,7 @@ public partial class ProgressDialog : UserControl, INotifyPropertyChanged
         lblTime.Visibility = Visibility.Hidden;
         lock (lockTime)
         {
-            timeRemain = new TimeSpan(0);
+            timeRemain = new TimeSpan(ticks: 0);
         }
     }
 
@@ -104,8 +106,9 @@ public partial class ProgressDialog : UserControl, INotifyPropertyChanged
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
+
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(sender: this, e: new PropertyChangedEventArgs(propertyName: propertyName));
     }
 }

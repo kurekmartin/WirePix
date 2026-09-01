@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Resources;
 using System.Threading;
 using System.Windows;
 using MaterialDesignThemes.Wpf;
@@ -17,7 +18,7 @@ namespace PhotoApp;
 /// </summary>
 public partial class App : Application
 {
-    private static List<Tuple<string, string>> _availableLanguages = new List<Tuple<string, string>>();
+    private static List<Tuple<string, string>> _availableLanguages = new();
 
     private static Mutex _mutex = null;
 
@@ -26,14 +27,14 @@ public partial class App : Application
         const string appName = "WirePix";
         bool createdNew;
 
-        _mutex = new Mutex(true, appName, out createdNew);
+        _mutex = new Mutex(initiallyOwned: true, name: appName, createdNew: out createdNew);
 
         if (!createdNew)
         {
             Current.Shutdown();
         }
 
-        base.OnStartup(e);
+        base.OnStartup(e: e);
     }
 
     private void Application_Startup(object sender, StartupEventArgs e)
@@ -47,48 +48,45 @@ public partial class App : Application
 
 
         SetLanguage();
-        string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        string mainFolder = "WirePix";
-        Resources.Add(Keys.MainFolder, Path.Combine(appData, mainFolder));
-        Resources.Add(Keys.TempFolder, Path.Combine(Path.GetTempPath(), mainFolder));
-        Resources.Add(Keys.LogsFolder, Path.Combine(appData, mainFolder, "Logs"));
-        Resources.Add(Keys.ProfilesFolder, Path.Combine(appData, mainFolder, "Profiles"));
-        Resources.Add(Keys.DataFolder, Path.Combine(appData, mainFolder, "Data"));
-        Resources.Add(Keys.CrashReportsFolder, Path.Combine(appData, mainFolder, "Crash Reports"));
-        DownloadSettings.ProfileDirectory = Resources[Keys.ProfilesFolder].ToString();
+        string appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
+        var mainFolder = "WirePix";
+        Resources.Add(key: Keys.MainFolder, value: Path.Combine(path1: appData, path2: mainFolder));
+        Resources.Add(key: Keys.TempFolder, value: Path.Combine(path1: Path.GetTempPath(), path2: mainFolder));
+        Resources.Add(key: Keys.LogsFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Logs"));
+        Resources.Add(key: Keys.ProfilesFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Profiles"));
+        Resources.Add(key: Keys.DataFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Data"));
+        Resources.Add(key: Keys.CrashReportsFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Crash Reports"));
+        DownloadSettings.ProfileDirectory = Resources[key: Keys.ProfilesFolder].ToString();
 
-        var keys = Current.Resources.Keys.GetEnumerator();
+        IEnumerator keys = Current.Resources.Keys.GetEnumerator();
         while (keys.MoveNext())
         {
-            string key = keys.Current.ToString();
-            if (key.Contains("Folder"))
+            var key = keys.Current.ToString();
+            if (key.Contains(value: "Folder"))
             {
-                Directory.CreateDirectory(Current.Resources[key].ToString());
+                Directory.CreateDirectory(path: Current.Resources[key: key].ToString());
             }
         }
 
-        var files = Directory.GetFiles(Current.Resources[Keys.TempFolder].ToString()).Where(x => x.EndsWith(".msi"));
-        foreach (var file in files)
+        IEnumerable<string> files = Directory.GetFiles(path: Current.Resources[key: Keys.TempFolder].ToString()).Where(predicate: x => x.EndsWith(value: ".msi"));
+        foreach (string file in files)
         {
-            File.Delete(file);
+            File.Delete(path: file);
         }
 
-        var logFolder = Current.Resources[Keys.LogsFolder].ToString();
-        var maxLogs = Settings.Default.MaxLogs;
-        var logFiles = new DirectoryInfo(logFolder);
-        var filesToDelete = logFiles.GetFiles().OrderByDescending(f => f.CreationTime).Skip(maxLogs);
-        foreach (var file in filesToDelete)
+        var logFolder = Current.Resources[key: Keys.LogsFolder].ToString();
+        int maxLogs = Settings.Default.MaxLogs;
+        var logFiles = new DirectoryInfo(path: logFolder);
+        IEnumerable<FileInfo> filesToDelete = logFiles.GetFiles().OrderByDescending(keySelector: f => f.CreationTime).Skip(count: maxLogs);
+        foreach (FileInfo file in filesToDelete)
         {
             file.Delete();
         }
 
-        SetThemeMode(Settings.Default.DarkMode);
+        SetThemeMode(darkMode: Settings.Default.DarkMode);
     }
 
-    public string Version
-    {
-        get { return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3); }
-    }
+    public string Version => Assembly.GetEntryAssembly()?.GetName().Version?.ToString(fieldCount: 3);
 
     public static void SetThemeMode(bool darkMode)
     {
@@ -97,14 +95,14 @@ public partial class App : Application
         ITheme theme = paletteHelper.GetTheme();
         if (darkMode)
         {
-            theme.SetBaseTheme(Theme.Dark);
+            theme.SetBaseTheme(baseTheme: Theme.Dark);
         }
         else
         {
-            theme.SetBaseTheme(Theme.Light);
+            theme.SetBaseTheme(baseTheme: Theme.Light);
         }
 
-        paletteHelper.SetTheme(theme);
+        paletteHelper.SetTheme(theme: theme);
         if (darkMode != Settings.Default.DarkMode)
         {
             Settings.Default.DarkMode = darkMode;
@@ -116,25 +114,25 @@ public partial class App : Application
     {
         if (Settings.Default.Language != nameof(Languages.system))
         {
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo(Settings.Default.Language);
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(name: Settings.Default.Language);
         }
         else
         {
-            string language = CultureInfo.CurrentUICulture.Name.Split('-')[0];
-            Thread.CurrentThread.CurrentUICulture = new CultureInfo(language);
+            string language = CultureInfo.CurrentUICulture.Name.Split(separator: '-')[0];
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(name: language);
         }
 
-        Console.WriteLine("CurrentCulture is {0}.", CultureInfo.CurrentUICulture.Name);
+        Console.WriteLine(format: "CurrentCulture is {0}.", arg0: CultureInfo.CurrentUICulture.Name);
     }
 
     public static List<Tuple<string, string>> GetAvailableLanguages()
     {
         if (_availableLanguages.Count() == 0)
         {
-            var res = Languages.ResourceManager.GetResourceSet(CultureInfo.InvariantCulture, true, false);
+            ResourceSet res = Languages.ResourceManager.GetResourceSet(culture: CultureInfo.InvariantCulture, createIfNotExists: true, tryParents: false);
             foreach (DictionaryEntry language in res)
             {
-                _availableLanguages.Add(new Tuple<string, string>(language.Key.ToString(), language.Value.ToString()));
+                _availableLanguages.Add(item: new Tuple<string, string>(item1: language.Key.ToString(), item2: language.Value.ToString()));
             }
         }
 
@@ -145,6 +143,6 @@ public partial class App : Application
     {
         Settings.Default.LastVersion = Version;
         Settings.Default.Save();
-        base.OnExit(e);
+        base.OnExit(e: e);
     }
 }

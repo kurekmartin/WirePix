@@ -4,15 +4,16 @@ using System.Windows.Data;
 
 namespace PhotoApp.Converters;
 
-class ArrayToProgress : IValueConverter
+internal class ArrayToProgress : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        double[] array = value as double[];
+        var array = value as double[];
         if (array.Length >= 2 && array[0] > 0)
         {
             return 100 - array[1] / array[0] * 100;
         }
+
         return 100;
     }
 

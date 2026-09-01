@@ -4,7 +4,10 @@ namespace WirePix.Core.Models.Settings;
 
 public sealed class DateRange : ObservableObject
 {
-    public DateRange() => Start = End = DateTime.Now.Date;
+    public DateRange()
+    {
+        Start = End = DateTime.Now.Date;
+    }
 
     public DateTime Start
     {
@@ -36,8 +39,23 @@ public sealed class DateRange : ObservableObject
         }
     }
 
-    public static bool operator ==(DateRange a, DateRange b) => ReferenceEquals(a, b) || (a != null && b != null && a.Start == b.Start && a.End == b.End);
-    public static bool operator !=(DateRange a, DateRange b) => !(a == b);
-    public override bool Equals(object obj) => obj is DateRange other && this == other;
-    public override int GetHashCode() => HashCode.Combine(Start, End);
+    public static bool operator ==(DateRange a, DateRange b)
+    {
+        return ReferenceEquals(objA: a, objB: b) || (a != null && b != null && a.Start == b.Start && a.End == b.End);
+    }
+
+    public static bool operator !=(DateRange a, DateRange b)
+    {
+        return !(a == b);
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is DateRange other && this == other;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(value1: Start, value2: End);
+    }
 }

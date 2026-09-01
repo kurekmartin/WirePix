@@ -13,33 +13,35 @@ namespace PhotoApp.Dialogs;
 public partial class AppSettingsDialog : UserControl
 {
     private MainWindow mainWindow;
-    private List<Tuple<string, string>> languages = new List<Tuple<string, string>>();
+    private List<Tuple<string, string>> languages = new();
     private string origLanguage;
+
     public AppSettingsDialog(MainWindow window)
     {
         DataContext = Properties.Settings.Default;
         InitializeComponent();
         mainWindow = window;
         languages = App.GetAvailableLanguages();
-        cbLanguages.ItemsSource = cbTagLanguages.ItemsSource = languages.ConvertAll(x => x.Item2);
-        cbLanguages.SelectedIndex = cbLanguages.Items.IndexOf(languages.Find(x => x.Item1 == Properties.Settings.Default.Language).Item2);
-        cbTagLanguages.SelectedIndex = cbTagLanguages.Items.IndexOf(languages.Find(x => x.Item1 == Properties.Settings.Default.TagLanguage).Item2);
+        cbLanguages.ItemsSource = cbTagLanguages.ItemsSource = languages.ConvertAll(converter: x => x.Item2);
+        cbLanguages.SelectedIndex = cbLanguages.Items.IndexOf(item: languages.Find(match: x => x.Item1 == Properties.Settings.Default.Language).Item2);
+        cbTagLanguages.SelectedIndex = cbTagLanguages.Items.IndexOf(item: languages.Find(match: x => x.Item1 == Properties.Settings.Default.TagLanguage).Item2);
         origLanguage = Properties.Settings.Default.Language;
     }
 
     private void cbDarkMode_Changed(object sender, RoutedEventArgs e)
     {
-        CheckBox checkBox = (CheckBox)sender;
-        App.SetThemeMode((bool)checkBox.IsChecked);
+        var checkBox = (CheckBox)sender;
+        App.SetThemeMode(darkMode: (bool)checkBox.IsChecked);
     }
+
     private void btnOK_Click(object sender, RoutedEventArgs e)
     {
-        mainWindow.DialogClose(this, null);
+        mainWindow.DialogClose(sender: this, result: null);
     }
 
     private void cbCheckNewVersion_Checked(object sender, RoutedEventArgs e)
     {
-        CheckBox checkBox = (CheckBox)sender;
+        var checkBox = (CheckBox)sender;
         Properties.Settings.Default.CheckUpdateOnStartup = (bool)checkBox.IsChecked;
         Properties.Settings.Default.Save();
     }
@@ -48,7 +50,7 @@ public partial class AppSettingsDialog : UserControl
     {
         if (e.RemovedItems.Count > 0)
         {
-            Properties.Settings.Default.Language = languages.Find(x => x.Item2 == (string)e.AddedItems[0]).Item1;
+            Properties.Settings.Default.Language = languages.Find(match: x => x.Item2 == (string)e.AddedItems[index: 0]).Item1;
             Properties.Settings.Default.Save();
 
             if (origLanguage != Properties.Settings.Default.Language)
@@ -65,8 +67,8 @@ public partial class AppSettingsDialog : UserControl
 
     private void btnRestart_Click(object sender, RoutedEventArgs e)
     {
-        var currentExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
-        ShellLauncher.Open(currentExecutablePath);
+        string currentExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
+        ShellLauncher.Open(target: currentExecutablePath);
         Application.Current.Shutdown();
     }
 
@@ -79,14 +81,14 @@ public partial class AppSettingsDialog : UserControl
     {
         if (e.RemovedItems.Count > 0)
         {
-            Properties.Settings.Default.TagLanguage = languages.Find(x => x.Item2 == (string)e.AddedItems[0]).Item1;
+            Properties.Settings.Default.TagLanguage = languages.Find(match: x => x.Item2 == (string)e.AddedItems[index: 0]).Item1;
             Properties.Settings.Default.Save();
         }
     }
 
     private void cbDifferentLanguageForTags_Checked(object sender, RoutedEventArgs e)
     {
-        CheckBox checkBox = (CheckBox)sender;
+        var checkBox = (CheckBox)sender;
         Properties.Settings.Default.UseDifferentLangForTags = (bool)checkBox.IsChecked;
         Properties.Settings.Default.Save();
     }

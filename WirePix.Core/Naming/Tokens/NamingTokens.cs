@@ -22,7 +22,7 @@ public static class NamingTokens
     public const string Hyphen = "{HYP}";
     public const string Underscore = "{UNDS}";
 
-    public static readonly IReadOnlySet<string> DateTokens = new HashSet<string>(StringComparer.Ordinal)
+    public static readonly IReadOnlySet<string> DateTokens = new HashSet<string>(comparer: StringComparer.Ordinal)
     {
         YearLong,
         Year,

@@ -16,6 +16,7 @@ namespace PhotoApp.Dialogs;
 public partial class AppInfoDialog : UserControl
 {
     private MainWindow mainWindow;
+
     public AppInfoDialog(MainWindow window)
     {
         InitializeComponent();
@@ -24,14 +25,14 @@ public partial class AppInfoDialog : UserControl
 
     private async void btnCheckUpdate_Click(object sender, RoutedEventArgs e)
     {
-        MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(btnCheckUpdate, true);
-        var currentVersion = Version.Parse(((App)System.Windows.Application.Current).Version);
+        MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(element: btnCheckUpdate, isIndicatorVisible: true);
+        Version currentVersion = Version.Parse(input: ((App)System.Windows.Application.Current).Version);
 
         try
         {
-            var github = new GitHubClient(new ProductHeaderValue("WirePix"));
-            var release = await github.Repository.Release.GetLatest("KurekMartin", "WirePix");
-            var latestVersion = Version.Parse(release.TagName.Replace("v", ""));
+            var github = new GitHubClient(productInformation: new ProductHeaderValue(name: "WirePix"));
+            Release release = await github.Repository.Release.GetLatest(owner: "KurekMartin", name: "WirePix");
+            Version latestVersion = Version.Parse(input: release.TagName.Replace(oldValue: "v", newValue: ""));
 
             if (latestVersion > currentVersion)
             {
@@ -47,7 +48,8 @@ public partial class AppInfoDialog : UserControl
         {
             ucUpdate.VersionInfo = Properties.Resources.Update_Error;
         }
-        MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(btnCheckUpdate, false);
+
+        MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(element: btnCheckUpdate, isIndicatorVisible: false);
     }
 
     private void ucUpdate_DownloadingChanged(object sender, EventArgs e)
@@ -57,33 +59,33 @@ public partial class AppInfoDialog : UserControl
 
     private void btnShowLicense_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://github.com/KurekMartin/WirePix/blob/master/LICENSE");
+        ShellLauncher.Open(target: "https://github.com/KurekMartin/WirePix/blob/master/LICENSE");
     }
 
     private void btnShowCode_Click(object sender, RoutedEventArgs e)
     {
-        ShellLauncher.Open("https://github.com/KurekMartin/WirePix");
+        ShellLauncher.Open(target: "https://github.com/KurekMartin/WirePix");
     }
 
     private void tbEmail_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        Clipboard.SetText(tbEmail.Text);
-        SnackBar.MessageQueue.Enqueue(Properties.Resources.EmailCopied);
+        Clipboard.SetText(text: tbEmail.Text);
+        SnackBar.MessageQueue.Enqueue(content: Properties.Resources.EmailCopied);
     }
 
     private void btnLibraries_Click(object sender, RoutedEventArgs e)
     {
-        mainWindow.ShowLibraries(this);
+        mainWindow.ShowLibraries(sender: this);
     }
 
     private void btnShowChangelog_Click(object sender, RoutedEventArgs e)
     {
-        mainWindow.ShowChangelog(this);
+        mainWindow.ShowChangelog(sender: this);
     }
 
     private void btnShowAppdata_Click(object sender, RoutedEventArgs e)
     {
-        string dataFolder = System.Windows.Application.Current.Resources[Properties.Keys.MainFolder].ToString();
-        System.Diagnostics.Process.Start("explorer.exe", dataFolder);
+        var dataFolder = System.Windows.Application.Current.Resources[key: Properties.Keys.MainFolder].ToString();
+        Process.Start(fileName: "explorer.exe", arguments: dataFolder);
     }
 }

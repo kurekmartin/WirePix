@@ -14,27 +14,27 @@ public sealed class ThumbnailGenerator
             return;
         }
 
-        Directory.CreateDirectory(Path.GetDirectoryName(output) ?? string.Empty);
-        using var image = new MagickImage(source);
-        var geometry = new MagickGeometry((uint)settings.Value) { FillArea = settings.Selected == ThumbnailSelect.ShorterSide };
+        Directory.CreateDirectory(path: Path.GetDirectoryName(path: output) ?? string.Empty);
+        using var image = new MagickImage(fileName: source);
+        var geometry = new MagickGeometry(widthAndHeight: (uint)settings.Value) { FillArea = settings.Selected == ThumbnailSelect.ShorterSide };
         image.AutoOrient();
-        image.Thumbnail(geometry);
+        image.Thumbnail(geometry: geometry);
         if (hash != null)
         {
             image.Comment = hash;
         }
 
-        image.Write(output, MagickFormat.Jpg);
+        image.Write(fileName: output, format: MagickFormat.Jpg);
     }
 
     public static bool IsImage(string path)
     {
         try
         {
-            IMagickFormatInfo format = MagickFormatInfo.Create(path);
+            IMagickFormatInfo format = MagickFormatInfo.Create(fileName: path);
             return format != null &&
                    (format.ModuleFormat == MagickFormat.Dng ||
-                    (format.MimeType?.Contains("image", StringComparison.OrdinalIgnoreCase) ?? false));
+                    (format.MimeType?.Contains(value: "image", comparisonType: StringComparison.OrdinalIgnoreCase) ?? false));
         }
         catch
         {

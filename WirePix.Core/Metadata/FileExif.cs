@@ -12,11 +12,11 @@ public static class FileExif
     {
         try
         {
-            ExifSubIfdDirectory directory = ImageMetadataReader.ReadMetadata(path)
+            ExifSubIfdDirectory directory = ImageMetadataReader.ReadMetadata(filePath: path)
                                                                .OfType<ExifSubIfdDirectory>()
                                                                .FirstOrDefault();
-            string value = directory?.GetDescription(ExifDirectoryBase.TagDateTimeOriginal);
-            return value == null ? default : DateTime.ParseExact(value, "yyyy:MM:dd HH:mm:ss", CultureInfo.InvariantCulture);
+            string value = directory?.GetDescription(tagType: ExifDirectoryBase.TagDateTimeOriginal);
+            return value == null ? default : DateTime.ParseExact(s: value, format: "yyyy:MM:dd HH:mm:ss", provider: CultureInfo.InvariantCulture);
         }
         catch
         {
@@ -24,14 +24,21 @@ public static class FileExif
         }
     }
 
-    public static string GetManufacturer(string path) => GetDescription(path, d => d.GetDescription(ExifDirectoryBase.TagMake));
-    public static string GetModel(string path) => GetDescription(path, d => d.GetDescription(ExifDirectoryBase.TagModel));
+    public static string GetManufacturer(string path)
+    {
+        return GetDescription(path: path, selector: d => d.GetDescription(tagType: ExifDirectoryBase.TagMake));
+    }
+
+    public static string GetModel(string path)
+    {
+        return GetDescription(path: path, selector: d => d.GetDescription(tagType: ExifDirectoryBase.TagModel));
+    }
 
     private static string GetDescription(string path, Func<ExifIfd0Directory, string> selector)
     {
         try
         {
-            return selector(ImageMetadataReader.ReadMetadata(path).OfType<ExifIfd0Directory>().FirstOrDefault());
+            return selector(arg: ImageMetadataReader.ReadMetadata(filePath: path).OfType<ExifIfd0Directory>().FirstOrDefault());
         }
         catch
         {

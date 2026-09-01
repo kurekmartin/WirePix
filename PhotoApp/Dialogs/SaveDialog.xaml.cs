@@ -13,6 +13,7 @@ public partial class SaveDialog : UserControl
 {
     private SaveOptions saveResult;
     private MainWindow mainWindow;
+
     public SaveDialog(MainWindow window, SaveOptions options = null)
     {
         InitializeComponent();
@@ -24,6 +25,7 @@ public partial class SaveDialog : UserControl
         {
             saveResult = options;
         }
+
         DataContext = saveResult;
         mainWindow = window;
     }
@@ -31,17 +33,17 @@ public partial class SaveDialog : UserControl
     private bool ValidFileName(string filename)
     {
         char[] invalidFileChars = Path.GetInvalidFileNameChars();
-        return filename.Length > 0 && filename.IndexOfAny(invalidFileChars.ToArray()) == -1;
+        return filename.Length > 0 && filename.IndexOfAny(anyOf: invalidFileChars.ToArray()) == -1;
     }
 
     private void tbFileName_TextChanged(object sender, TextChangedEventArgs e)
     {
-        TextBox tb = sender as TextBox;
-        if (!ValidFileName(tb.Text))
+        var tb = sender as TextBox;
+        if (!ValidFileName(filename: tb.Text))
         {
             tbError.Text = Properties.Resources.InvalidFilename;
         }
-        else if (File.Exists(Path.Combine(Application.Current.Resources[Keys.ProfilesFolder].ToString(), $"{tb.Text}.xml")))
+        else if (File.Exists(path: Path.Combine(path1: Application.Current.Resources[key: Keys.ProfilesFolder].ToString(), path2: $"{tb.Text}.xml")))
         {
             tbError.Text = Properties.Resources.FileExists_Overwrite;
         }
@@ -80,9 +82,9 @@ public partial class SaveDialog : UserControl
 
     private void btnSave_Click(object sender, RoutedEventArgs e)
     {
-        if (ValidFileName(saveResult.FileName))
+        if (ValidFileName(filename: saveResult.FileName))
         {
-            mainWindow.DialogClose(this, saveResult, MainWindow.RESULT_OK);
+            mainWindow.DialogClose(sender: this, result: saveResult, resultCode: MainWindow.RESULT_OK);
         }
     }
 }

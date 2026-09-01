@@ -16,8 +16,8 @@ namespace WirePix.Core.Import;
 public sealed class ImportCoordinator(string tempFolder, string logFolder = null)
 {
     private const int MaxAttempts = 5;
-    private readonly string _tempFolder = tempFolder ?? throw new ArgumentNullException(nameof(tempFolder));
-    private readonly FileLogger _logger = logFolder == null ? null : new FileLogger(logFolder);
+    private readonly string _tempFolder = tempFolder ?? throw new ArgumentNullException(paramName: nameof(tempFolder));
+    private readonly FileLogger _logger = logFolder == null ? null : new FileLogger(folder: logFolder);
     private readonly ThumbnailGenerator _thumbnails = new();
 
     public static Task<ImportPlan> CreatePlanAsync(
@@ -26,7 +26,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         IProgress<ImportProgress> progress = null,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(() => CreatePlan(device, settings, progress, cancellationToken), cancellationToken);
+        return Task.Run(function: () => CreatePlan(device: device, settings: settings, progress: progress, token: cancellationToken), cancellationToken: cancellationToken);
     }
 
     private static ImportPlan CreatePlan(
@@ -36,12 +36,14 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         CancellationToken token)
     {
         var files = new List<ImportFile>();
-        progress?.Report(new ImportProgress(ImportStage.Searching, 0, 0));
+        progress?.Report(value: new ImportProgress(stage: ImportStage.Searching, completed: 0, total: 0));
         device.Connect();
         try
         {
             foreach (ImportDrive drive in device.GetDrives() ?? [])
-                FindMediaFiles(device, drive.RootPath, files, progress, token);
+            {
+                FindMediaFiles(device: device, path: drive.RootPath, result: files, progress: progress, token: token);
+            }
         }
         finally
         {
@@ -51,21 +53,21 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         IEnumerable<ImportFile> selected = files;
         if (settings?.Date != null && settings.Date.Start != default)
         {
-            progress?.Report(new ImportProgress(ImportStage.Filtering, 0, files.Count));
-            DateTime end = settings.Date.End.Date.AddDays(1);
-            selected = files.Where(f => EffectiveDate(f) >= settings.Date.Start && EffectiveDate(f) < end);
+            progress?.Report(value: new ImportProgress(stage: ImportStage.Filtering, completed: 0, total: files.Count));
+            DateTime end = settings.Date.End.Date.AddDays(value: 1);
+            selected = files.Where(predicate: f => EffectiveDate(file: f) >= settings.Date.Start && EffectiveDate(file: f) < end);
         }
 
         List<ImportFile> result =
         [
-            .. selected.OrderBy(EffectiveDate)
-                       .ThenBy(f => f.Name)
+            .. selected.OrderBy(keySelector: EffectiveDate)
+                       .ThenBy(keySelector: f => f.Name)
         ];
 
         return new ImportPlan
         {
             Files = result,
-            TotalBytes = result.Sum(x => x.Length),
+            TotalBytes = result.Sum(selector: x => x.Length),
             Date = settings?.Date
         };
     }
@@ -78,9 +80,9 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
-        List<string> directories = [.. device.EnumerateDirectories(path) ?? []];
-        string dcim = directories.FirstOrDefault(x =>
-            string.Equals(Path.GetFileName(x.TrimEnd('\\', '/')), "DCIM", StringComparison.OrdinalIgnoreCase));
+        List<string> directories = [.. device.EnumerateDirectories(path: path) ?? []];
+        string dcim = directories.FirstOrDefault(predicate: x =>
+            string.Equals(a: Path.GetFileName(path: x.TrimEnd('\\', '/')), b: "DCIM", comparisonType: StringComparison.OrdinalIgnoreCase));
 
         if (dcim != null)
         {
@@ -90,17 +92,17 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         {
             foreach (string child in directories)
             {
-                string name = Path.GetFileName(child.TrimEnd('\\', '/'));
-                if (!string.IsNullOrEmpty(name) && !name.StartsWith('.'))
+                string name = Path.GetFileName(path: child.TrimEnd('\\', '/'));
+                if (!string.IsNullOrEmpty(value: name) && !name.StartsWith(value: '.'))
                 {
-                    FindMediaFiles(device, child, result, progress, token);
+                    FindMediaFiles(device: device, path: child, result: result, progress: progress, token: token);
                 }
             }
 
             return;
         }
 
-        EnumerateDirectory(device, path, result, progress, token);
+        EnumerateDirectory(device: device, path: path, result: result, progress: progress, token: token);
     }
 
     private static void EnumerateDirectory(
@@ -111,18 +113,18 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
-        foreach (ImportFile file in device.EnumerateFiles(path) ?? [])
+        foreach (ImportFile file in device.EnumerateFiles(path: path) ?? [])
         {
-            result.Add(file);
-            progress?.Report(new ImportProgress(ImportStage.Searching, result.Count, 0, file.FullName));
+            result.Add(item: file);
+            progress?.Report(value: new ImportProgress(stage: ImportStage.Searching, completed: result.Count, total: 0, currentFile: file.FullName));
         }
 
-        foreach (string child in device.EnumerateDirectories(path) ?? [])
+        foreach (string child in device.EnumerateDirectories(path: path) ?? [])
         {
-            string name = Path.GetFileName(child.TrimEnd('\\', '/'));
-            if (!string.IsNullOrEmpty(name) && !name.StartsWith('.'))
+            string name = Path.GetFileName(path: child.TrimEnd('\\', '/'));
+            if (!string.IsNullOrEmpty(value: name) && !name.StartsWith(value: '.'))
             {
-                EnumerateDirectory(device, child, result, progress, token);
+                EnumerateDirectory(device: device, path: child, result: result, progress: progress, token: token);
             }
         }
     }
@@ -135,7 +137,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         IProgress<ImportProgress> progress = null,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(() => Execute(device, plan, settings, naming, progress, cancellationToken), cancellationToken);
+        return Task.Run(function: () => Execute(device: device, plan: plan, settings: settings, naming: naming, progress: progress, token: cancellationToken), cancellationToken: cancellationToken);
     }
 
     private ImportResult Execute(
@@ -152,7 +154,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
             return result;
         }
 
-        Directory.CreateDirectory(_tempFolder);
+        Directory.CreateDirectory(path: _tempFolder);
         _logger?.Start();
         var toDelete = new List<string>();
         device.Connect();
@@ -161,31 +163,31 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
             for (var index = 0; index < plan.Files.Count; index++)
             {
                 token.ThrowIfCancellationRequested();
-                ImportFile file = plan.Files[index];
-                progress?.Report(new ImportProgress(ImportStage.Downloading, index, plan.Files.Count, file.FullName));
-                string temp = Path.Combine(_tempFolder, Guid.NewGuid().ToString("N"));
+                ImportFile file = plan.Files[index: index];
+                progress?.Report(value: new ImportProgress(stage: ImportStage.Downloading, completed: index, total: plan.Files.Count, currentFile: file.FullName));
+                string temp = Path.Combine(path1: _tempFolder, path2: Guid.NewGuid().ToString(format: "N"));
                 try
                 {
                     byte[] originalHash = null;
                     if (settings.CheckFiles)
                     {
-                        using Stream stream = device.OpenRead(file);
-                        originalHash = FileOperations.Hash(stream);
+                        using Stream stream = device.OpenRead(file: file);
+                        originalHash = FileOperations.Hash(stream: stream);
                     }
 
                     var downloaded = false;
                     for (var attempt = 0; attempt < MaxAttempts && !downloaded; attempt++)
                     {
-                        device.Download(file, temp);
-                        downloaded = !settings.CheckFiles || FileOperations.Verify(originalHash, temp);
+                        device.Download(file: file, destination: temp);
+                        downloaded = !settings.CheckFiles || FileOperations.Verify(expected: originalHash, path: temp);
                     }
 
                     if (!downloaded)
                     {
-                        throw new IOException("Downloaded file failed hash verification.");
+                        throw new IOException(message: "Downloaded file failed hash verification.");
                     }
 
-                    originalHash ??= FileOperations.Hash(File.OpenRead(temp));
+                    originalHash ??= FileOperations.Hash(stream: File.OpenRead(path: temp));
 
                     var context = new NamingContext
                     {
@@ -195,50 +197,50 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                         Culture = naming?.Culture
                     };
 
-                    string relativeFolder = NameTemplate.EvaluateFolders(settings.Paths.FolderTags, context);
-                    string relativeName = NameTemplate.Evaluate(settings.Paths.FileTags, context) + Path.GetExtension(file.Name);
-                    string relativePath = Path.Combine(relativeFolder ?? string.Empty, relativeName);
+                    string relativeFolder = NameTemplate.EvaluateFolders(folders: settings.Paths.FolderTags, context: context);
+                    string relativeName = NameTemplate.Evaluate(tags: settings.Paths.FileTags, context: context) + Path.GetExtension(path: file.Name);
+                    string relativePath = Path.Combine(path1: relativeFolder ?? string.Empty, path2: relativeName);
                     if (settings.Thumbnail)
                     {
-                        progress?.Report(new ImportProgress(ImportStage.GeneratingThumbnail, index, plan.Files.Count, file.FullName));
+                        progress?.Report(value: new ImportProgress(stage: ImportStage.GeneratingThumbnail, completed: index, total: plan.Files.Count, currentFile: file.FullName));
                     }
 
-                    if (settings.Thumbnail && ThumbnailGenerator.IsImage(temp))
+                    if (settings.Thumbnail && ThumbnailGenerator.IsImage(path: temp))
                     {
-                        string thumbnailPath = Path.Combine(settings.Paths.Thumbnail ?? string.Empty, relativePath);
-                        thumbnailPath = Path.Combine(Path.GetDirectoryName(thumbnailPath) ?? string.Empty, Path.GetFileNameWithoutExtension(thumbnailPath) + "(" + Path.GetExtension(thumbnailPath).TrimStart('.') + ").jpg");
-                        ThumbnailGenerator.Generate(temp, thumbnailPath, settings.ThumbnailSettings, Convert.ToHexStringLower(originalHash));
+                        string thumbnailPath = Path.Combine(path1: settings.Paths.Thumbnail ?? string.Empty, path2: relativePath);
+                        thumbnailPath = Path.Combine(path1: Path.GetDirectoryName(path: thumbnailPath) ?? string.Empty, path2: Path.GetFileNameWithoutExtension(path: thumbnailPath) + "(" + Path.GetExtension(path: thumbnailPath).TrimStart(trimChar: '.') + ").jpg");
+                        ThumbnailGenerator.Generate(source: temp, output: thumbnailPath, settings: settings.ThumbnailSettings, hash: Convert.ToHexStringLower(inArray: originalHash));
                     }
 
-                    if (!SaveToRoots(settings, relativePath, temp, originalHash, file.FullName))
+                    if (!SaveToRoots(settings: settings, relativePath: relativePath, temp: temp, hash: originalHash, original: file.FullName))
                     {
-                        throw new IOException("Could not save file.");
+                        throw new IOException(message: "Could not save file.");
                     }
 
                     result.FilesDone++;
                     if (settings.DeleteFiles)
                     {
-                        toDelete.Add(file.FullName);
+                        toDelete.Add(item: file.FullName);
                     }
                 }
                 catch (Exception ex)
                 {
                     result.Errors++;
-                    _logger?.Add(ex.ToString(), LogType.Error, nameof(Execute));
+                    _logger?.Add(message: ex.ToString(), type: LogType.Error, function: nameof(Execute));
                 }
                 finally
                 {
-                    if (File.Exists(temp))
+                    if (File.Exists(path: temp))
                     {
-                        File.Delete(temp);
+                        File.Delete(path: temp);
                     }
                 }
             }
 
             foreach (string source in toDelete)
             {
-                progress?.Report(new ImportProgress(ImportStage.Deleting, result.Deleted, toDelete.Count, source));
-                device.Delete(source);
+                progress?.Report(value: new ImportProgress(stage: ImportStage.Deleting, completed: result.Deleted, total: toDelete.Count, currentFile: source));
+                device.Delete(fullName: source);
                 result.Deleted++;
             }
         }
@@ -248,7 +250,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
             _logger?.Stop();
         }
 
-        progress?.Report(new ImportProgress(ImportStage.Completed, result.FilesDone, result.FilesTotal));
+        progress?.Report(value: new ImportProgress(stage: ImportStage.Completed, completed: result.FilesDone, total: result.FilesTotal));
         return result;
     }
 
@@ -256,23 +258,23 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
     {
         foreach (string root in new[] { settings.Paths.Root, settings.Paths.Backup })
         {
-            if (string.IsNullOrEmpty(root))
+            if (string.IsNullOrEmpty(value: root))
             {
                 return true;
             }
 
-            string destination = Path.Combine(root, relativePath);
-            if (File.Exists(destination))
+            string destination = Path.Combine(path1: root, path2: relativePath);
+            if (File.Exists(path: destination))
             {
-                destination = FileOperations.UniqueName(destination, temp);
+                destination = FileOperations.UniqueName(path: destination, sourcePath: temp);
             }
 
-            Directory.CreateDirectory(Path.GetDirectoryName(destination) ?? root);
+            Directory.CreateDirectory(path: Path.GetDirectoryName(path: destination) ?? root);
             var copied = false;
             for (var attempt = 0; attempt < MaxAttempts && !copied; attempt++)
             {
-                File.Copy(temp, destination, true);
-                copied = !settings.CheckFiles || FileOperations.Verify(hash, destination);
+                File.Copy(sourceFileName: temp, destFileName: destination, overwrite: true);
+                copied = !settings.CheckFiles || FileOperations.Verify(expected: hash, path: destination);
             }
 
             if (!copied)
@@ -284,5 +286,8 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         return true;
     }
 
-    private static DateTime EffectiveDate(ImportFile file) => file.CreationTime != default ? file.CreationTime : file.DateAuthored != default ? file.DateAuthored : file.LastWriteTime;
+    private static DateTime EffectiveDate(ImportFile file)
+    {
+        return file.CreationTime != default ? file.CreationTime : file.DateAuthored != default ? file.DateAuthored : file.LastWriteTime;
+    }
 }

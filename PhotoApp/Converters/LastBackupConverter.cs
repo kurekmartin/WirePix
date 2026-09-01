@@ -4,18 +4,18 @@ using System.Windows.Data;
 
 namespace PhotoApp.Converters;
 
-class LastBackupConverter : IValueConverter
+internal class LastBackupConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        DateTime date = (DateTime)value;
+        var date = (DateTime)value;
         if (date == new DateTime())
         {
             return Properties.Resources.LastBackup_Never;
         }
         else
         {
-            return date.ToString("dd.MM.yyyy HH:mm:ss");
+            return date.ToString(format: "dd.MM.yyyy HH:mm:ss");
         }
     }
 

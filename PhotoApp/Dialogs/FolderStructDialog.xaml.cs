@@ -24,26 +24,27 @@ public class FolderLevel : ObservableObject
         Index = index;
         if (tags != null)
         {
-            Tags = new ObservableCollection<string>(tags);
+            Tags = new ObservableCollection<string>(list: tags);
         }
         else
         {
             Tags = new ObservableCollection<string>();
         }
-
     }
+
     public int Index
     {
-        get { return _index; }
+        get => _index;
         set
         {
             _index = value;
             OnPropertyChanged();
         }
     }
+
     public ObservableCollection<string> Tags
     {
-        get { return _tags; }
+        get => _tags;
         set
         {
             _tags = value;
@@ -54,16 +55,16 @@ public class FolderLevel : ObservableObject
 
     private void Tags_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        OnPropertyChanged("Tags");
+        OnPropertyChanged(propertyName: "Tags");
     }
 }
 
 public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
 {
     private MainWindow mainWindow;
-    private ObservableCollection<FolderLevel> _folderStructure;//struktura pro uložení fotek
-    private List<ButtonGroupStruct> _buttons = new List<ButtonGroupStruct>();
-    private Point _buttonGridSize = new Point();
+    private ObservableCollection<FolderLevel> _folderStructure; //struktura pro uložení fotek
+    private List<ButtonGroupStruct> _buttons = new();
+    private Point _buttonGridSize = new();
     private int _selectedFolderIndex = -1; //index vybrané složky
     private int _selectedTagIndex = -1; //index vybraneho tagu
 
@@ -71,7 +72,7 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
 
     public ObservableCollection<FolderLevel> FolderStructure
     {
-        get { return _folderStructure; }
+        get => _folderStructure;
         set
         {
             _folderStructure = value;
@@ -82,7 +83,7 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
 
     private void FolderStructure_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        ObservableCollection<FolderLevel> folders = sender as ObservableCollection<FolderLevel>;
+        var folders = sender as ObservableCollection<FolderLevel>;
         int index = e.OldStartingIndex == -1 ? e.NewStartingIndex : e.OldStartingIndex;
         short change = 0;
         if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -93,7 +94,8 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
         {
             change = 1;
         }
-        int i = 0;
+
+        var i = 0;
         foreach (FolderLevel folder in folders)
         {
             if (i++ > index)
@@ -101,28 +103,36 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
                 folder.Index += change;
             }
         }
-        OnPropertyChanged("FolderStructure");
+
+        OnPropertyChanged(propertyName: "FolderStructure");
     }
 
     public int SelectedFolderIndex
     {
-        get { return _selectedFolderIndex; }
+        get => _selectedFolderIndex;
         set
         {
             if (_selectedFolderIndex != value)
             {
                 _selectedFolderIndex = value;
                 OnPropertyChanged();
-                OnPropertyChanged("SelectedFolder");
-                if (SelectedFolder != null && SelectedFolder.Tags.Count > 0) { SelectedTagIndex = 0; }
+                OnPropertyChanged(propertyName: "SelectedFolder");
+                if (SelectedFolder != null && SelectedFolder.Tags.Count > 0)
+                {
+                    SelectedTagIndex = 0;
+                }
             }
         }
     }
 
     public int SelectedTagIndex
     {
-        get { return _selectedTagIndex; }
-        set { _selectedTagIndex = value; OnPropertyChanged(); }
+        get => _selectedTagIndex;
+        set
+        {
+            _selectedTagIndex = value;
+            OnPropertyChanged();
+        }
     }
 
     public FolderLevel SelectedFolder
@@ -131,7 +141,7 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
         {
             if (SelectedFolderIndex > -1 && SelectedFolderIndex < FolderStructure.Count)
             {
-                return FolderStructure[SelectedFolderIndex];
+                return FolderStructure[index: SelectedFolderIndex];
             }
             else
             {
@@ -140,33 +150,43 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
         }
         set
         {
-            FolderStructure[SelectedFolderIndex] = value;
+            FolderStructure[index: SelectedFolderIndex] = value;
             OnPropertyChanged();
         }
     }
 
     public List<ButtonGroupStruct> Buttons
     {
-        get { return _buttons; }
-        set { _buttons = value; OnPropertyChanged(); }
+        get => _buttons;
+        set
+        {
+            _buttons = value;
+            OnPropertyChanged();
+        }
     }
 
     public Point ButtonGridSize
     {
-        get { return _buttonGridSize; }
-        set { _buttonGridSize = value; OnPropertyChanged(); }
+        get => _buttonGridSize;
+        set
+        {
+            _buttonGridSize = value;
+            OnPropertyChanged();
+        }
     }
 
     private void SelectedFolder_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        OnPropertyChanged("SelectedFolder");
+        OnPropertyChanged(propertyName: "SelectedFolder");
     }
 
     public event PropertyChangedEventHandler PropertyChanged;
+
     private void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PropertyChanged?.Invoke(sender: this, e: new PropertyChangedEventArgs(propertyName: propertyName));
     }
+
     public FolderStructDialog(MainWindow window, List<ButtonGroupStruct> buttons, List<List<string>> initStructure = null)
     {
         FolderStructure = new ObservableCollection<FolderLevel>();
@@ -174,12 +194,12 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
         InitializeComponent();
         mainWindow = window;
 
-        ButtonGridSize = new Point(buttons.Max(x => x.gridPosition.X) + 1,
-            buttons.Max(x => x.gridPosition.Y) + 1);
+        ButtonGridSize = new Point(x: buttons.Max(selector: x => x.gridPosition.X) + 1,
+            y: buttons.Max(selector: x => x.gridPosition.Y) + 1);
         Buttons = buttons;
 
-        int i = 0;
-        initStructure.ForEach(x => FolderStructure.Add(new FolderLevel(i++, x)));
+        var i = 0;
+        initStructure.ForEach(action: x => FolderStructure.Add(item: new FolderLevel(index: i++, tags: x)));
         if (FolderStructure.Count == 0)
         {
             //vytvoreni korene treeView
@@ -188,8 +208,12 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
         else
         {
             SelectedFolderIndex = 0;
-            if (SelectedFolder.Tags.Count > 0) { SelectedTagIndex = 0; }
+            if (SelectedFolder.Tags.Count > 0)
+            {
+                SelectedTagIndex = 0;
+            }
         }
+
         ShowControls();
     }
 
@@ -198,11 +222,14 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
     private void Button_Click(object sender, RoutedEventArgs e)
     {
         tbError.Text = ""; //reset chybové hlášky
-        string tagCode = ((Button)sender).Tag.ToString();
+        var tagCode = ((Button)sender).Tag.ToString();
 
-        if (SelectedFolderIndex == -1) { SelectedFolderIndex = FolderStructure.Count() - 1; }
+        if (SelectedFolderIndex == -1)
+        {
+            SelectedFolderIndex = FolderStructure.Count() - 1;
+        }
 
-        if (ValidCustomText(tbCustomText))
+        if (ValidCustomText(textBox: tbCustomText))
         {
             if (tagCode == Properties.TagCodes.NewFolder) //přidání nové složky
             {
@@ -218,25 +245,23 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
                     }
                 }
             }
-            else if (TagAdd(tagCode, FolderStructure[SelectedFolderIndex].Tags.ToList(), tbError))
+            else if (TagAdd(tagCode: tagCode, tags: FolderStructure[index: SelectedFolderIndex].Tags.ToList(), error: tbError))
             {
-                FolderStructure[SelectedFolderIndex].Tags.Insert(SelectedTagIndex + 1, tagCode);
+                FolderStructure[index: SelectedFolderIndex].Tags.Insert(index: SelectedTagIndex + 1, item: tagCode);
                 SelectedTagIndex++;
                 ShowControls();
             }
         }
         else
         {
-            ShowCustomTextError(tbCustomText, tbControlsError);
+            ShowCustomTextError(customText: tbCustomText, errorBlock: tbControlsError);
         }
-
-
     }
 
     //vytvoření nové složky
     private void NewFolderLevel()
     {
-        FolderStructure.Insert(SelectedFolderIndex + 1, new FolderLevel(SelectedFolderIndex + 1));
+        FolderStructure.Insert(index: SelectedFolderIndex + 1, item: new FolderLevel(index: SelectedFolderIndex + 1));
         SelectedFolderIndex++;
         SelectedTagIndex = -1;
         btnDeleteFolder.Visibility = Visibility.Collapsed;
@@ -249,7 +274,7 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
         //Regex regex = new Regex(@"^[a-zA-Z0-9\-_]*$");
         //e.Handled = !regex.IsMatch(e.Text);
 
-        e.Handled = e.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0;
+        e.Handled = e.Text.IndexOfAny(anyOf: Path.GetInvalidFileNameChars()) >= 0;
     }
 
 
@@ -258,9 +283,9 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
     {
         if (e.RemovedItems.Count > 0 && ((ComboBox)sender).SelectedIndex > -1)
         {
-            TagStruct tag = (TagStruct)((ComboBox)sender).SelectedItem;
+            var tag = (TagStruct)((ComboBox)sender).SelectedItem;
             int oldIndex = SelectedTagIndex;
-            FolderStructure[SelectedFolderIndex].Tags[SelectedTagIndex] = tag.Code;
+            FolderStructure[index: SelectedFolderIndex].Tags[index: SelectedTagIndex] = tag.Code;
             SelectedTagIndex = oldIndex;
         }
     }
@@ -269,16 +294,17 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
     private void TagSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         tbControlsError.Visibility = Visibility.Hidden;
-        if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0 && Tags.GetTag(code: e.RemovedItems[0].ToString()).Code == Properties.TagCodes.CustomText) //kontrola parametru CustomText
+        if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0 && Tags.GetTag(code: e.RemovedItems[index: 0].ToString()).Code == Properties.TagCodes.CustomText) //kontrola parametru CustomText
         {
-            string tag = FolderStructure[SelectedFolderIndex].Tags.First(x => x == e.RemovedItems[0].ToString());
-            string text = Tags.GetParameter(tag);
-            if (!Tags.IsValidFileName(text))
+            string tag = FolderStructure[index: SelectedFolderIndex].Tags.First(predicate: x => x == e.RemovedItems[index: 0].ToString());
+            string text = Tags.GetParameter(visibleText: tag);
+            if (!Tags.IsValidFileName(text: text))
             {
-                SelectedTagIndex = FolderStructure[SelectedFolderIndex].Tags.IndexOf(tag);
-                ShowCustomTextError(tbCustomText, tbControlsError);
+                SelectedTagIndex = FolderStructure[index: SelectedFolderIndex].Tags.IndexOf(item: tag);
+                ShowCustomTextError(customText: tbCustomText, errorBlock: tbControlsError);
             }
         }
+
         ShowControls();
     }
 
@@ -287,10 +313,10 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
     {
         int oldIndex = SelectedTagIndex;
 
-        if (FolderStructure[SelectedFolderIndex].Tags.Count > 0)
+        if (FolderStructure[index: SelectedFolderIndex].Tags.Count > 0)
         {
-            FolderStructure[SelectedFolderIndex].Tags.RemoveAt(SelectedTagIndex);
-            if (oldIndex >= FolderStructure[SelectedFolderIndex].Tags.Count)
+            FolderStructure[index: SelectedFolderIndex].Tags.RemoveAt(index: SelectedTagIndex);
+            if (oldIndex >= FolderStructure[index: SelectedFolderIndex].Tags.Count)
             {
                 SelectedTagIndex = oldIndex - 1;
             }
@@ -311,7 +337,7 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
 
     private void DeleteSelectedFolder()
     {
-        FolderStructure.RemoveAt(SelectedFolderIndex);
+        FolderStructure.RemoveAt(index: SelectedFolderIndex);
         if (FolderStructure.Count == 0)
         {
             NewFolderLevel();
@@ -322,26 +348,29 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
     private void tbCustomText_TextChanged(object sender, TextChangedEventArgs e)
     {
         int oldIndex = SelectedTagIndex;
-        string tag = FolderStructure[SelectedFolderIndex].Tags[SelectedTagIndex];
-        tag = Tags.RemoveParameter(tag);
+        string tag = FolderStructure[index: SelectedFolderIndex].Tags[index: SelectedTagIndex];
+        tag = Tags.RemoveParameter(tag: tag);
         tag += $"({tbCustomText.Text})";
 
-        FolderStructure[SelectedFolderIndex].Tags[SelectedTagIndex] = tag;
+        FolderStructure[index: SelectedFolderIndex].Tags[index: SelectedTagIndex] = tag;
         SelectedTagIndex = oldIndex;
         tbCustomText.Focus();
 
-        if (tbCustomText.Text.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        if (tbCustomText.Text.IndexOfAny(anyOf: Path.GetInvalidFileNameChars()) >= 0)
         {
-            ShowCustomTextError(tbCustomText, tbControlsError);
+            ShowCustomTextError(customText: tbCustomText, errorBlock: tbControlsError);
         }
-        else { tbError.Text = ""; }
+        else
+        {
+            tbError.Text = "";
+        }
     }
 
     private void ShowControls()
     {
         cbGroupSelect.Visibility = tbCustomText.Visibility = btnDeleteTag.Visibility = Visibility.Collapsed;
 
-        if (SelectedFolderIndex > -1 && FolderStructure.Count() > 0 && FolderStructure[SelectedFolderIndex].Tags.Count() > 0)
+        if (SelectedFolderIndex > -1 && FolderStructure.Count() > 0 && FolderStructure[index: SelectedFolderIndex].Tags.Count() > 0)
         {
             btnDeleteFolder.Visibility = Visibility.Visible;
 
@@ -349,21 +378,21 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
             {
                 btnDeleteTag.Visibility = Visibility.Visible;
 
-                string tagText = FolderStructure[SelectedFolderIndex].Tags[SelectedTagIndex];
+                string tagText = FolderStructure[index: SelectedFolderIndex].Tags[index: SelectedTagIndex];
                 TagStruct tag = Tags.GetTag(code: tagText);
 
                 if (tag.Group != string.Empty)
                 {
-                    List<TagStruct> tagGroup = Tags.GetTagGroup(tag.Group);
+                    List<TagStruct> tagGroup = Tags.GetTagGroup(code: tag.Group);
 
                     cbGroupSelect.ItemsSource = tagGroup;
-                    cbGroupSelect.SelectedIndex = tagGroup.IndexOf(tag);
+                    cbGroupSelect.SelectedIndex = tagGroup.IndexOf(item: tag);
                     cbGroupSelect.Visibility = Visibility.Visible;
                 }
                 else if (tag.Code == Properties.TagCodes.CustomText)
                 {
                     tbCustomText.Visibility = Visibility.Visible;
-                    tbCustomText.Text = Tags.GetParameter(tagText);
+                    tbCustomText.Text = Tags.GetParameter(visibleText: tagText);
                     tbCustomText.Focus();
                 }
             }
@@ -375,7 +404,6 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
         else
         {
             btnDeleteFolder.Visibility = Visibility.Hidden;
-
         }
     }
 
@@ -383,38 +411,37 @@ public partial class FolderStructDialog : UserControl, INotifyPropertyChanged
     {
         if (tbCustomText.Visibility != Visibility.Visible)
         {
-            OnPropertyChanged("SelectedFolder");
+            OnPropertyChanged(propertyName: "SelectedFolder");
             ShowControls();
             if (FolderStructure.Count > 0 && SelectedFolderIndex != FolderStructure.Count() - 1 && FolderStructure.Last().Tags.Count == 0)
             {
-                FolderStructure.Remove(FolderStructure.Last());
+                FolderStructure.Remove(item: FolderStructure.Last());
             }
         }
-        else if (e.RemovedItems.Count > 0 && !Tags.IsValidFileName(tbCustomText.Text))
+        else if (e.RemovedItems.Count > 0 && !Tags.IsValidFileName(text: tbCustomText.Text))
         {
-            SelectedFolderIndex = ((FolderLevel)e.RemovedItems[0]).Index;
-            ShowCustomTextError(tbCustomText, tbControlsError);
+            SelectedFolderIndex = ((FolderLevel)e.RemovedItems[index: 0]).Index;
+            ShowCustomTextError(customText: tbCustomText, errorBlock: tbControlsError);
         }
-
     }
 
     //ukončení formuláře
     private void btnDone_Click(object sender, RoutedEventArgs e)
     {
-        if (ValidCustomText(tbCustomText))
+        if (ValidCustomText(textBox: tbCustomText))
         {
-            List<List<string>> result = new List<List<string>>();
-            FolderStructure.ToList().ForEach(x => result.Add(x.Tags.ToList()));
-            mainWindow.DialogClose(this, result, MainWindow.RESULT_OK);
+            var result = new List<List<string>>();
+            FolderStructure.ToList().ForEach(action: x => result.Add(item: x.Tags.ToList()));
+            mainWindow.DialogClose(sender: this, result: result, resultCode: MainWindow.RESULT_OK);
         }
         else
         {
-            ShowCustomTextError(tbCustomText, tbControlsError);
+            ShowCustomTextError(customText: tbCustomText, errorBlock: tbControlsError);
         }
     }
 
     private void btnCancel_Click(object sender, RoutedEventArgs e)
     {
-        mainWindow.DialogClose(this, resultCode: MainWindow.RESULT_CANCEL);
+        mainWindow.DialogClose(sender: this, resultCode: MainWindow.RESULT_CANCEL);
     }
 }

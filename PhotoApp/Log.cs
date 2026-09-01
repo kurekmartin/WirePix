@@ -6,36 +6,41 @@ namespace PhotoApp;
 
 public enum LogType
 {
-    INFO, WARNING, ERROR
+    INFO,
+    WARNING,
+    ERROR
 }
-class Log
+
+internal class Log
 {
     private bool _running { get; set; } = false;
     private string _currentLog;
     private static string _timeFormat = "yyyy-MM-dd HH:mm:ss,fff";
     private static string _fileNameFormat = "yyyy-MM-dd HH-mm-ss";
-    private string _logFolder = Application.Current.Resources[Properties.Keys.LogsFolder].ToString();
+    private string _logFolder = Application.Current.Resources[key: Properties.Keys.LogsFolder].ToString();
+
     public Log()
     {
-        Directory.CreateDirectory(_logFolder);
+        Directory.CreateDirectory(path: _logFolder);
     }
+
     public void Start()
     {
-        string fileName = DateTime.Now.ToString(_fileNameFormat);
-        _currentLog = Path.Combine(_logFolder, fileName + ".log");
+        var fileName = DateTime.Now.ToString(format: _fileNameFormat);
+        _currentLog = Path.Combine(path1: _logFolder, path2: fileName + ".log");
         _running = true;
         //File.CreateText(_currentLog);
     }
 
     public void Add(string message, LogType type, string functionName = "")
     {
-        string time = DateTime.Now.ToString(_timeFormat);
-        File.AppendAllText(_currentLog, $"[{time}][{type}]{functionName} - {message}\n");
+        var time = DateTime.Now.ToString(format: _timeFormat);
+        File.AppendAllText(path: _currentLog, contents: $"[{time}][{type}]{functionName} - {message}\n");
     }
 
     public void Stop()
     {
-        var file = new FileInfo(_currentLog);
+        var file = new FileInfo(fileName: _currentLog);
         _running = false;
     }
 
@@ -45,5 +50,4 @@ class Log
 
         private set => _running = value;
     }
-
 }

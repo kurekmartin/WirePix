@@ -4,13 +4,12 @@ using System.Windows.Data;
 
 namespace PhotoApp.Converters;
 
-class TagToValue : IValueConverter
+internal class TagToValue : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        string tag = value as string;
-        return Tags.GetSampleValueByTag(tag);
-
+        var tag = value as string;
+        return Tags.GetSampleValueByTag(tagCode: tag);
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

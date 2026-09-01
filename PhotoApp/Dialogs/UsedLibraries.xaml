@@ -1,73 +1,80 @@
 ﻿<UserControl x:Class="PhotoApp.Dialogs.UsedLibraries"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:PhotoApp.Dialogs"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:p ="clr-namespace:PhotoApp.Properties"
+             xmlns:p="clr-namespace:PhotoApp.Properties"
              mc:Ignorable="d">
     <materialDesign:Card>
         <StackPanel Orientation="Vertical">
             <materialDesign:ColorZone Mode="PrimaryMid" CornerRadius="5,5,0,0">
-                <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}" Text="{x:Static p:Resources.LibrariesUsed}" Padding="5" TextAlignment="Center"/>
+                <TextBlock Style="{StaticResource MaterialDesignHeadline6TextBlock}"
+                           Text="{x:Static p:Resources.LibrariesUsed}" Padding="5" TextAlignment="Center" />
             </materialDesign:ColorZone>
             <StackPanel Orientation="Vertical" Margin="10">
                 <DockPanel Margin="0,0,0,5" HorizontalAlignment="Stretch">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="MediaDevices" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="MediaDevices" FontWeight="Bold" />
                     <Button x:Name="btnMediaDevices"
                             Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
                             HorizontalAlignment="Right" Margin="10,0,0,0" Click="btnMediaDevices_Click">
-                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25"/>
+                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25" />
                     </Button>
                 </DockPanel>
-                
+
                 <DockPanel Margin="0,0,0,5" HorizontalAlignment="Stretch">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="Magick.NET" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="Magick.NET" FontWeight="Bold" />
                     <Button x:Name="btnMagickNET"
                             Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
                             HorizontalAlignment="Right" Margin="10,0,0,0" Click="btnMagickNET_Click">
-                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25"/>
+                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25" />
                     </Button>
                 </DockPanel>
 
                 <DockPanel Margin="0,0,0,5" HorizontalAlignment="Stretch">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="MaterialDesignThemes" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="MaterialDesignThemes" FontWeight="Bold" />
                     <Button x:Name="btnMaterialDesign"
                             Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
                             HorizontalAlignment="Right" Margin="10,0,0,0" Click="btnMaterialDesign_Click">
-                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25"/>
+                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25" />
                     </Button>
                 </DockPanel>
 
                 <DockPanel Margin="0,0,0,5" HorizontalAlignment="Stretch">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="MetadataExtractor" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="MetadataExtractor" FontWeight="Bold" />
                     <Button x:Name="btnMetadataExtractor"
                             Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
                             HorizontalAlignment="Right" Margin="10,0,0,0" Click="btnMetadataExtractor_Click">
-                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25"/>
+                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25" />
                     </Button>
                 </DockPanel>
 
                 <DockPanel Margin="0,0,0,5" HorizontalAlignment="Stretch">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="Octokit" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="Octokit" FontWeight="Bold" />
                     <Button x:Name="btnOctokit"
                             Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
                             HorizontalAlignment="Right" Margin="10,0,0,0" Click="btnOctokit_Click">
-                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25"/>
+                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25" />
                     </Button>
                 </DockPanel>
 
                 <DockPanel Margin="0,0,0,5" HorizontalAlignment="Stretch">
-                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}" Text="Usb.Events" FontWeight="Bold"/>
+                    <TextBlock VerticalAlignment="Center" Style="{StaticResource MaterialDesignBody2TextBlock}"
+                               Text="Usb.Events" FontWeight="Bold" />
                     <Button x:Name="btnUsbEvents"
                             Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
                             HorizontalAlignment="Right" Margin="10,0,0,0" Click="btnUsbEvents_Click">
-                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25"/>
+                        <materialDesign:PackIcon Kind="Github" Width="25" Height="25" />
                     </Button>
                 </DockPanel>
             </StackPanel>
-            <Button x:Name="btnOK" Content="{x:Static p:Resources.OK}" Margin="15,10" Grid.Row="1" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}"/>
+            <Button x:Name="btnOK" Content="{x:Static p:Resources.OK}" Margin="15,10"
+                    Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" />
         </StackPanel>
     </materialDesign:Card>
 </UserControl>
