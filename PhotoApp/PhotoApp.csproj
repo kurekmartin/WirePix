@@ -1,408 +1,75 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <IncludeMaterialDesignFont>True</IncludeMaterialDesignFont>
-    <MaterialDesignFontDirectory>Resources\Roboto\</MaterialDesignFontDirectory>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B1E61C48-5C3A-4DE6-97DE-3ACAC327E8FA}</ProjectGuid>
     <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.17763.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>PhotoApp</RootNamespace>
     <AssemblyName>WirePix</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <WarningLevel>4</WarningLevel>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
-    <PublishUrl>publish\</PublishUrl>
-    <Install>true</Install>
-    <InstallFrom>Disk</InstallFrom>
-    <UpdateEnabled>false</UpdateEnabled>
-    <UpdateMode>Foreground</UpdateMode>
-    <UpdateInterval>7</UpdateInterval>
-    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
-    <UpdatePeriodically>false</UpdatePeriodically>
-    <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
-    <ApplicationRevision>0</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <UseApplicationTrust>false</UseApplicationTrust>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
     <ApplicationIcon>icon.ico</ApplicationIcon>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
+    <IncludeMaterialDesignFont>true</IncludeMaterialDesignFont>
+    <MaterialDesignFontDirectory>Resources\Roboto\</MaterialDesignFontDirectory>
+    <Platforms>x64</Platforms>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>false</Prefer32Bit>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssetTargetFallback>$(AssetTargetFallback);net48</AssetTargetFallback>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Magick.NET-Q8-x64, Version=11.1.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=AMD64">
-      <HintPath>..\packages\Magick.NET-Q8-x64.11.1.0\lib\net20\Magick.NET-Q8-x64.dll</HintPath>
-    </Reference>
-    <Reference Include="Magick.NET.Core, Version=11.1.0.0, Culture=neutral, PublicKeyToken=2004825badfa91ec, processorArchitecture=MSIL">
-      <HintPath>..\packages\Magick.NET.Core.11.1.0\lib\net20\Magick.NET.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignColors, Version=2.0.5.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignColors.2.0.5\lib\net452\MaterialDesignColors.dll</HintPath>
-    </Reference>
-    <Reference Include="MaterialDesignThemes.Wpf, Version=4.4.0.0, Culture=neutral, PublicKeyToken=df2a72020bd7962a, processorArchitecture=MSIL">
-      <HintPath>..\packages\MaterialDesignThemes.4.4.0\lib\net452\MaterialDesignThemes.Wpf.dll</HintPath>
-    </Reference>
-    <Reference Include="MediaDevices, Version=1.9.1.0, Culture=neutral, PublicKeyToken=36ac35b4ea7a1f67, processorArchitecture=MSIL">
-      <HintPath>..\packages\MediaDevices.1.9.1\lib\net45\MediaDevices.dll</HintPath>
-    </Reference>
-    <Reference Include="MetadataExtractor, Version=2.7.2.0, Culture=neutral, PublicKeyToken=b66b5ccaf776c301, processorArchitecture=MSIL">
-      <HintPath>..\packages\MetadataExtractor.2.7.2\lib\net45\MetadataExtractor.dll</HintPath>
-    </Reference>
-    <Reference Include="Octokit, Version=0.50.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Octokit.0.50.0\lib\net46\Octokit.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.CodeDom, Version=6.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.CodeDom.6.0.0\lib\net461\System.CodeDom.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Deployment" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Management" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="Usb.Events, Version=10.0.1.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Usb.Events.10.0.1.1\lib\netstandard2.0\Usb.Events.dll</HintPath>
-    </Reference>
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="XmpCore, Version=6.1.10.1, Culture=neutral, PublicKeyToken=961f4f366277b80e, processorArchitecture=MSIL">
-      <HintPath>..\packages\XmpCore.6.1.10.1\lib\net35\XmpCore.dll</HintPath>
-    </Reference>
+    <PackageReference Include="Magick.NET.Core" Version="11.1.0" />
+    <PackageReference Include="Magick.NET-Q8-x64" Version="11.1.0" />
+    <PackageReference Include="MaterialDesignColors" Version="2.0.5" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.4.0" />
+    <PackageReference Include="MediaDevices" Version="1.9.1" />
+    <PackageReference Include="MetadataExtractor" Version="2.7.2" />
+    <PackageReference Include="Octokit" Version="0.50.0" />
+    <PackageReference Include="System.CodeDom" Version="6.0.0" />
+    <PackageReference Include="System.Management" Version="6.0.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+    <PackageReference Include="Usb.Events" Version="10.0.1.1" />
+    <PackageReference Include="XmpCore" Version="6.1.10.1" />
   </ItemGroup>
+
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-    <Compile Include="Converters\EqualityConverter.cs" />
-    <Compile Include="Converters\IndexToMargin.cs" />
-    <Compile Include="Converters\MarginFromListCount.cs" />
-    <Compile Include="Converters\ListIndexToMargin.cs" />
-    <Compile Include="Converters\TagCodeToLabel.cs" />
-    <Compile Include="Converters\TagToValue.cs" />
-    <Compile Include="Converters\TimeSpanToString.cs" />
-    <Compile Include="Converters\ArrayToProgress.cs" />
-    <Compile Include="Converters\IntToFileSearchStatusConverter.cs" />
-    <Compile Include="Converters\IntToDeviceStatusConverter.cs" />
-    <Compile Include="Converters\LastBackupConverter.cs" />
-    <Compile Include="Converters\ListToStringConverter.cs" />
-    <Compile Include="Dialogs\AppFeedbackDialog.xaml.cs">
-      <DependentUpon>AppFeedbackDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ChangelogDialog.xaml.cs">
-      <DependentUpon>ChangelogDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\AppSettingsDialog.xaml.cs">
-      <DependentUpon>AppSettingsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\BaseStructDialog.cs" />
-    <Compile Include="Dialogs\AppInfoDialog.xaml.cs">
-      <DependentUpon>AppInfoDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ErrorDialog.xaml.cs">
-      <DependentUpon>ErrorDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\FileStructDialog.xaml.cs">
-      <DependentUpon>FileStructDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\SaveDialog.xaml.cs">
-      <DependentUpon>SaveDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Converters\EnumCompare.cs" />
-    <Compile Include="Converters\EnumToBoleanConverter.cs" />
-    <Compile Include="Dialogs\UpdateDialog.xaml.cs">
-      <DependentUpon>UpdateDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\UsedLibraries.xaml.cs">
-      <DependentUpon>UsedLibraries.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Languages.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Languages.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Resources.en.Designer.cs">
-      <DependentUpon>Resources.en.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Properties\Resources.cs.Designer.cs">
-      <DependentUpon>Resources.cs.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="UIElements\UpdateControl.xaml.cs">
-      <DependentUpon>UpdateControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\YesNoDialog.xaml.cs">
-      <DependentUpon>YesNoDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="FileExif.cs" />
-    <Compile Include="Log.cs" />
-    <Compile Include="Models\BaseObserveObject.cs" />
-    <Compile Include="Models\DeviceInfo.cs" />
-    <Compile Include="Models\SaveOptions.cs" />
-    <Compile Include="Models\DateRange.cs" />
-    <Compile Include="Models\PathStruct.cs" />
-    <Compile Include="Models\Thumbnails.cs" />
-    <Compile Include="Models\DownloadSettings.cs" />
-    <Compile Include="Dialogs\Tags.cs" />
-    <Compile Include="Properties\Keys.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Keys.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\TagGroups.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TagGroups.resx</DependentUpon>
-    </Compile>
-    <Page Include="CircularProgress.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\AppFeedbackDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\ChangelogDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\AppSettingsDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\AppInfoDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\ErrorDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\FileStructDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Dialogs\FolderStructDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\SaveDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\UpdateDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\UsedLibraries.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UIElements\UpdateControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Dialogs\YesNoDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="CircularProgress.xaml.cs">
-      <DependentUpon>CircularProgress.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Device.cs" />
-    <Compile Include="DeviceList.cs" />
-    <Compile Include="Dialogs\FolderStructDialog.xaml.cs">
-      <DependentUpon>FolderStructDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Dialogs\ProgressDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Dialogs\ProgressDialog.xaml.cs">
-      <DependentUpon>ProgressDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\ProgressUpdateArgs.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Properties\TagCodes.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TagCodes.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
-    <EmbeddedResource Include="Properties\Keys.resx">
+    <EmbeddedResource Update="Properties\Keys.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Keys.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Languages.resx">
+    <EmbeddedResource Update="Properties\Languages.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Languages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.en.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.en.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.cs.resx">
+    <EmbeddedResource Update="Properties\Resources.cs.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.cs.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
+    <EmbeddedResource Update="Properties\Resources.en.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.en.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\TagCodes.resx">
+    <EmbeddedResource Update="Properties\TagCodes.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>TagCodes.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\TagGroups.resx">
+    <EmbeddedResource Update="Properties\TagGroups.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TagGroups.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="MediaDevices.chm" />
-    <None Include="packages.config" />
-    <None Include="Properties\Settings.settings">
+    <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
+
   <ItemGroup>
     <Resource Include="MediaDevicesLicense.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.8 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
-    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
-      <Visible>False</Visible>
-      <ProductName>.NET Framework 3.5 SP1</ProductName>
-      <Install>false</Install>
-    </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="icon.ico" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\MaterialDesignThemes.4.4.0\build\MaterialDesignThemes.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MaterialDesignThemes.4.4.0\build\MaterialDesignThemes.targets'))" />
-    <Error Condition="!Exists('..\packages\Magick.NET-Q8-x64.11.1.0\build\net20\Magick.NET-Q8-x64.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Magick.NET-Q8-x64.11.1.0\build\net20\Magick.NET-Q8-x64.targets'))" />
-  </Target>
-  <Import Project="..\packages\MaterialDesignThemes.4.4.0\build\MaterialDesignThemes.targets" Condition="Exists('..\packages\MaterialDesignThemes.4.4.0\build\MaterialDesignThemes.targets')" />
-  <Import Project="..\packages\Magick.NET-Q8-x64.11.1.0\build\net20\Magick.NET-Q8-x64.targets" Condition="Exists('..\packages\Magick.NET-Q8-x64.11.1.0\build\net20\Magick.NET-Q8-x64.targets')" />
 </Project>

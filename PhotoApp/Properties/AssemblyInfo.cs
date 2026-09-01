@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using System.Windows;
 
 // Obecné informace o sestavení se řídí přes následující 
@@ -18,6 +19,7 @@ using System.Windows;
 // pro komponenty modelu COM. Pokud potřebujete přístup k typu v tomto sestavení
 // z modelu COM, nastavte atribut ComVisible tohoto typu na True.
 [assembly: ComVisible(false)]
+[assembly: SupportedOSPlatform("windows10.0.17763.0")]
 
 //Pokud chcete začít vytvářet aplikace, které se dají lokalizovat, nastavte
 //<UICulture>JazykováVerzeVeKteréPíšeteKód</UICulture> v souboru .csproj

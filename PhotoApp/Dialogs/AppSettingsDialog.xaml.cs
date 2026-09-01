@@ -66,7 +66,7 @@ namespace PhotoApp.Dialogs
         private void btnRestart_Click(object sender, RoutedEventArgs e)
         {
             var currentExecutablePath = Process.GetCurrentProcess().MainModule.FileName;
-            Process.Start(currentExecutablePath);
+            ShellLauncher.Open(currentExecutablePath);
             Application.Current.Shutdown();
         }
 

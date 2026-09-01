@@ -109,7 +109,7 @@ namespace PhotoApp.UIElements
 
                     if (File.Exists(downloadFile))
                     {
-                        Process.Start(downloadFile);
+                        ShellLauncher.Open(downloadFile);
                         System.Windows.Application.Current.Shutdown();
                     }
                 }
@@ -122,7 +122,7 @@ namespace PhotoApp.UIElements
         }
         private void btnManualUpdate_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(_release.HtmlUrl);
+            ShellLauncher.Open(_release.HtmlUrl);
         }
 
         private void SetDownloadingStatus(bool status)
