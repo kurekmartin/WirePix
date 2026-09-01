@@ -1,12 +1,10 @@
 ﻿using MaterialDesignThemes.Wpf;
 using System;
-using System.Deployment.Application;
 using System.IO;
 using System.Reflection;
 using System.Windows;
 using System.Linq;
 using System.Globalization;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Collections;
 using System.Threading;
@@ -88,14 +86,7 @@ namespace PhotoApp
         {
             get
             {
-                try
-                {
-                    return ApplicationDeployment.CurrentDeployment.CurrentVersion.ToString(3);
-                }
-                catch (Exception)
-                {
-                    return Assembly.GetExecutingAssembly().GetName().Version.ToString(3);
-                }
+                return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3);
             }
         }
 

@@ -57,12 +57,12 @@ namespace PhotoApp.Dialogs
 
         private void btnShowLicense_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/KurekMartin/WirePix/blob/master/LICENSE");
+            ShellLauncher.Open("https://github.com/KurekMartin/WirePix/blob/master/LICENSE");
         }
 
         private void btnShowCode_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/KurekMartin/WirePix");
+            ShellLauncher.Open("https://github.com/KurekMartin/WirePix");
         }
 
         private void tbEmail_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

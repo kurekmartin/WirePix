@@ -28,32 +28,32 @@ namespace PhotoApp.Dialogs
 
         private void btnMagickNET_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/dlemstra/Magick.NET");
+            ShellLauncher.Open("https://github.com/dlemstra/Magick.NET");
         }
 
         private void btnMaterialDesign_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit");
+            ShellLauncher.Open("https://github.com/MaterialDesignInXAML/MaterialDesignInXamlToolkit");
         }
 
         private void btnMetadataExtractor_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/drewnoakes/metadata-extractor-dotnet");
+            ShellLauncher.Open("https://github.com/drewnoakes/metadata-extractor-dotnet");
         }
 
         private void btnOctokit_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/octokit/octokit.net");
+            ShellLauncher.Open("https://github.com/octokit/octokit.net");
         }
 
         private void btnUsbEvents_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/Jinjinov/Usb.Events");
+            ShellLauncher.Open("https://github.com/Jinjinov/Usb.Events");
         }
 
         private void btnMediaDevices_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("https://github.com/Bassman2/MediaDevices");
+            ShellLauncher.Open("https://github.com/Bassman2/MediaDevices");
         }
     }
 }

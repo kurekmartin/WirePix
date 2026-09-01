@@ -23,7 +23,7 @@ namespace PhotoApp.Dialogs
         }
         private void btnSendFeedback_Click(object sender, RoutedEventArgs e)
         {
-            System.Diagnostics.Process.Start("https://forms.gle/D5HTruypWjfqEToq6");
+            ShellLauncher.Open("https://forms.gle/D5HTruypWjfqEToq6");
         }
 
         private void btnShowDumpFiles_Click(object sender, RoutedEventArgs e)

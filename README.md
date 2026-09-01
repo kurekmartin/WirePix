@@ -46,3 +46,18 @@ In the current version of the program you can also download files from your phon
 - download directly from SD card reader
 
 If you have a suggestion for improvement you can use the feedback option in the program.
+
+## Development
+
+WirePix is a Windows-only WPF application targeting .NET 10 and x64. Building it requires a .NET 10 SDK. Visual Studio users should use Visual Studio 2026 with the .NET desktop development workload.
+
+Restore and build the application from the repository root:
+
+```powershell
+dotnet restore PhotoApp/PhotoApp.csproj
+dotnet build PhotoApp/PhotoApp.csproj --configuration Release --no-restore
+```
+
+The supported operating systems are x64 editions of Windows 10 version 1809 or later and Windows 11 that are supported by .NET 10. The current migration intentionally keeps the existing NuGet package versions; package modernization will be handled separately.
+
+The legacy Visual Studio Installer project has not yet been migrated for .NET 10 and is excluded from default solution builds. Build and test the application project directly; do not use the existing installer for .NET 10 releases.

@@ -734,7 +734,7 @@ namespace PhotoApp
                     return;
                 }
 
-                var size = new MagickGeometry(settings.ThumbnailSettings.Value);
+                var size = new MagickGeometry((uint)settings.ThumbnailSettings.Value);
                 switch (settings.ThumbnailSettings.Selected)
                 {
                     case ThumbnailSelect.longerSide:
@@ -750,7 +750,7 @@ namespace PhotoApp
                     Defines = new DngReadDefines
                     {
                         ReadThumbnail = true,
-                        UseCameraWhitebalance = true,
+                        UseCameraWhiteBalance = true,
                     }
                 };
 
@@ -762,7 +762,7 @@ namespace PhotoApp
 
                     if (profile != null)
                     {
-                        using (var jpgThumbnail = new MagickImage(profile.GetData())) //use embedded thumbnail
+                        using (var jpgThumbnail = new MagickImage(profile.ToByteArray())) //use embedded thumbnail
                         {
                             if (IsLargerResolution(settings.ThumbnailSettings, jpgThumbnail.Width, jpgThumbnail.Height))
                             {
@@ -781,7 +781,7 @@ namespace PhotoApp
                     using (MagickImage image = new MagickImage(tmpFile, readSettings))
                     {
                         image.Thumbnail(size);
-                        image.TransformColorSpace(ColorProfile.AdobeRGB1998);
+                        image.TransformColorSpace(ColorProfiles.AdobeRGB1998);
                         image.AutoLevel();
                         image.Comment = origHash;
                         Directory.CreateDirectory(Path.GetDirectoryName(outFile));
@@ -824,7 +824,7 @@ namespace PhotoApp
             return format.ModuleFormat == MagickFormat.Dng || (format.MimeType != null && format.MimeType.Contains("image"));
         }
 
-        private bool IsLargerResolution(Thumbnails thumbnailSettings, int width, int height)
+        private bool IsLargerResolution(Thumbnails thumbnailSettings, uint width, uint height)
         {
 
             if (thumbnailSettings.Selected == ThumbnailSelect.longerSide)
