@@ -1,4 +1,4 @@
-﻿using PhotoApp.Models;
+﻿using WirePix.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,7 +14,7 @@ using static PhotoApp.Dialogs.BaseStructDialog;
 
 namespace PhotoApp.Dialogs
 {
-    public class FolderLevel : BaseObserveObject
+    public class FolderLevel : ObservableObject
     {
         private int _index;
         private ObservableCollection<string> _tags;

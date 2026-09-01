@@ -1,15 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace PhotoApp.Models
+namespace WirePix.Core.Models
 {
-    public class BaseObserveObject : INotifyPropertyChanged
+    public class ObservableObject : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 }

@@ -19,15 +19,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Magick.NET-Q8-x64" Version="14.16.0" />
     <PackageReference Include="MaterialDesignColors" Version="2.0.5" />
     <PackageReference Include="MaterialDesignThemes" Version="4.4.0" />
     <PackageReference Include="MediaDevices" Version="1.9.1" />
-    <PackageReference Include="MetadataExtractor" Version="2.7.2" />
     <PackageReference Include="Octokit" Version="0.50.0" />
     <PackageReference Include="System.Management" Version="6.0.0" />
     <PackageReference Include="Usb.Events" Version="10.0.1.1" />
-    <PackageReference Include="XmpCore" Version="6.1.10.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -68,5 +65,9 @@
   <ItemGroup>
     <Resource Include="MediaDevicesLicense.txt" />
     <Resource Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WirePix.Core\WirePix.Core.csproj" />
+    <Compile Remove="Models\*.cs" />
   </ItemGroup>
 </Project>

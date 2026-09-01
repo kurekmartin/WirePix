@@ -1,4 +1,4 @@
-﻿using PhotoApp.Models;
+﻿using WirePix.Core.Models;
 using System.IO;
 using System.Linq;
 using System.Windows;

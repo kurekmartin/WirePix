@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Collections;
 using System.Threading;
+using WirePix.Core.Models;
 
 namespace PhotoApp
 {
@@ -53,6 +54,7 @@ namespace PhotoApp
             Resources.Add(PhotoApp.Properties.Keys.ProfilesFolder, Path.Combine(appData, mainFolder, "Profiles"));
             Resources.Add(PhotoApp.Properties.Keys.DataFolder, Path.Combine(appData, mainFolder, "Data"));
             Resources.Add(PhotoApp.Properties.Keys.CrashReportsFolder, Path.Combine(appData, mainFolder, "Crash Reports"));
+            DownloadSettings.ProfileDirectory = Resources[PhotoApp.Properties.Keys.ProfilesFolder].ToString();
 
             var keys = Current.Resources.Keys.GetEnumerator();
             while (keys.MoveNext())

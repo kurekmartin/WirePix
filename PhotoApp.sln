@@ -3,8 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoApp", "PhotoApp\PhotoApp.csproj", "{B1E61C48-5C3A-4DE6-97DE-3ACAC327E8FA}"
-EndProject
+	Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PhotoApp", "PhotoApp\PhotoApp.csproj", "{B1E61C48-5C3A-4DE6-97DE-3ACAC327E8FA}"
+	EndProject
+	Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WirePix.Core", "WirePix.Core\WirePix.Core.csproj", "{3D337101-7B61-4ABC-B23A-C7572A6210AE}"
+	EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "WirePix Setup", "Photo Manager Setup\Photo Manager Setup.vdproj", "{7A01CC83-E1BA-41E4-BE23-43114ECAE5B3}"
 EndProject
 Global
@@ -15,6 +17,14 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3D337101-7B61-4ABC-B23A-C7572A6210AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D337101-7B61-4ABC-B23A-C7572A6210AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D337101-7B61-4ABC-B23A-C7572A6210AE}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3D337101-7B61-4ABC-B23A-C7572A6210AE}.Debug|x64.Build.0 = Debug|Any CPU
+		{3D337101-7B61-4ABC-B23A-C7572A6210AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D337101-7B61-4ABC-B23A-C7572A6210AE}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{3D337101-7B61-4ABC-B23A-C7572A6210AE}.Release|x64.ActiveCfg = Release|Any CPU
+		{3D337101-7B61-4ABC-B23A-C7572A6210AE}.Release|x64.Build.0 = Release|Any CPU
 		{B1E61C48-5C3A-4DE6-97DE-3ACAC327E8FA}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{B1E61C48-5C3A-4DE6-97DE-3ACAC327E8FA}.Debug|Any CPU.Build.0 = Debug|x64
 		{B1E61C48-5C3A-4DE6-97DE-3ACAC327E8FA}.Debug|x64.ActiveCfg = Debug|x64

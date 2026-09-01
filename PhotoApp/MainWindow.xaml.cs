@@ -1,6 +1,6 @@
 ﻿using MaterialDesignThemes.Wpf;
 using PhotoApp.Dialogs;
-using PhotoApp.Models;
+using WirePix.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

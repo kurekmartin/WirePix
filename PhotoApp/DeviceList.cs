@@ -1,5 +1,5 @@
 ﻿using MediaDevices;
-using PhotoApp.Models;
+using WirePix.Core.Models;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 
 namespace PhotoApp
 {
-    public class DeviceList : BaseObserveObject
+    public class DeviceList : ObservableObject
     {
         [XmlElement]
         public ObservableCollection<DeviceInfo> DeviceInfo = new ObservableCollection<DeviceInfo>();
