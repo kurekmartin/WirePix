@@ -8,53 +8,50 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.IO;
 using static PhotoApp.Dialogs.BaseStructDialog;
+using WirePix.Core.Naming.Templates;
 
 namespace PhotoApp.Dialogs;
 
 public partial class FileStructDialog : UserControl, INotifyPropertyChanged
 {
     private MainWindow mainWindow;
-    private ObservableCollection<string> _fileStructure = new(); //struktura souboru
-    private List<ButtonGroupStruct> _buttons = new();
-    private Point _buttonGridSize = new();
-    private int _selectedIndex = -1;
 
     public ObservableCollection<string> FileStructure
     {
-        get => _fileStructure;
+        get;
         set
         {
-            _fileStructure = value;
+            field = value;
             OnPropertyChanged();
         }
     }
 
     public int SelectedIndex
     {
-        get => _selectedIndex;
+        get;
         set
         {
-            _selectedIndex = value;
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = -1;
 
     public List<ButtonGroupStruct> Buttons
     {
-        get => _buttons;
+        get;
         set
         {
-            _buttons = value;
+            field = value;
             OnPropertyChanged();
         }
     }
 
     public Point ButtonGridSize
     {
-        get => _buttonGridSize;
+        get;
         set
         {
-            _buttonGridSize = value;
+            field = value;
             OnPropertyChanged();
         }
     }
@@ -76,7 +73,11 @@ public partial class FileStructDialog : UserControl, INotifyPropertyChanged
             y: buttons.Max(selector: x => x.gridPosition.Y) + 1);
         Buttons = buttons;
 
-        FileStructure = new ObservableCollection<string>(list: initStructure);
+        if (initStructure != null)
+        {
+            FileStructure = new ObservableCollection<string>(list: initStructure);
+        }
+
         if (FileStructure.Count > 0)
         {
             SelectedIndex = 0;
@@ -98,7 +99,7 @@ public partial class FileStructDialog : UserControl, INotifyPropertyChanged
             SelectedIndex++;
         }
 
-        if (FileStructure.Count() > 0)
+        if (FileStructure.Any())
         {
             ShowControls();
         }
@@ -108,30 +109,32 @@ public partial class FileStructDialog : UserControl, INotifyPropertyChanged
     {
         cbGroupSelect.Visibility = tbCustomText.Visibility = Visibility.Collapsed;
 
-        if (FileStructure.Count() > 0)
+        if (FileStructure.Count > 0)
         {
             tbFileExt.Visibility = Visibility.Visible;
 
-            if (SelectedIndex >= 0)
+            if (SelectedIndex < 0)
             {
-                btnDeleteTag.Visibility = Visibility.Visible;
+                return;
+            }
 
-                string tagText = FileStructure[index: SelectedIndex];
-                TagStruct tag = Tags.GetTag(code: tagText);
+            btnDeleteTag.Visibility = Visibility.Visible;
 
-                if (tag.Group != string.Empty)
-                {
-                    List<TagStruct> tagGroup = Tags.GetTagGroup(code: tag.Group);
+            string tagText = FileStructure[index: SelectedIndex];
+            TagStruct tag = TagPresentation.GetTag(code: tagText);
 
-                    cbGroupSelect.ItemsSource = tagGroup;
-                    cbGroupSelect.SelectedIndex = tagGroup.IndexOf(item: tag);
-                    cbGroupSelect.Visibility = Visibility.Visible;
-                }
-                else if (tag.Code == Properties.TagCodes.CustomText)
-                {
-                    tbCustomText.Visibility = Visibility.Visible;
-                    tbCustomText.Text = Tags.GetParameter(visibleText: tagText);
-                }
+            if (tag.Group != string.Empty)
+            {
+                List<TagStruct> tagGroup = TagPresentation.GetTagGroup(group: tag.Group);
+
+                cbGroupSelect.ItemsSource = tagGroup;
+                cbGroupSelect.SelectedIndex = tagGroup.IndexOf(item: tag);
+                cbGroupSelect.Visibility = Visibility.Visible;
+            }
+            else if (tag.Code == Properties.TagCodes.CustomText)
+            {
+                tbCustomText.Visibility = Visibility.Visible;
+                tbCustomText.Text = NameTemplate.GetParameter(tag: tagText);
             }
         }
         else
@@ -146,11 +149,11 @@ public partial class FileStructDialog : UserControl, INotifyPropertyChanged
     private void TagSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         tbControlsError.Visibility = Visibility.Hidden;
-        if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0 && Tags.GetTag(code: e.RemovedItems[index: 0].ToString()).Code == Properties.TagCodes.CustomText) //kontrola parametru CustomText
+        if (e.AddedItems.Count > 0 && e.RemovedItems.Count > 0 && TagPresentation.GetTag(code: e.RemovedItems[index: 0].ToString()).Code == Properties.TagCodes.CustomText) //kontrola parametru CustomText
         {
             string tag = FileStructure.First(predicate: x => x == e.RemovedItems[index: 0].ToString());
-            string text = Tags.GetParameter(visibleText: tag);
-            if (!Tags.IsValidFileName(text: text))
+            string text = NameTemplate.GetParameter(tag: tag);
+            if (!NameTemplate.IsValidFileName(text: text))
             {
                 SelectedIndex = FileStructure.IndexOf(item: tag);
                 ShowCustomTextError(customText: tbCustomText, errorBlock: tbControlsError);
@@ -173,13 +176,15 @@ public partial class FileStructDialog : UserControl, INotifyPropertyChanged
     //změna vybraneho tagu
     private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (e.RemovedItems.Count > 0 && ((ComboBox)sender).SelectedIndex > -1)
+        if (e.RemovedItems.Count <= 0 || ((ComboBox)sender).SelectedIndex <= -1)
         {
-            var tag = (TagStruct)((ComboBox)sender).SelectedItem;
-            int oldIndex = SelectedIndex;
-            FileStructure[index: SelectedIndex] = tag.Code;
-            SelectedIndex = oldIndex;
+            return;
         }
+
+        var tag = (TagStruct)((ComboBox)sender).SelectedItem;
+        int oldIndex = SelectedIndex;
+        FileStructure[index: SelectedIndex] = tag.Code;
+        SelectedIndex = oldIndex;
     }
 
     //smazani vybraneho tagu
@@ -210,7 +215,7 @@ public partial class FileStructDialog : UserControl, INotifyPropertyChanged
         int oldIndex = SelectedIndex;
         string tag = FileStructure[index: SelectedIndex];
 
-        tag = Tags.RemoveParameter(tag: tag);
+        tag = NameTemplate.RemoveParameter(tag: tag);
         tag += $"({tbCustomText.Text})";
 
         FileStructure[index: SelectedIndex] = tag;

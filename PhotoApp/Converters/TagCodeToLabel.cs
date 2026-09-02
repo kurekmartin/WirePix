@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
+using PhotoApp.Dialogs;
+using WirePix.Core.Naming.Templates;
 
 namespace PhotoApp.Converters;
 
@@ -12,24 +10,20 @@ internal class TagCodeToLabel : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        string code, tag;
-        if (value is string)
-        {
-            tag = code = value as string;
-            if (tag.Contains(value: "("))
-            {
-                code = Tags.RemoveParameter(tag: tag);
-                return $"{Tags.GetTag(code: code).VisibleText}({Tags.GetParameter(visibleText: tag)})";
-            }
-            else
-            {
-                return Tags.GetTag(code: code).VisibleText;
-            }
-        }
-        else
+        if (value is not string s)
         {
             return string.Empty;
         }
+
+        string code;
+        string tag = code = s;
+        if (!tag.Contains(value: '('))
+        {
+            return TagPresentation.GetTag(code: code).VisibleText;
+        }
+
+        code = NameTemplate.RemoveParameter(tag: tag);
+        return $"{TagPresentation.GetTag(code: code).VisibleText}({NameTemplate.GetParameter(tag: tag)})";
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

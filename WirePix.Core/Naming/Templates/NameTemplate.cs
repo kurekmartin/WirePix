@@ -12,30 +12,6 @@ namespace WirePix.Core.Naming.Templates;
 
 public static partial class NameTemplate
 {
-    public static List<string> Parse(string template)
-    {
-        var result = new List<string>();
-        while (!string.IsNullOrEmpty(value: template))
-        {
-            Match match = TokenRegex().Match(input: template);
-            string token = match.Success ? match.Value : FreeTextRegex().Match(input: template).Value;
-            if (match.Success && token.Length < template.Length && template[index: token.Length] == '(')
-            {
-                token += TagParameterRegex().Match(input: template).Value;
-            }
-
-            if (token.Length == 0)
-            {
-                break;
-            }
-
-            result.Add(item: token);
-            template = template[token.Length..];
-        }
-
-        return result;
-    }
-
     public static string Evaluate(IEnumerable<string> tags, NamingContext context)
     {
         if (context == null)
@@ -45,7 +21,7 @@ public static partial class NameTemplate
 
         MediaItem file = context.File;
         DateTime date = string.IsNullOrEmpty(value: context.LocalFilePath)
-            ? default
+            ? context.File == null ? DateTime.Now : default
             : FileExif.GetDateTimeOriginal(path: context.LocalFilePath);
         if (date == default)
         {
@@ -114,7 +90,7 @@ public static partial class NameTemplate
         }
     }
 
-    private static string NormalizeCode(string code)
+    public static string NormalizeCode(string code)
     {
         return code is ['{', _, ..] && code[^1] == '}'
             ? code[1..^1]
@@ -143,15 +119,6 @@ public static partial class NameTemplate
     {
         return !string.IsNullOrEmpty(value: text) && text.IndexOfAny(anyOf: Path.GetInvalidFileNameChars()) < 0;
     }
-
-    [GeneratedRegex(pattern: @"\{.*?\}")]
-    private static partial Regex TokenRegex();
-
-    [GeneratedRegex(pattern: @"[^\{]*")]
-    private static partial Regex FreeTextRegex();
-
-    [GeneratedRegex(pattern: @"\(.*?\)")]
-    private static partial Regex TagParameterRegex();
 
     [GeneratedRegex(pattern: @"(?<=\().+?(?=\))")]
     private static partial Regex TagParameterContentRegex();
