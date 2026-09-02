@@ -1,22 +1,22 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Windows;
-using MediaDevices;
-using PhotoApp.Devices;
 using PhotoApp.Properties;
 using WirePix.Core.Import;
 using WirePix.Core.Import.Contracts;
 using WirePix.Core.Naming.Templates;
+using WirePix.Devices.Contracts;
+using WirePix.Devices.Models;
 
 namespace PhotoApp;
 
 public sealed class Device
 {
-    private readonly MediaDevicesImportDevice _source;
+    private IMediaDevice _sourceDevice;
     private readonly ImportCoordinator _coordinator;
     private ImportPlan _plan;
     private List<string> _fileTypes;
@@ -27,54 +27,54 @@ public sealed class Device
     public const int DEVICE_UNKNOWN_STATUS = -1, DEVICE_CANNOT_CONNECT = 0, DEVICE_READY = 1;
     public const int DEVICE_FILES_READY = 1, DEVICE_FILES_SEARCHING = 0, DEVICE_FILES_ERROR = -1;
 
-    public Device(MediaDevice mediaDevice)
+    public Device(IMediaDevice mediaDevice)
     {
-        _source = new MediaDevicesImportDevice(device: mediaDevice);
+        _sourceDevice = mediaDevice ?? throw new ArgumentNullException(paramName: nameof(mediaDevice));
         ResourceDictionary resources = Application.Current.Resources;
-        _coordinator = new ImportCoordinator(tempFolder: resources[key: Keys.TempFolder].ToString(), logFolder: resources[key: Keys.LogsFolder].ToString());
+        _coordinator = new ImportCoordinator(
+            tempFolder: resources[key: Keys.TempFolder].ToString(),
+            logFolder: resources[key: Keys.LogsFolder].ToString());
     }
 
-    public string Id => _source.Id;
-    public string Manufacturer => _source.Manufacturer;
-    public string Name => _source.Name;
+    public string Id => _sourceDevice.Id;
+    public string Manufacturer => _sourceDevice.Manufacturer ?? string.Empty;
+    public string Name => _sourceDevice.DisplayName;
 
-    public int Status
-    {
-        get
-        {
-            try
-            {
-                _source.Connect();
-                _source.Disconnect();
-                return DEVICE_READY;
-            }
-            catch
-            {
-                return DEVICE_CANNOT_CONNECT;
-            }
-        }
-    }
+    public int Status => _sourceDevice.Status.IsUsable
+        ? DEVICE_READY
+        : DEVICE_CANNOT_CONNECT;
 
-    public int FileSearchStatus => _plan == null ? DEVICE_FILES_SEARCHING : _plan.Files.Count > 0 ? DEVICE_FILES_READY : DEVICE_FILES_ERROR;
+    public int FileSearchStatus => _plan == null
+        ? DEVICE_FILES_SEARCHING
+        : _plan.Files.Count > 0
+            ? DEVICE_FILES_READY
+            : DEVICE_FILES_ERROR;
 
     public List<string> MediaDirectories =>
     [
-        .. _source.GetDrives()
-                  .Select(selector: x => x.RootPath)
+        .. _sourceDevice.GetMediaSourcesAsync(CancellationToken.None)
+                  .GetAwaiter()
+                  .GetResult()
+                  .Select(selector: source => source.DevicePath)
     ];
 
     public double[] Space
     {
         get
         {
-            try
-            {
-                return _source.GetSpace();
-            }
-            catch
+            MediaDeviceStorage storage = _sourceDevice.Storage;
+            if (storage == null)
             {
                 return [0d, 0d, 0d];
             }
+
+            const double bytesPerGigabyte = 1073741824d;
+            return
+            [
+                Math.Round(value: storage.TotalBytes / bytesPerGigabyte, digits: 2),
+                Math.Round(value: storage.AvailableBytes / bytesPerGigabyte, digits: 2),
+                Math.Round(value: storage.UsedBytes / bytesPerGigabyte, digits: 2)
+            ];
         }
     }
 
@@ -85,49 +85,43 @@ public sealed class Device
             return _fileTypes;
         }
 
-        _fileTypes = [];
         try
         {
-            _source.Connect();
-            foreach (ImportDrive drive in _source.GetDrives())
-            {
-                CollectTypes(path: drive.RootPath);
-            }
-
-            _source.Disconnect();
+            _fileTypes =
+            [
+                .. _sourceDevice.GetMediaAsync(CancellationToken.None)
+                          .GetAwaiter()
+                          .GetResult()
+                          .Select(selector: item => Path.GetExtension(item.FileName).ToUpperInvariant())
+                          .Distinct()
+            ];
         }
         catch
         {
-            // ignored
+            _fileTypes = [];
         }
 
         return _fileTypes;
     }
 
-    private void CollectTypes(string path)
-    {
-        foreach (ImportFile file in _source.EnumerateFiles(path: path) ?? [])
-        {
-            string ext = Path.GetExtension(path: file.Name).ToUpperInvariant();
-            if (!_fileTypes.Contains(item: ext))
-            {
-                _fileTypes.Add(item: ext);
-            }
-        }
-
-        foreach (string child in _source.EnumerateDirectories(path: path) ?? [])
-        {
-            CollectTypes(path: child);
-        }
-    }
-
     public int FilesToDownload => FilesToCopyCount;
+
+    internal void UpdateSource(IMediaDevice mediaDevice)
+    {
+        _sourceDevice = mediaDevice ?? throw new ArgumentNullException(paramName: nameof(mediaDevice));
+    }
 
     public void GetFilesByDate(BackgroundWorker worker, DoWorkEventArgs e, DownloadSettings settings)
     {
         try
         {
-            _plan = ImportCoordinator.CreatePlanAsync(device: _source, settings: settings, progress: new Progress<ImportProgress>(handler: p => Report(worker: worker, p: p)), cancellationToken: CancellationToken.None).GetAwaiter().GetResult();
+            _plan = ImportCoordinator.CreatePlanAsync(
+                    device: _sourceDevice,
+                    settings: settings,
+                    progress: new Progress<ImportProgress>(handler: progress => Report(worker: worker, p: progress)),
+                    cancellationToken: CancellationToken.None)
+                .GetAwaiter()
+                .GetResult();
             FilesTotal = _plan.Files.Count;
             e.Result = new WorkerResult(code: MainWindow.RESULT_OK, task: TaskType.FindFiles);
         }
@@ -155,7 +149,18 @@ public sealed class Device
                 return;
             }
 
-            ImportResult result = _coordinator.ExecuteAsync(device: _source, plan: _plan, settings: settings, naming: new NamingContext(), progress: new Progress<ImportProgress>(handler: p => Report(worker: worker, p: p))).GetAwaiter().GetResult();
+            ImportResult result = _coordinator.ExecuteAsync(
+                    device: _sourceDevice,
+                    plan: _plan,
+                    settings: settings,
+                    naming: new NamingContext
+                    {
+                        TagLanguage = Settings.Default.TagLanguage,
+                        UseTagLanguage = Settings.Default.UseDifferentLangForTags
+                    },
+                    progress: new Progress<ImportProgress>(handler: progress => Report(worker: worker, p: progress)))
+                .GetAwaiter()
+                .GetResult();
             FilesDoneCount = result.FilesDone;
             Errors = result.Errors;
             FilesTotal = result.FilesTotal;
@@ -183,20 +188,22 @@ public sealed class Device
             ImportStage.Searching => Resources.FileSearch,
             ImportStage.Filtering => Resources.DeviceFileFilterDate,
             ImportStage.Downloading => Resources.DeviceCopyingFiles,
-            ImportStage.GeneratingThumbnail => Resources.DeviceGeneratingThumbnail,
+            ImportStage.GeneratingThumbnail => string.Format(
+                format: Resources.DeviceGeneratingThumbnail,
+                arg0: p.CurrentFile ?? string.Empty),
             ImportStage.Deleting => Resources.DeviceDeletingFilesTask,
             _ => Resources.DeviceSortingFile
         };
-        worker.ReportProgress(percentProgress: p.Total == 0
-                ? 0
-                : p.Completed * 100 / p.Total,
+        worker.ReportProgress(
+            percentProgress: p.Total == 0 ? 0 : p.Completed * 100 / p.Total,
             userState: new ProgressUpdateArgs
             {
                 taskName = task,
                 currentTask = p.CurrentFile ?? string.Empty,
                 progressText = p.Total == 0
                     ? string.Empty
-                    : string.Format(format: Resources.DeviceFilesDoneCount,
+                    : string.Format(
+                        format: Resources.DeviceFilesDoneCount,
                         arg0: p.Completed,
                         arg1: p.Total),
                 indeterminateTask = p.Total == 0

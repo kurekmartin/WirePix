@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using ImageMagick;
+using ImageMagick.Formats;
+using WirePix.Core.Files;
 using WirePix.Core.Models.Settings;
 
 namespace WirePix.Core.Imaging;
@@ -14,17 +16,57 @@ public sealed class ThumbnailGenerator
             return;
         }
 
-        Directory.CreateDirectory(path: Path.GetDirectoryName(path: output) ?? string.Empty);
-        using var image = new MagickImage(fileName: source);
-        var geometry = new MagickGeometry(widthAndHeight: (uint)settings.Value) { FillArea = settings.Selected == ThumbnailSelect.shorterSide };
-        image.AutoOrient();
-        image.Thumbnail(geometry: geometry);
-        if (hash != null)
+        output = ResolveOutput(source: source, output: output, settings: settings, hash: hash);
+        if (output == null)
         {
-            image.Comment = hash;
+            return;
         }
 
-        image.Write(fileName: output, format: MagickFormat.Jpg);
+        var geometry = new MagickGeometry(widthAndHeight: (uint)settings.Value)
+        {
+            FillArea = settings.Selected == ThumbnailSelect.shorterSide
+        };
+        var readSettings = new MagickReadSettings
+        {
+            Defines = new DngReadDefines
+            {
+                ReadThumbnail = true,
+                UseCameraWhiteBalance = true
+            }
+        };
+
+        var thumbnailCreated = false;
+        using (var image = new MagickImage())
+        {
+            image.Ping(fileName: source, readSettings: readSettings);
+            IImageProfile profile = image.GetProfile(name: "dng:thumbnail");
+            if (profile != null)
+            {
+                using var embeddedThumbnail = new MagickImage(data: profile.ToByteArray());
+                if (IsLargerResolution(
+                        settings: settings,
+                        width: embeddedThumbnail.Width,
+                        height: embeddedThumbnail.Height))
+                {
+                    embeddedThumbnail.AutoOrient();
+                    embeddedThumbnail.Thumbnail(geometry: geometry);
+                    CreateOutputDirectory(output: output);
+                    embeddedThumbnail.Write(fileName: output);
+                    thumbnailCreated = true;
+                }
+            }
+        }
+
+        if (!thumbnailCreated)
+        {
+            using var image = new MagickImage(fileName: source, readSettings: readSettings);
+            image.Thumbnail(geometry: geometry);
+            image.TransformColorSpace(target: ColorProfiles.AdobeRGB1998);
+            image.AutoLevel();
+            image.Comment = hash;
+            CreateOutputDirectory(output: output);
+            image.Write(fileName: output, format: MagickFormat.Jpg);
+        }
     }
 
     public static bool IsImage(string path)
@@ -39,6 +81,41 @@ public sealed class ThumbnailGenerator
         catch
         {
             return false;
+        }
+    }
+
+    private static string ResolveOutput(string source, string output, Thumbnails settings, string hash)
+    {
+        if (!File.Exists(path: output))
+        {
+            return output;
+        }
+
+        using var image = new MagickImage(fileName: output);
+        if (image.Comment == hash)
+        {
+            bool matches = settings.Selected == ThumbnailSelect.longerSide
+                ? settings.Value == Math.Max(val1: image.Width, val2: image.Height)
+                : settings.Value == Math.Min(val1: image.Width, val2: image.Height);
+            return matches ? null : output;
+        }
+
+        return FileOperations.UniqueName(path: output, sourcePath: source, alwaysUnique: true);
+    }
+
+    private static bool IsLargerResolution(Thumbnails settings, uint width, uint height)
+    {
+        return settings.Selected == ThumbnailSelect.longerSide
+            ? Math.Max(val1: width, val2: height) > settings.Value
+            : Math.Min(val1: width, val2: height) > settings.Value;
+    }
+
+    private static void CreateOutputDirectory(string output)
+    {
+        string directory = Path.GetDirectoryName(path: output);
+        if (!string.IsNullOrEmpty(value: directory))
+        {
+            Directory.CreateDirectory(path: directory);
         }
     }
 }

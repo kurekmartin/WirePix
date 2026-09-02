@@ -14,7 +14,8 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Octokit;
-using Usb.Events;
+using WirePix.Devices.Contracts;
+using WirePix.Devices.Windows;
 using Application = System.Windows.Application;
 using DateRange = WirePix.Core.Models.Settings.DateRange;
 
@@ -48,7 +49,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     public List<string> Profiles { get; set; }
 
     public DeviceList DeviceList { get; set; }
-    private static readonly IUsbEventWatcher usbEventWatcher = new UsbEventWatcher();
+    private readonly IMediaDeviceProvider deviceProvider;
     public ProgressDialog progressDialog { get; private set; } = null;
     private BackgroundWorker backgroundWorker = null;
     private DateTime backupStart = new();
@@ -72,7 +73,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DataContext = this;
         DownloadSettings = new DownloadSettings();
         Profiles = new List<string>();
-        DeviceList = new DeviceList();
+        deviceProvider = new WindowsMediaDeviceProvider();
+        DeviceList = new DeviceList(provider: deviceProvider);
 
         DeviceList.Load();
 
@@ -90,8 +92,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         ListConnectedDevices();
 
         //udalost pripojeni/odpojeni zarizeni -> aktualizace seznamu
-        usbEventWatcher.UsbDeviceAdded += (_, device) => Dispatcher.Invoke(callback: ListConnectedDevices);
-        usbEventWatcher.UsbDeviceRemoved += (_, device) => Dispatcher.Invoke(callback: ListConnectedDevices);
+        deviceProvider.DevicesChanged += DeviceProvider_DevicesChanged;
 
         Properties.Settings.Default.PropertyChanged += Settings_Changed;
 
@@ -153,9 +154,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
 
     //nalezeni a vypis vsech zarizeni vyuzivajicich MTP
-    private void ListConnectedDevices()
+    private async void ListConnectedDevices()
     {
-        ListBoxDevices.SelectedIndex = DeviceList.UpdateDevices();
+        try
+        {
+            ListBoxDevices.SelectedIndex = await DeviceList.UpdateDevicesAsync();
+        }
+        catch (OperationCanceledException)
+        {
+            // The window is closing or a refresh was superseded.
+        }
+        catch (ObjectDisposedException)
+        {
+            // A queued device notification can complete while the window is closing.
+        }
+    }
+
+    private void DeviceProvider_DevicesChanged(object sender, EventArgs e)
+    {
+        Dispatcher.InvokeAsync(callback: ListConnectedDevices);
     }
 
     private void GetProfiles(string SelectProfile = "")
@@ -810,6 +827,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Window_Closing(object sender, CancelEventArgs e)
     {
+        deviceProvider.DevicesChanged -= DeviceProvider_DevicesChanged;
+        if (deviceProvider is IDisposable disposableProvider)
+        {
+            disposableProvider.Dispose();
+        }
+
         DeviceList.Save();
         ClearTemp();
     }

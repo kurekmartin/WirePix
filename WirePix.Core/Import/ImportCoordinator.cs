@@ -1,15 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using ImageMagick;
 using WirePix.Core.Files;
 using WirePix.Core.Import.Contracts;
-using WirePix.Core.Models.Settings;
-using WirePix.Core.Naming.Templates;
 using WirePix.Core.Imaging;
 using WirePix.Core.Logging;
+using WirePix.Core.Models.Settings;
+using WirePix.Core.Naming.Templates;
+using WirePix.Devices.Contracts;
+using WirePix.Devices.Models;
 
 namespace WirePix.Core.Import;
 
@@ -18,136 +22,59 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
     private const int MaxAttempts = 5;
     private readonly string _tempFolder = tempFolder ?? throw new ArgumentNullException(paramName: nameof(tempFolder));
     private readonly FileLogger _logger = logFolder == null ? null : new FileLogger(folder: logFolder);
-    private readonly ThumbnailGenerator _thumbnails = new();
 
-    public static Task<ImportPlan> CreatePlanAsync(
-        IImportDevice device,
+    public static async Task<ImportPlan> CreatePlanAsync(
+        IMediaDevice device,
         DownloadSettings settings,
         IProgress<ImportProgress> progress = null,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(function: () => CreatePlan(device: device, settings: settings, progress: progress, token: cancellationToken), cancellationToken: cancellationToken);
-    }
-
-    private static ImportPlan CreatePlan(
-        IImportDevice device,
-        DownloadSettings settings,
-        IProgress<ImportProgress> progress,
-        CancellationToken token)
-    {
-        var files = new List<ImportFile>();
+        ArgumentNullException.ThrowIfNull(device);
         progress?.Report(value: new ImportProgress(stage: ImportStage.Searching, completed: 0, total: 0));
-        device.Connect();
-        try
+        IReadOnlyList<MediaItem> files = await device.GetMediaAsync(cancellationToken).ConfigureAwait(false);
+
+        for (var index = 0; index < files.Count; index++)
         {
-            foreach (ImportDrive drive in device.GetDrives() ?? [])
-            {
-                FindMediaFiles(device: device, path: drive.RootPath, result: files, progress: progress, token: token);
-            }
-        }
-        finally
-        {
-            device.Disconnect();
+            cancellationToken.ThrowIfCancellationRequested();
+            progress?.Report(value: new ImportProgress(
+                stage: ImportStage.Searching,
+                completed: index + 1,
+                total: 0,
+                currentFile: files[index].FileName));
         }
 
-        IEnumerable<ImportFile> selected = files;
-        if (settings?.Date != null && settings.Date.Start != default)
+        IEnumerable<MediaItem> selected = files;
+        if (settings?.Date is not null && settings.Date.Start != default)
         {
             progress?.Report(value: new ImportProgress(stage: ImportStage.Filtering, completed: 0, total: files.Count));
             DateTime end = settings.Date.End.Date.AddDays(value: 1);
-            selected = files.Where(predicate: f => EffectiveDate(file: f) >= settings.Date.Start && EffectiveDate(file: f) < end);
+            selected = files.Where(predicate: file =>
+                EffectiveDate(file) >= settings.Date.Start && EffectiveDate(file) < end);
         }
 
-        List<ImportFile> result =
+        List<MediaItem> result =
         [
             .. selected.OrderBy(keySelector: EffectiveDate)
-                       .ThenBy(keySelector: f => f.Name)
+                       .ThenBy(keySelector: file => file.FileName)
         ];
 
         return new ImportPlan
         {
             Files = result,
-            TotalBytes = result.Sum(selector: x => x.Length),
+            TotalBytes = result.Sum(selector: item => item.Size ?? 0),
             Date = settings?.Date
         };
     }
 
-    private static void FindMediaFiles(
-        IImportDevice device,
-        string path,
-        List<ImportFile> result,
-        IProgress<ImportProgress> progress,
-        CancellationToken token)
-    {
-        token.ThrowIfCancellationRequested();
-        List<string> directories = [.. device.EnumerateDirectories(path: path) ?? []];
-        string dcim = directories.FirstOrDefault(predicate: x =>
-            string.Equals(a: Path.GetFileName(path: x.TrimEnd('\\', '/')), b: "DCIM", comparisonType: StringComparison.OrdinalIgnoreCase));
-
-        if (dcim != null)
-        {
-            path = dcim;
-        }
-        else
-        {
-            foreach (string child in directories)
-            {
-                string name = Path.GetFileName(path: child.TrimEnd('\\', '/'));
-                if (!string.IsNullOrEmpty(value: name) && !name.StartsWith(value: '.'))
-                {
-                    FindMediaFiles(device: device, path: child, result: result, progress: progress, token: token);
-                }
-            }
-
-            return;
-        }
-
-        EnumerateDirectory(device: device, path: path, result: result, progress: progress, token: token);
-    }
-
-    private static void EnumerateDirectory(
-        IImportDevice device,
-        string path,
-        List<ImportFile> result,
-        IProgress<ImportProgress> progress,
-        CancellationToken token)
-    {
-        token.ThrowIfCancellationRequested();
-        foreach (ImportFile file in device.EnumerateFiles(path: path) ?? [])
-        {
-            result.Add(item: file);
-            progress?.Report(value: new ImportProgress(stage: ImportStage.Searching, completed: result.Count, total: 0, currentFile: file.FullName));
-        }
-
-        foreach (string child in device.EnumerateDirectories(path: path) ?? [])
-        {
-            string name = Path.GetFileName(path: child.TrimEnd('\\', '/'));
-            if (!string.IsNullOrEmpty(value: name) && !name.StartsWith(value: '.'))
-            {
-                EnumerateDirectory(device: device, path: child, result: result, progress: progress, token: token);
-            }
-        }
-    }
-
-    public Task<ImportResult> ExecuteAsync(
-        IImportDevice device,
+    public async Task<ImportResult> ExecuteAsync(
+        IMediaDevice device,
         ImportPlan plan,
         DownloadSettings settings,
         NamingContext naming,
         IProgress<ImportProgress> progress = null,
         CancellationToken cancellationToken = default)
     {
-        return Task.Run(function: () => Execute(device: device, plan: plan, settings: settings, naming: naming, progress: progress, token: cancellationToken), cancellationToken: cancellationToken);
-    }
-
-    private ImportResult Execute(
-        IImportDevice device,
-        ImportPlan plan,
-        DownloadSettings settings,
-        NamingContext naming,
-        IProgress<ImportProgress> progress,
-        CancellationToken token)
-    {
+        ArgumentNullException.ThrowIfNull(device);
         var result = new ImportResult { FilesTotal = plan?.Files?.Count ?? 0 };
         if (plan?.Files == null || plan.Files.Count == 0)
         {
@@ -156,29 +83,31 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
 
         Directory.CreateDirectory(path: _tempFolder);
         _logger?.Start();
-        var toDelete = new List<string>();
-        device.Connect();
+        var toDelete = new List<MediaItem>();
         try
         {
             for (var index = 0; index < plan.Files.Count; index++)
             {
-                token.ThrowIfCancellationRequested();
-                ImportFile file = plan.Files[index: index];
-                progress?.Report(value: new ImportProgress(stage: ImportStage.Downloading, completed: index, total: plan.Files.Count, currentFile: file.FullName));
+                cancellationToken.ThrowIfCancellationRequested();
+                MediaItem file = plan.Files[index: index];
+                progress?.Report(value: new ImportProgress(
+                    stage: ImportStage.Downloading,
+                    completed: index,
+                    total: plan.Files.Count,
+                    currentFile: file.FileName));
                 string temp = Path.Combine(path1: _tempFolder, path2: Guid.NewGuid().ToString(format: "N"));
                 try
                 {
                     byte[] originalHash = null;
                     if (settings.CheckFiles)
                     {
-                        using Stream stream = device.OpenRead(file: file);
-                        originalHash = FileOperations.Hash(stream: stream);
+                        originalHash = await HashDeviceItemAsync(device, file, cancellationToken).ConfigureAwait(false);
                     }
 
                     var downloaded = false;
                     for (var attempt = 0; attempt < MaxAttempts && !downloaded; attempt++)
                     {
-                        device.Download(file: file, destination: temp);
+                        await DownloadToFileAsync(device, file, temp, cancellationToken).ConfigureAwait(false);
                         downloaded = !settings.CheckFiles || FileOperations.Verify(expected: originalHash, path: temp);
                     }
 
@@ -192,27 +121,72 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                     var context = new NamingContext
                     {
                         File = file,
-                        DeviceName = naming?.DeviceName ?? device.Name,
-                        Manufacturer = naming?.Manufacturer ?? device.Manufacturer,
-                        Culture = naming?.Culture
+                        LocalFilePath = temp,
+                        DeviceName = string.IsNullOrEmpty(value: naming?.DeviceName)
+                            ? device.DisplayName
+                            : naming.DeviceName,
+                        Manufacturer = string.IsNullOrEmpty(value: naming?.Manufacturer)
+                            ? device.Manufacturer ?? string.Empty
+                            : naming.Manufacturer,
+                        Culture = naming?.Culture,
+                        TagLanguage = naming?.TagLanguage,
+                        UseTagLanguage = naming?.UseTagLanguage ?? false
                     };
 
                     string relativeFolder = NameTemplate.EvaluateFolders(folders: settings.Paths.FolderTags, context: context);
-                    string relativeName = NameTemplate.Evaluate(tags: settings.Paths.FileTags, context: context) + Path.GetExtension(path: file.Name);
+                    string relativeName = NameTemplate.Evaluate(tags: settings.Paths.FileTags, context: context) + Path.GetExtension(path: file.FileName);
                     string relativePath = Path.Combine(path1: relativeFolder ?? string.Empty, path2: relativeName);
                     if (settings.Thumbnail)
                     {
-                        progress?.Report(value: new ImportProgress(stage: ImportStage.GeneratingThumbnail, completed: index, total: plan.Files.Count, currentFile: file.FullName));
+                        progress?.Report(value: new ImportProgress(
+                            stage: ImportStage.GeneratingThumbnail,
+                            completed: index,
+                            total: plan.Files.Count,
+                            currentFile: file.FileName));
                     }
 
-                    if (settings.Thumbnail && ThumbnailGenerator.IsImage(path: temp))
+                    if (settings.Thumbnail && ThumbnailGenerator.IsImage(path: file.FileName))
                     {
                         string thumbnailPath = Path.Combine(path1: settings.Paths.Thumbnail ?? string.Empty, path2: relativePath);
-                        thumbnailPath = Path.Combine(path1: Path.GetDirectoryName(path: thumbnailPath) ?? string.Empty, path2: Path.GetFileNameWithoutExtension(path: thumbnailPath) + "(" + Path.GetExtension(path: thumbnailPath).TrimStart(trimChar: '.') + ").jpg");
-                        ThumbnailGenerator.Generate(source: temp, output: thumbnailPath, settings: settings.ThumbnailSettings, hash: Convert.ToHexStringLower(inArray: originalHash));
+                        thumbnailPath = Path.Combine(
+                            path1: Path.GetDirectoryName(path: thumbnailPath) ?? string.Empty,
+                            path2: Path.GetFileNameWithoutExtension(path: thumbnailPath) + "(" + Path.GetExtension(path: thumbnailPath).TrimStart(trimChar: '.') + ").jpg");
+                        try
+                        {
+                            await GenerateThumbnailAsync(
+                                    source: temp,
+                                    output: thumbnailPath,
+                                    settings: settings.ThumbnailSettings,
+                                    hash: Convert.ToHexStringLower(inArray: originalHash),
+                                    cancellationToken: cancellationToken)
+                                .ConfigureAwait(false);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            result.Errors++;
+                            _logger?.Add(
+                                message: $"Could not create thumbnail for {file.FileName}.{Environment.NewLine}{ex}",
+                                type: LogType.Error,
+                                function: nameof(ExecuteAsync));
+                        }
+                    }
+                    else if (settings.Thumbnail)
+                    {
+                        _logger?.Add(
+                            message: $"Could not generate thumbnail for [{file.FileName}]. Not supported image format.",
+                            type: LogType.Info,
+                            function: nameof(ExecuteAsync));
                     }
 
-                    if (!SaveToRoots(settings: settings, relativePath: relativePath, temp: temp, hash: originalHash, original: file.FullName))
+                    if (!SaveToRoots(
+                            settings: settings,
+                            relativePath: relativePath,
+                            temp: temp,
+                            hash: originalHash))
                     {
                         throw new IOException(message: "Could not save file.");
                     }
@@ -220,13 +194,13 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                     result.FilesDone++;
                     if (settings.DeleteFiles)
                     {
-                        toDelete.Add(item: file.FullName);
+                        toDelete.Add(item: file);
                     }
                 }
                 catch (Exception ex)
                 {
                     result.Errors++;
-                    _logger?.Add(message: ex.ToString(), type: LogType.Error, function: nameof(Execute));
+                    _logger?.Add(message: ex.ToString(), type: LogType.Error, function: nameof(ExecuteAsync));
                 }
                 finally
                 {
@@ -237,24 +211,95 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                 }
             }
 
-            foreach (string source in toDelete)
+            foreach (MediaItem source in toDelete)
             {
-                progress?.Report(value: new ImportProgress(stage: ImportStage.Deleting, completed: result.Deleted, total: toDelete.Count, currentFile: source));
-                device.Delete(fullName: source);
+                cancellationToken.ThrowIfCancellationRequested();
+                progress?.Report(value: new ImportProgress(
+                    stage: ImportStage.Deleting,
+                    completed: result.Deleted,
+                    total: toDelete.Count,
+                    currentFile: source.FileName));
+                await device.DeleteAsync(source, cancellationToken).ConfigureAwait(false);
                 result.Deleted++;
             }
         }
         finally
         {
-            device.Disconnect();
             _logger?.Stop();
         }
 
-        progress?.Report(value: new ImportProgress(stage: ImportStage.Completed, completed: result.FilesDone, total: result.FilesTotal));
+        progress?.Report(value: new ImportProgress(
+            stage: ImportStage.Completed,
+            completed: result.FilesDone,
+            total: result.FilesTotal));
         return result;
     }
 
-    private static bool SaveToRoots(DownloadSettings settings, string relativePath, string temp, byte[] hash, string original)
+    private static async Task<byte[]> HashDeviceItemAsync(
+        IMediaDevice device,
+        MediaItem item,
+        CancellationToken cancellationToken)
+    {
+        using var hash = MD5.Create();
+        using var destination = new CryptoStream(
+            Stream.Null,
+            hash,
+            CryptoStreamMode.Write,
+            leaveOpen: true);
+        await device.DownloadAsync(item, destination, cancellationToken).ConfigureAwait(false);
+        destination.FlushFinalBlock();
+        return hash.Hash ?? throw new CryptographicException("The device item hash could not be calculated.");
+    }
+
+    private static async Task DownloadToFileAsync(
+        IMediaDevice device,
+        MediaItem item,
+        string path,
+        CancellationToken cancellationToken)
+    {
+        await using var destination = new FileStream(
+            path,
+            FileMode.Create,
+            FileAccess.Write,
+            FileShare.None,
+            bufferSize: 81920,
+            useAsync: true);
+        await device.DownloadAsync(item, destination, cancellationToken).ConfigureAwait(false);
+    }
+
+    private static async Task GenerateThumbnailAsync(
+        string source,
+        string output,
+        Thumbnails settings,
+        string hash,
+        CancellationToken cancellationToken)
+    {
+        var delay = TimeSpan.FromSeconds(value: 2);
+        for (var attempt = 0; ; attempt++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                ThumbnailGenerator.Generate(
+                    source: source,
+                    output: output,
+                    settings: settings,
+                    hash: hash);
+                return;
+            }
+            catch (MagickException) when (attempt + 1 < MaxAttempts)
+            {
+                await Task.Delay(delay: delay, cancellationToken: cancellationToken).ConfigureAwait(false);
+                delay += delay;
+            }
+        }
+    }
+
+    private static bool SaveToRoots(
+        DownloadSettings settings,
+        string relativePath,
+        string temp,
+        byte[] hash)
     {
         foreach (string root in new[] { settings.Paths.Root, settings.Paths.Backup })
         {
@@ -286,8 +331,8 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         return true;
     }
 
-    private static DateTime EffectiveDate(ImportFile file)
+    private static DateTime EffectiveDate(MediaItem file)
     {
-        return file.CreationTime != default ? file.CreationTime : file.DateAuthored != default ? file.DateAuthored : file.LastWriteTime;
+        return file.CapturedAt?.LocalDateTime ?? default;
     }
 }

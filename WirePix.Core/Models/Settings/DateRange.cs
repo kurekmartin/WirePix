@@ -41,7 +41,12 @@ public sealed class DateRange : ObservableObject
 
     public static bool operator ==(DateRange a, DateRange b)
     {
-        return ReferenceEquals(objA: a, objB: b) || (a != null && b != null && a.Start == b.Start && a.End == b.End);
+        if (ReferenceEquals(objA: a, objB: b))
+        {
+            return true;
+        }
+
+        return a is not null && b is not null && a.Start == b.Start && a.End == b.End;
     }
 
     public static bool operator !=(DateRange a, DateRange b)

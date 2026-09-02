@@ -4,9 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using WirePix.Core.Import.Contracts;
 using WirePix.Core.Metadata;
 using WirePix.Core.Naming.Tokens;
+using WirePix.Devices.Models;
 
 namespace WirePix.Core.Naming.Templates;
 
@@ -43,18 +43,26 @@ public static partial class NameTemplate
             return string.Empty;
         }
 
-        ImportFile file = context.File;
-        DateTime date = file == null ? default : FileExif.GetDateTimeOriginal(path: file.FullName);
-        if (date == default && file != null)
+        MediaItem file = context.File;
+        DateTime date = string.IsNullOrEmpty(value: context.LocalFilePath)
+            ? default
+            : FileExif.GetDateTimeOriginal(path: context.LocalFilePath);
+        if (date == default)
         {
-            date = file.CreationTime != default ? file.CreationTime : file.DateAuthored != default ? file.DateAuthored : file.LastWriteTime;
+            date = file?.CapturedAt?.LocalDateTime ?? default;
         }
 
-        CultureInfo culture = context.Culture ?? CultureInfo.CurrentCulture;
+        CultureInfo culture = ResolveDateCulture(context);
+        string manufacturer = string.IsNullOrEmpty(value: context.LocalFilePath)
+            ? string.Empty
+            : FileExif.GetManufacturer(path: context.LocalFilePath);
+        string model = string.IsNullOrEmpty(value: context.LocalFilePath)
+            ? string.Empty
+            : FileExif.GetModel(path: context.LocalFilePath);
         var values = new List<string>();
         foreach (string tag in tags ?? [])
         {
-            string code = RemoveParameter(tag: tag);
+            string code = NormalizeCode(code: RemoveParameter(tag: tag));
             switch (code)
             {
                 case NamingTokens.CustomText: values.Add(item: GetParameter(tag: tag)); break;
@@ -66,9 +74,9 @@ public static partial class NameTemplate
                 case NamingTokens.Day: values.Add(item: date.Day.ToString(format: "00", provider: culture)); break;
                 case NamingTokens.DayShort: values.Add(item: culture.DateTimeFormat.GetAbbreviatedDayName(dayofweek: date.DayOfWeek)); break;
                 case NamingTokens.DayLong: values.Add(item: culture.DateTimeFormat.GetDayName(dayofweek: date.DayOfWeek)); break;
-                case NamingTokens.DeviceName: values.Add(item: string.IsNullOrEmpty(value: context.DeviceName) ? string.Empty : context.DeviceName); break;
-                case NamingTokens.DeviceManufacturer: values.Add(item: string.IsNullOrEmpty(value: context.Manufacturer) ? string.Empty : context.Manufacturer); break;
-                case NamingTokens.FileName: values.Add(item: file == null ? string.Empty : Path.GetFileNameWithoutExtension(path: file.Name)); break;
+                case NamingTokens.DeviceName: values.Add(item: string.IsNullOrEmpty(value: model) ? context.DeviceName ?? string.Empty : model); break;
+                case NamingTokens.DeviceManufacturer: values.Add(item: string.IsNullOrEmpty(value: manufacturer) ? context.Manufacturer ?? string.Empty : manufacturer); break;
+                case NamingTokens.FileName: values.Add(item: file == null ? string.Empty : Path.GetFileNameWithoutExtension(path: file.FileName)); break;
                 case NamingTokens.Sequence: values.Add(item: "####"); break;
                 case NamingTokens.NewFolder: values.Add(item: Path.DirectorySeparatorChar.ToString()); break;
                 case NamingTokens.Hyphen: values.Add(item: "-"); break;
@@ -78,6 +86,39 @@ public static partial class NameTemplate
         }
 
         return string.Concat(values: values);
+    }
+
+    private static CultureInfo ResolveDateCulture(NamingContext context)
+    {
+        CultureInfo fallback = context.Culture ?? CultureInfo.CurrentUICulture;
+        if (!context.UseTagLanguage || string.IsNullOrWhiteSpace(value: context.TagLanguage))
+        {
+            return fallback;
+        }
+
+        if (string.Equals(
+                a: context.TagLanguage,
+                b: "system",
+                comparisonType: StringComparison.OrdinalIgnoreCase))
+        {
+            return CultureInfo.CurrentCulture;
+        }
+
+        try
+        {
+            return CultureInfo.CreateSpecificCulture(name: context.TagLanguage);
+        }
+        catch (CultureNotFoundException)
+        {
+            return fallback;
+        }
+    }
+
+    private static string NormalizeCode(string code)
+    {
+        return code is ['{', _, ..] && code[^1] == '}'
+            ? code[1..^1]
+            : code;
     }
 
     public static string EvaluateFolders(IEnumerable<IEnumerable<string>> folders, NamingContext context)

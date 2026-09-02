@@ -1,5 +1,5 @@
 ﻿using MaterialDesignThemes.Wpf;
-using MediaDevices;
+using WirePix.Devices.Models;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -151,7 +151,7 @@ internal static class Tags
 
 
     //získání hodnot pro zobrazení náhledu výsledného názvu
-    public static string GetSampleValueByTag(string tagCode, MediaFileInfo fileInfo = null, Device device = null, string filePath = null)
+    public static string GetSampleValueByTag(string tagCode, MediaItem fileInfo = null, Device device = null, string filePath = null)
     {
         TagStruct tag = GetTag(code: tagCode);
         if (tag != null)
@@ -183,16 +183,7 @@ internal static class Tags
                     // soubor nemusí obsahovat EXIF informace
                     if (date == new DateTime())
                     {
-                        date = (DateTime)fileInfo.CreationTime; // nemusí obsahovat správné datum (někdy se používá DateAuthored nebo LastWriteTime)
-                        if (date == new DateTime())
-                        {
-                            date = (DateTime)fileInfo.DateAuthored;
-                        }
-
-                        if (date == new DateTime())
-                        {
-                            date = (DateTime)fileInfo.LastWriteTime;
-                        }
+                        date = fileInfo.CapturedAt?.LocalDateTime ?? default;
                     }
                 }
 
@@ -216,7 +207,7 @@ internal static class Tags
 
                 if (codeTag == Properties.TagCodes.FileName)
                 {
-                    filename = Path.GetFileNameWithoutExtension(path: fileInfo.Name);
+                    filename = Path.GetFileNameWithoutExtension(path: fileInfo.FileName);
                 }
             }
 
@@ -310,7 +301,7 @@ internal static class Tags
     }
 
     //dosadi hodnoty za tagy
-    public static string TagsToValues(List<string> tags, Device device = null, MediaFileInfo fileInfo = null, string filePath = null)
+    public static string TagsToValues(List<string> tags, Device device = null, MediaItem fileInfo = null, string filePath = null)
     {
         var values = "";
         foreach (string tag in tags)
@@ -334,7 +325,7 @@ internal static class Tags
         return values;
     }
 
-    internal static string TagsToValues(List<List<string>> folderTags, Device device, MediaFileInfo file, string tmpFile)
+    internal static string TagsToValues(List<List<string>> folderTags, Device device, MediaItem file, string tmpFile)
     {
         var folders = new List<string>();
         folderTags.ForEach(action: x => folders.Add(item: TagsToValues(tags: x, device: device, fileInfo: file, filePath: tmpFile)));

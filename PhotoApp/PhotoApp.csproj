@@ -21,10 +21,7 @@
     <ItemGroup>
         <PackageReference Include="MaterialDesignColors" Version="2.0.5"/>
         <PackageReference Include="MaterialDesignThemes" Version="4.4.0"/>
-        <PackageReference Include="MediaDevices" Version="1.9.1"/>
         <PackageReference Include="Octokit" Version="0.50.0"/>
-        <PackageReference Include="System.Management" Version="6.0.0"/>
-        <PackageReference Include="Usb.Events" Version="10.0.1.1"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -68,6 +65,8 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\WirePix.Core\WirePix.Core.csproj"/>
+        <ProjectReference Include="..\src\WirePix.Devices\WirePix.Devices.csproj" />
+        <ProjectReference Include="..\src\WirePix.Devices.Windows\WirePix.Devices.Windows.csproj" />
         <Compile Remove="Models\*.cs"/>
     </ItemGroup>
 </Project>
