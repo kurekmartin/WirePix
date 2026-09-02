@@ -528,11 +528,11 @@
                                                        Style="{StaticResource MaterialDesignBody2TextBlock}" />
                                             <RadioButton Content="{x:Static p:Resources.ThumbnailLongerSide}"
                                                          x:Name="cbLongSide"
-                                                         IsChecked="{Binding DownloadSettings.ThumbnailSettings.Selected,Converter={StaticResource EnumToBool},ConverterParameter=LongerSide}"
+                                                         IsChecked="{Binding DownloadSettings.ThumbnailSettings.Selected,Converter={StaticResource EnumToBool},ConverterParameter=longerSide}"
                                                          Margin="5,0" GroupName="rgResize" />
                                             <RadioButton Content="{x:Static p:Resources.ThumbnailShorterSide}"
                                                          x:Name="cbShortSide"
-                                                         IsChecked="{Binding DownloadSettings.ThumbnailSettings.Selected,Converter={StaticResource EnumToBool},ConverterParameter=ShorterSide}"
+                                                         IsChecked="{Binding DownloadSettings.ThumbnailSettings.Selected,Converter={StaticResource EnumToBool},ConverterParameter=shorterSide}"
                                                          Margin="5,0" GroupName="rgResize" />
                                         </StackPanel>
 
@@ -573,11 +573,11 @@
                                                   Margin="0,2" />
                                         <RadioButton Content="{x:Static p:Resources.DownloadNewFiles}"
                                                      x:Name="cbNewFiles"
-                                                     IsChecked="{Binding DownloadSettings.DownloadSelect,Converter={StaticResource EnumToBool},ConverterParameter=LastBackup}"
+                                                     IsChecked="{Binding DownloadSettings.DownloadSelect,Converter={StaticResource EnumToBool},ConverterParameter=lastBackup}"
                                                      Margin="0,2" GroupName="rbgDate" Checked="cbNewFiles_Checked" />
                                         <RadioButton Content="{x:Static p:Resources.DownloadDateRange}"
                                                      x:Name="cbDateRange" Margin="0,2" GroupName="rbgDate"
-                                                     IsChecked="{Binding DownloadSettings.DownloadSelect,Converter={StaticResource EnumToBool},ConverterParameter=DateRange}"
+                                                     IsChecked="{Binding DownloadSettings.DownloadSelect,Converter={StaticResource EnumToBool},ConverterParameter=dateRange}"
                                                      Checked="cbDateRange_Checked" />
                                     </StackPanel>
                                     <StackPanel Orientation="Vertical" Margin="30,0" x:Name="spDate"

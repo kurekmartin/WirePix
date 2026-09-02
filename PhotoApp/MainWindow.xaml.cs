@@ -454,7 +454,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 lblResult.Text += $"{Properties.Resources.FilesDownloadedTotal}: {downloaded}/{toDownload}\n" +
                                   $"{Properties.Resources.FilesDownloadErrorTotal}: {errors}";
-                if (DownloadSettings.DownloadSelect == DownloadSelect.LastBackup && downloaded == toDownload)
+                if (DownloadSettings.DownloadSelect == DownloadSelect.lastBackup && downloaded == toDownload)
                 {
                     DeviceList.SelectedDeviceInfo.LastBackup = backupStart;
                 }

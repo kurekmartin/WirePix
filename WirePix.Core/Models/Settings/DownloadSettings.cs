@@ -85,7 +85,7 @@ public sealed class DownloadSettings : ObservableObject
             field = value;
             OnPropertyChanged();
         }
-    } = DownloadSelect.LastBackup;
+    } = DownloadSelect.lastBackup;
 
     [XmlIgnore]
     public static string ProfileDirectory { get; set; } = Path.Combine(path1: Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData), path2: "WirePix", path3: "Profiles");

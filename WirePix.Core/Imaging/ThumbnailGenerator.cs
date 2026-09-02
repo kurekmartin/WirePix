@@ -16,7 +16,7 @@ public sealed class ThumbnailGenerator
 
         Directory.CreateDirectory(path: Path.GetDirectoryName(path: output) ?? string.Empty);
         using var image = new MagickImage(fileName: source);
-        var geometry = new MagickGeometry(widthAndHeight: (uint)settings.Value) { FillArea = settings.Selected == ThumbnailSelect.ShorterSide };
+        var geometry = new MagickGeometry(widthAndHeight: (uint)settings.Value) { FillArea = settings.Selected == ThumbnailSelect.shorterSide };
         image.AutoOrient();
         image.Thumbnail(geometry: geometry);
         if (hash != null)
