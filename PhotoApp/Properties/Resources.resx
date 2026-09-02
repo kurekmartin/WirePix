@@ -1,156 +1,156 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
-  <!-- 
-    Microsoft ResX Schema 
-    
-    Version 2.0
-    
-    The primary goals of this format is to allow a simple XML format 
-    that is mostly human readable. The generation and parsing of the 
-    various data types are done through the TypeConverter classes 
-    associated with the data types.
-    
-    Example:
-    
-    ... ado.net/XML headers & schema ...
-    <resheader name="resmimetype">text/microsoft-resx</resheader>
-    <resheader name="version">2.0</resheader>
-    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
-    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
-    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
-    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
-    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
-        <value>[base64 mime encoded serialized .NET Framework object]</value>
-    </data>
-    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
-        <comment>This is a comment</comment>
-    </data>
-                
-    There are any number of "resheader" rows that contain simple 
-    name/value pairs.
-    
-    Each data row contains a name, and value. The row also contains a 
-    type or mimetype. Type corresponds to a .NET class that support 
-    text/value conversion through the TypeConverter architecture. 
-    Classes that don't support this are serialized and stored with the 
-    mimetype set.
-    
-    The mimetype is used for serialized objects, and tells the 
-    ResXResourceReader how to depersist the object. This is currently not 
-    extensible. For a given mimetype the value must be set accordingly:
-    
-    Note - application/x-microsoft.net.object.binary.base64 is the format 
-    that the ResXResourceWriter will generate, however the reader can 
-    read any of the formats listed below.
-    
-    mimetype: application/x-microsoft.net.object.binary.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
-            : and then encoded with base64 encoding.
-    
-    mimetype: application/x-microsoft.net.object.soap.base64
-    value   : The object must be serialized with 
-            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
-            : and then encoded with base64 encoding.
+    <!--
+      Microsoft ResX Schema
 
-    mimetype: application/x-microsoft.net.object.bytearray.base64
-    value   : The object must be serialized into a byte array 
-            : using a System.ComponentModel.TypeConverter
-            : and then encoded with base64 encoding.
-    -->
-  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
-    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
-    <xsd:element name="root" msdata:IsDataSet="true">
-      <xsd:complexType>
-        <xsd:choice maxOccurs="unbounded">
-          <xsd:element name="metadata">
+      Version 2.0
+
+      The primary goals of this format is to allow a simple XML format
+      that is mostly human readable. The generation and parsing of the
+      various data types are done through the TypeConverter classes
+      associated with the data types.
+
+      Example:
+
+      ... ado.net/XML headers & schema ...
+      <resheader name="resmimetype">text/microsoft-resx</resheader>
+      <resheader name="version">2.0</resheader>
+      <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+      <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+      <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+      <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+      <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+          <value>[base64 mime encoded serialized .NET Framework object]</value>
+      </data>
+      <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+          <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+          <comment>This is a comment</comment>
+      </data>
+
+      There are any number of "resheader" rows that contain simple
+      name/value pairs.
+
+      Each data row contains a name, and value. The row also contains a
+      type or mimetype. Type corresponds to a .NET class that support
+      text/value conversion through the TypeConverter architecture.
+      Classes that don't support this are serialized and stored with the
+      mimetype set.
+
+      The mimetype is used for serialized objects, and tells the
+      ResXResourceReader how to depersist the object. This is currently not
+      extensible. For a given mimetype the value must be set accordingly:
+
+      Note - application/x-microsoft.net.object.binary.base64 is the format
+      that the ResXResourceWriter will generate, however the reader can
+      read any of the formats listed below.
+
+      mimetype: application/x-microsoft.net.object.binary.base64
+      value   : The object must be serialized with
+              : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+              : and then encoded with base64 encoding.
+
+      mimetype: application/x-microsoft.net.object.soap.base64
+      value   : The object must be serialized with
+              : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+              : and then encoded with base64 encoding.
+
+      mimetype: application/x-microsoft.net.object.bytearray.base64
+      value   : The object must be serialized into a byte array
+              : using a System.ComponentModel.TypeConverter
+              : and then encoded with base64 encoding.
+      -->
+    <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+        <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+        <xsd:element name="root" msdata:IsDataSet="true">
             <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" />
-              </xsd:sequence>
-              <xsd:attribute name="name" use="required" type="xsd:string" />
-              <xsd:attribute name="type" type="xsd:string" />
-              <xsd:attribute name="mimetype" type="xsd:string" />
-              <xsd:attribute ref="xml:space" />
+                <xsd:choice maxOccurs="unbounded">
+                    <xsd:element name="metadata">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" use="required" type="xsd:string"/>
+                            <xsd:attribute name="type" type="xsd:string"/>
+                            <xsd:attribute name="mimetype" type="xsd:string"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="assembly">
+                        <xsd:complexType>
+                            <xsd:attribute name="alias" type="xsd:string"/>
+                            <xsd:attribute name="name" type="xsd:string"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="data">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1"/>
+                            <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3"/>
+                            <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4"/>
+                            <xsd:attribute ref="xml:space"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                    <xsd:element name="resheader">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1"/>
+                            </xsd:sequence>
+                            <xsd:attribute name="name" type="xsd:string" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:choice>
             </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="assembly">
-            <xsd:complexType>
-              <xsd:attribute name="alias" type="xsd:string" />
-              <xsd:attribute name="name" type="xsd:string" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="data">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
-              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
-              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
-              <xsd:attribute ref="xml:space" />
-            </xsd:complexType>
-          </xsd:element>
-          <xsd:element name="resheader">
-            <xsd:complexType>
-              <xsd:sequence>
-                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
-              </xsd:sequence>
-              <xsd:attribute name="name" type="xsd:string" use="required" />
-            </xsd:complexType>
-          </xsd:element>
-        </xsd:choice>
-      </xsd:complexType>
-    </xsd:element>
-  </xsd:schema>
-  <resheader name="resmimetype">
-    <value>text/microsoft-resx</value>
-  </resheader>
-  <resheader name="version">
-    <value>2.0</value>
-  </resheader>
-  <resheader name="reader">
-    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <resheader name="writer">
-    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </resheader>
-  <data name="About" xml:space="preserve">
+        </xsd:element>
+    </xsd:schema>
+    <resheader name="resmimetype">
+        <value>text/microsoft-resx</value>
+    </resheader>
+    <resheader name="version">
+        <value>2.0</value>
+    </resheader>
+    <resheader name="reader">
+        <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <resheader name="writer">
+        <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    </resheader>
+    <data name="About" xml:space="preserve">
     <value>About</value>
   </data>
-  <data name="AppVersion" xml:space="preserve">
+    <data name="AppVersion" xml:space="preserve">
     <value>Version</value>
   </data>
-  <data name="Backup" xml:space="preserve">
+    <data name="Backup" xml:space="preserve">
     <value>Backup</value>
   </data>
-  <data name="Cancel" xml:space="preserve">
+    <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
-  <data name="CannotBeZero" xml:space="preserve">
+    <data name="CannotBeZero" xml:space="preserve">
     <value>Value cannot be 0</value>
   </data>
-  <data name="CardDownload" xml:space="preserve">
+    <data name="CardDownload" xml:space="preserve">
     <value>Download</value>
   </data>
-  <data name="CardOtherSettings" xml:space="preserve">
+    <data name="CardOtherSettings" xml:space="preserve">
     <value>Other</value>
   </data>
-  <data name="CardProfile" xml:space="preserve">
+    <data name="CardProfile" xml:space="preserve">
     <value>Profile</value>
   </data>
-  <data name="CardStorage" xml:space="preserve">
+    <data name="CardStorage" xml:space="preserve">
     <value>Path structure</value>
   </data>
-  <data name="Changelog" xml:space="preserve">
+    <data name="Changelog" xml:space="preserve">
     <value>What's new?</value>
   </data>
-  <data name="Changelog_Fixes" xml:space="preserve">
+    <data name="Changelog_Fixes" xml:space="preserve">
     <value>Fixes</value>
   </data>
-  <data name="Changelog_Fixes_List" xml:space="preserve">
+    <data name="Changelog_Fixes_List" xml:space="preserve">
     <value>fix localization
 fix UI layout
 keep 50 recent log files
@@ -158,10 +158,10 @@ validation of profile when loading
 allow only one instance of app
 fixed crash when using in app update feature</value>
   </data>
-  <data name="Changelog_NewFeatures" xml:space="preserve">
+    <data name="Changelog_NewFeatures" xml:space="preserve">
     <value>New features</value>
   </data>
-  <data name="Changelog_NewFeatures_List" xml:space="preserve">
+    <data name="Changelog_NewFeatures_List" xml:space="preserve">
     <value>use embedded thumbnails for thumbnail generation(up to 2x faster generation, uses 6x less memory)
 option to use different language for tags (month and day names)
 show change log after update
@@ -169,487 +169,487 @@ you can see change log and app data from the About dialog
 you can now use save as option to update profile settings
 auto select first connected device</value>
   </data>
-  <data name="CheckUpdates" xml:space="preserve">
+    <data name="CheckUpdates" xml:space="preserve">
     <value>Check for updates</value>
   </data>
-  <data name="Contact" xml:space="preserve">
+    <data name="Contact" xml:space="preserve">
     <value>Contact</value>
   </data>
-  <data name="CopyToClipboard" xml:space="preserve">
+    <data name="CopyToClipboard" xml:space="preserve">
     <value>Copy to clipboard</value>
   </data>
-  <data name="DarkMode" xml:space="preserve">
+    <data name="DarkMode" xml:space="preserve">
     <value>Dark mode</value>
   </data>
-  <data name="DateRangeFrom" xml:space="preserve">
+    <data name="DateRangeFrom" xml:space="preserve">
     <value>From</value>
   </data>
-  <data name="DateRangeTo" xml:space="preserve">
+    <data name="DateRangeTo" xml:space="preserve">
     <value>To</value>
   </data>
-  <data name="DateRange_StartGreater" xml:space="preserve">
+    <data name="DateRange_StartGreater" xml:space="preserve">
     <value>The start date cannot be greater than the end date</value>
   </data>
-  <data name="DeleteProfilePrompt" xml:space="preserve">
+    <data name="DeleteProfilePrompt" xml:space="preserve">
     <value>Do you want to delete profile [{0}]?</value>
   </data>
-  <data name="DeviceCopyingFiles" xml:space="preserve">
+    <data name="DeviceCopyingFiles" xml:space="preserve">
     <value>Copying files</value>
   </data>
-  <data name="DeviceDeletingFile" xml:space="preserve">
+    <data name="DeviceDeletingFile" xml:space="preserve">
     <value>Deleting file {0}</value>
   </data>
-  <data name="DeviceDeletingFilesTask" xml:space="preserve">
+    <data name="DeviceDeletingFilesTask" xml:space="preserve">
     <value>Deleting downloaded files from device</value>
   </data>
-  <data name="DeviceDeletingProgress" xml:space="preserve">
+    <data name="DeviceDeletingProgress" xml:space="preserve">
     <value>Deleted {0}/{1} files</value>
   </data>
-  <data name="DeviceDownloadingFile" xml:space="preserve">
+    <data name="DeviceDownloadingFile" xml:space="preserve">
     <value>Downloading {0}</value>
   </data>
-  <data name="DeviceFileFilterDate" xml:space="preserve">
+    <data name="DeviceFileFilterDate" xml:space="preserve">
     <value>Filtering files by date</value>
   </data>
-  <data name="DeviceFilesDoneCount" xml:space="preserve">
+    <data name="DeviceFilesDoneCount" xml:space="preserve">
     <value>Processed {0}/{1} files</value>
   </data>
-  <data name="DeviceFilesFound" xml:space="preserve">
+    <data name="DeviceFilesFound" xml:space="preserve">
     <value>Found {0} files</value>
   </data>
-  <data name="DeviceGeneratingThumbnail" xml:space="preserve">
+    <data name="DeviceGeneratingThumbnail" xml:space="preserve">
     <value>Generating thumbnail {0}</value>
   </data>
-  <data name="DeviceName" xml:space="preserve">
+    <data name="DeviceName" xml:space="preserve">
     <value>Device name</value>
   </data>
-  <data name="DeviceNameEmpty" xml:space="preserve">
+    <data name="DeviceNameEmpty" xml:space="preserve">
     <value>Enter a device name</value>
   </data>
-  <data name="DeviceSortingFile" xml:space="preserve">
+    <data name="DeviceSortingFile" xml:space="preserve">
     <value>Sorting file {0}</value>
   </data>
-  <data name="DeviceState" xml:space="preserve">
+    <data name="DeviceState" xml:space="preserve">
     <value>State</value>
   </data>
-  <data name="DeviceStatus_CannotConnect" xml:space="preserve">
+    <data name="DeviceStatus_CannotConnect" xml:space="preserve">
     <value>Cannot connect</value>
   </data>
-  <data name="DeviceStatus_Ready" xml:space="preserve">
+    <data name="DeviceStatus_Ready" xml:space="preserve">
     <value>Ready</value>
   </data>
-  <data name="DeviceStatus_Unknown" xml:space="preserve">
+    <data name="DeviceStatus_Unknown" xml:space="preserve">
     <value>Unknown</value>
   </data>
-  <data name="Done" xml:space="preserve">
+    <data name="Done" xml:space="preserve">
     <value>Done</value>
   </data>
-  <data name="DownloadDateRange" xml:space="preserve">
+    <data name="DownloadDateRange" xml:space="preserve">
     <value>Download files by date</value>
   </data>
-  <data name="DownloadDeleteFile" xml:space="preserve">
+    <data name="DownloadDeleteFile" xml:space="preserve">
     <value>Delete downloaded files from device</value>
   </data>
-  <data name="DownloadFileCheck" xml:space="preserve">
+    <data name="DownloadFileCheck" xml:space="preserve">
     <value>Check files</value>
   </data>
-  <data name="DownloadFiles" xml:space="preserve">
+    <data name="DownloadFiles" xml:space="preserve">
     <value>Download files</value>
   </data>
-  <data name="DownloadNewFiles" xml:space="preserve">
+    <data name="DownloadNewFiles" xml:space="preserve">
     <value>Download new files since last backup</value>
   </data>
-  <data name="EmailCopied" xml:space="preserve">
+    <data name="EmailCopied" xml:space="preserve">
     <value>Email copied to clipboard</value>
   </data>
-  <data name="Error" xml:space="preserve">
+    <data name="Error" xml:space="preserve">
     <value>Error</value>
   </data>
-  <data name="ErrorUnknown" xml:space="preserve">
+    <data name="ErrorUnknown" xml:space="preserve">
     <value>An unknown error has occurred</value>
   </data>
-  <data name="Feedback" xml:space="preserve">
+    <data name="Feedback" xml:space="preserve">
     <value>Feedback</value>
   </data>
-  <data name="FeedbackSend" xml:space="preserve">
+    <data name="FeedbackSend" xml:space="preserve">
     <value>Send feedback</value>
   </data>
-  <data name="FileCheckError" xml:space="preserve">
+    <data name="FileCheckError" xml:space="preserve">
     <value>An error occurred while getting files. 
 Please check if the device is connected and retry the action.</value>
   </data>
-  <data name="FileExists_Overwrite" xml:space="preserve">
+    <data name="FileExists_Overwrite" xml:space="preserve">
     <value>The file already exists.
 Save to overwrite this file.</value>
   </data>
-  <data name="FilenameStructure" xml:space="preserve">
+    <data name="FilenameStructure" xml:space="preserve">
     <value>Filename structure</value>
   </data>
-  <data name="FilesDownloadedTotal" xml:space="preserve">
+    <data name="FilesDownloadedTotal" xml:space="preserve">
     <value>Downloaded</value>
   </data>
-  <data name="FilesDownloadErrorTotal" xml:space="preserve">
+    <data name="FilesDownloadErrorTotal" xml:space="preserve">
     <value>Errors</value>
   </data>
-  <data name="FileSearch" xml:space="preserve">
+    <data name="FileSearch" xml:space="preserve">
     <value>Searching for files</value>
   </data>
-  <data name="FileSearchState" xml:space="preserve">
+    <data name="FileSearchState" xml:space="preserve">
     <value>File search</value>
   </data>
-  <data name="FileSearchStatus_Ready" xml:space="preserve">
+    <data name="FileSearchStatus_Ready" xml:space="preserve">
     <value>Done</value>
   </data>
-  <data name="FileSearchStatus_Searching" xml:space="preserve">
+    <data name="FileSearchStatus_Searching" xml:space="preserve">
     <value>In progress</value>
   </data>
-  <data name="FileSearchStatus_Unknown" xml:space="preserve">
+    <data name="FileSearchStatus_Unknown" xml:space="preserve">
     <value>Unknown</value>
   </data>
-  <data name="FilesFoundTotal" xml:space="preserve">
+    <data name="FilesFoundTotal" xml:space="preserve">
     <value>Files total</value>
   </data>
-  <data name="FilesToDownload" xml:space="preserve">
+    <data name="FilesToDownload" xml:space="preserve">
     <value>To download</value>
   </data>
-  <data name="FindFiles" xml:space="preserve">
+    <data name="FindFiles" xml:space="preserve">
     <value>Find files</value>
   </data>
-  <data name="FirstTagError" xml:space="preserve">
+    <data name="FirstTagError" xml:space="preserve">
     <value>Cannot use {0} at the beginning of the name.</value>
   </data>
-  <data name="FolderDelete" xml:space="preserve">
+    <data name="FolderDelete" xml:space="preserve">
     <value>Delete folder</value>
   </data>
-  <data name="FolderDoesNotExist" xml:space="preserve">
+    <data name="FolderDoesNotExist" xml:space="preserve">
     <value>Selected folder does not exist</value>
   </data>
-  <data name="FolderStructure" xml:space="preserve">
+    <data name="FolderStructure" xml:space="preserve">
     <value>Folder structure</value>
   </data>
-  <data name="GenerateThumbnails" xml:space="preserve">
+    <data name="GenerateThumbnails" xml:space="preserve">
     <value>Generate thumbnails</value>
   </data>
-  <data name="InvalidCharsError" xml:space="preserve">
+    <data name="InvalidCharsError" xml:space="preserve">
     <value>Text contains invalid characters: {0}</value>
   </data>
-  <data name="InvalidFilename" xml:space="preserve">
+    <data name="InvalidFilename" xml:space="preserve">
     <value>Invalid filename</value>
   </data>
-  <data name="Language" xml:space="preserve">
+    <data name="Language" xml:space="preserve">
     <value>Language</value>
   </data>
-  <data name="LastBackup" xml:space="preserve">
+    <data name="LastBackup" xml:space="preserve">
     <value>Last backup</value>
   </data>
-  <data name="LastBackup_Never" xml:space="preserve">
+    <data name="LastBackup_Never" xml:space="preserve">
     <value>Never</value>
   </data>
-  <data name="LibrariesUsed" xml:space="preserve">
+    <data name="LibrariesUsed" xml:space="preserve">
     <value>Used libraries</value>
   </data>
-  <data name="License" xml:space="preserve">
+    <data name="License" xml:space="preserve">
     <value>License</value>
   </data>
-  <data name="Manufacturer" xml:space="preserve">
+    <data name="Manufacturer" xml:space="preserve">
     <value>Manufacturer</value>
   </data>
-  <data name="MaxTagError" xml:space="preserve">
+    <data name="MaxTagError" xml:space="preserve">
     <value>You can use a maximum of {0} tags.</value>
   </data>
-  <data name="MediaPath" xml:space="preserve">
+    <data name="MediaPath" xml:space="preserve">
     <value>Media path</value>
   </data>
-  <data name="No" xml:space="preserve">
+    <data name="No" xml:space="preserve">
     <value>No</value>
   </data>
-  <data name="NoBackupFolder" xml:space="preserve">
+    <data name="NoBackupFolder" xml:space="preserve">
     <value>Select a folder for backup</value>
   </data>
-  <data name="NoDownloadFolder" xml:space="preserve">
+    <data name="NoDownloadFolder" xml:space="preserve">
     <value>Select a folder to save files</value>
   </data>
-  <data name="NoFileStructure" xml:space="preserve">
+    <data name="NoFileStructure" xml:space="preserve">
     <value>Choose a filename structure</value>
   </data>
-  <data name="NoFolderStructure" xml:space="preserve">
+    <data name="NoFolderStructure" xml:space="preserve">
     <value>Choose a folder structure</value>
   </data>
-  <data name="NoThumbnailFolder" xml:space="preserve">
+    <data name="NoThumbnailFolder" xml:space="preserve">
     <value>Select folder for thumbnails</value>
   </data>
-  <data name="OK" xml:space="preserve">
+    <data name="OK" xml:space="preserve">
     <value>OK</value>
   </data>
-  <data name="ProfileDelete" xml:space="preserve">
+    <data name="ProfileDelete" xml:space="preserve">
     <value>Delete profile</value>
   </data>
-  <data name="ProfileName" xml:space="preserve">
+    <data name="ProfileName" xml:space="preserve">
     <value>Profile name</value>
   </data>
-  <data name="Profile_Load_Error" xml:space="preserve">
+    <data name="Profile_Load_Error" xml:space="preserve">
     <value>Could not load profile "{0}". Do you want to delete it?</value>
   </data>
-  <data name="Refresh" xml:space="preserve">
+    <data name="Refresh" xml:space="preserve">
     <value>Refresh</value>
   </data>
-  <data name="RemainingTime_Calculating" xml:space="preserve">
+    <data name="RemainingTime_Calculating" xml:space="preserve">
     <value>Calculating remaining time</value>
   </data>
-  <data name="RemainingTime_Days" xml:space="preserve">
+    <data name="RemainingTime_Days" xml:space="preserve">
     <value>d</value>
   </data>
-  <data name="RemainingTime_Hours" xml:space="preserve">
+    <data name="RemainingTime_Hours" xml:space="preserve">
     <value>h</value>
   </data>
-  <data name="RemainingTime_Minutes" xml:space="preserve">
+    <data name="RemainingTime_Minutes" xml:space="preserve">
     <value>m</value>
   </data>
-  <data name="RemainingTime_Remains" xml:space="preserve">
+    <data name="RemainingTime_Remains" xml:space="preserve">
     <value>Remains</value>
   </data>
-  <data name="RemainingTime_Seconds" xml:space="preserve">
+    <data name="RemainingTime_Seconds" xml:space="preserve">
     <value>s</value>
   </data>
-  <data name="RestartApp" xml:space="preserve">
+    <data name="RestartApp" xml:space="preserve">
     <value>Restart app</value>
   </data>
-  <data name="ResultCanceled" xml:space="preserve">
+    <data name="ResultCanceled" xml:space="preserve">
     <value>Canceled</value>
   </data>
-  <data name="Save" xml:space="preserve">
+    <data name="Save" xml:space="preserve">
     <value>Save</value>
   </data>
-  <data name="SaveAs" xml:space="preserve">
+    <data name="SaveAs" xml:space="preserve">
     <value>Save as</value>
   </data>
-  <data name="SelectDestination" xml:space="preserve">
+    <data name="SelectDestination" xml:space="preserve">
     <value>Select folder</value>
   </data>
-  <data name="SelectDevice" xml:space="preserve">
+    <data name="SelectDevice" xml:space="preserve">
     <value>Select a device</value>
   </data>
-  <data name="SelectFilename" xml:space="preserve">
+    <data name="SelectFilename" xml:space="preserve">
     <value>Filename structure</value>
   </data>
-  <data name="SelectFolderStructure" xml:space="preserve">
+    <data name="SelectFolderStructure" xml:space="preserve">
     <value>Folder structure</value>
   </data>
-  <data name="SelectMainFolder" xml:space="preserve">
+    <data name="SelectMainFolder" xml:space="preserve">
     <value>Select main folder</value>
   </data>
-  <data name="Settings" xml:space="preserve">
+    <data name="Settings" xml:space="preserve">
     <value>Settings</value>
   </data>
-  <data name="SettingsBackup" xml:space="preserve">
+    <data name="SettingsBackup" xml:space="preserve">
     <value>Backup</value>
   </data>
-  <data name="SettingsDeleteDownloaded" xml:space="preserve">
+    <data name="SettingsDeleteDownloaded" xml:space="preserve">
     <value>Delete downloaded files</value>
   </data>
-  <data name="SettingsFileCheck" xml:space="preserve">
+    <data name="SettingsFileCheck" xml:space="preserve">
     <value>File check</value>
   </data>
-  <data name="SettingsFilenameStructure" xml:space="preserve">
+    <data name="SettingsFilenameStructure" xml:space="preserve">
     <value>Filename structure</value>
   </data>
-  <data name="SettingsFolderStructure" xml:space="preserve">
+    <data name="SettingsFolderStructure" xml:space="preserve">
     <value>Folder structure</value>
   </data>
-  <data name="SettingsInfoRestart" xml:space="preserve">
+    <data name="SettingsInfoRestart" xml:space="preserve">
     <value>Some changes will take effect after restarting the application</value>
   </data>
-  <data name="SettingsMainFolder" xml:space="preserve">
+    <data name="SettingsMainFolder" xml:space="preserve">
     <value>Main folder</value>
   </data>
-  <data name="SettingsSave" xml:space="preserve">
+    <data name="SettingsSave" xml:space="preserve">
     <value>Save settings</value>
   </data>
-  <data name="SettingsStorage" xml:space="preserve">
+    <data name="SettingsStorage" xml:space="preserve">
     <value>Path structure</value>
   </data>
-  <data name="SettingsThumbnail" xml:space="preserve">
+    <data name="SettingsThumbnail" xml:space="preserve">
     <value>Thumbnail generation</value>
   </data>
-  <data name="Show" xml:space="preserve">
+    <data name="Show" xml:space="preserve">
     <value>Show</value>
   </data>
-  <data name="ShowAppdataFolder" xml:space="preserve">
+    <data name="ShowAppdataFolder" xml:space="preserve">
     <value>Show app data</value>
   </data>
-  <data name="ShowCrashFiles" xml:space="preserve">
+    <data name="ShowCrashFiles" xml:space="preserve">
     <value>Show crash files</value>
   </data>
-  <data name="ShowLog" xml:space="preserve">
+    <data name="ShowLog" xml:space="preserve">
     <value>Show log</value>
   </data>
-  <data name="SourceCode" xml:space="preserve">
+    <data name="SourceCode" xml:space="preserve">
     <value>Source code</value>
   </data>
-  <data name="SpaceAvailable" xml:space="preserve">
+    <data name="SpaceAvailable" xml:space="preserve">
     <value>Available</value>
   </data>
-  <data name="SpaceTotal" xml:space="preserve">
+    <data name="SpaceTotal" xml:space="preserve">
     <value>Total space</value>
   </data>
-  <data name="SpaceUsed" xml:space="preserve">
+    <data name="SpaceUsed" xml:space="preserve">
     <value>Used</value>
   </data>
-  <data name="StartupUpdateCheck" xml:space="preserve">
+    <data name="StartupUpdateCheck" xml:space="preserve">
     <value>Check updates after startup</value>
   </data>
-  <data name="TagCustomText" xml:space="preserve">
+    <data name="TagCustomText" xml:space="preserve">
     <value>Custom text</value>
   </data>
-  <data name="TagCustomTextMissing" xml:space="preserve">
+    <data name="TagCustomTextMissing" xml:space="preserve">
     <value>Missing value for {0}.
 Fill the value or remove the tag.</value>
   </data>
-  <data name="TagDelete" xml:space="preserve">
+    <data name="TagDelete" xml:space="preserve">
     <value>Delete tag</value>
   </data>
-  <data name="TagGroup_Custom" xml:space="preserve">
+    <data name="TagGroup_Custom" xml:space="preserve">
     <value>Custom</value>
   </data>
-  <data name="TagGroup_Date" xml:space="preserve">
+    <data name="TagGroup_Date" xml:space="preserve">
     <value>Date</value>
   </data>
-  <data name="TagGroup_Device" xml:space="preserve">
+    <data name="TagGroup_Device" xml:space="preserve">
     <value>Device</value>
   </data>
-  <data name="TagGroup_Folder" xml:space="preserve">
+    <data name="TagGroup_Folder" xml:space="preserve">
     <value>Folder</value>
   </data>
-  <data name="TagGroup_Other" xml:space="preserve">
+    <data name="TagGroup_Other" xml:space="preserve">
     <value>Other</value>
   </data>
-  <data name="TagGroup_Separator" xml:space="preserve">
+    <data name="TagGroup_Separator" xml:space="preserve">
     <value>Separator</value>
   </data>
-  <data name="TagLanguage" xml:space="preserve">
+    <data name="TagLanguage" xml:space="preserve">
     <value>Tag language</value>
   </data>
-  <data name="TagPairError" xml:space="preserve">
+    <data name="TagPairError" xml:space="preserve">
     <value>Cannot use {0} after {1}.</value>
   </data>
-  <data name="Tags" xml:space="preserve">
+    <data name="Tags" xml:space="preserve">
     <value>Tags</value>
   </data>
-  <data name="Tag_CustomText_Button" xml:space="preserve">
+    <data name="Tag_CustomText_Button" xml:space="preserve">
     <value>Text</value>
   </data>
-  <data name="Tag_CustomText_VisibleText" xml:space="preserve">
+    <data name="Tag_CustomText_VisibleText" xml:space="preserve">
     <value>Text</value>
   </data>
-  <data name="Tag_DayLong_Button" xml:space="preserve">
+    <data name="Tag_DayLong_Button" xml:space="preserve">
     <value>Day long (name)</value>
   </data>
-  <data name="Tag_DayLong_VisibleText" xml:space="preserve">
+    <data name="Tag_DayLong_VisibleText" xml:space="preserve">
     <value>Day long</value>
   </data>
-  <data name="Tag_DayShort_Button" xml:space="preserve">
+    <data name="Tag_DayShort_Button" xml:space="preserve">
     <value>Day short (name)</value>
   </data>
-  <data name="Tag_DayShort_VisibleText" xml:space="preserve">
+    <data name="Tag_DayShort_VisibleText" xml:space="preserve">
     <value>Day short</value>
   </data>
-  <data name="Tag_Day_Button" xml:space="preserve">
+    <data name="Tag_Day_Button" xml:space="preserve">
     <value>Day</value>
   </data>
-  <data name="Tag_Day_VisibleText" xml:space="preserve">
+    <data name="Tag_Day_VisibleText" xml:space="preserve">
     <value>Day</value>
   </data>
-  <data name="Tag_DeviceManuf_Button" xml:space="preserve">
+    <data name="Tag_DeviceManuf_Button" xml:space="preserve">
     <value>Manufacturer</value>
   </data>
-  <data name="Tag_DeviceManuf_VisibleText" xml:space="preserve">
+    <data name="Tag_DeviceManuf_VisibleText" xml:space="preserve">
     <value>Device manufacturer</value>
   </data>
-  <data name="Tag_DeviceName_Button" xml:space="preserve">
+    <data name="Tag_DeviceName_Button" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="Tag_DeviceName_VisibleText" xml:space="preserve">
+    <data name="Tag_DeviceName_VisibleText" xml:space="preserve">
     <value>Device name</value>
   </data>
-  <data name="Tag_FileName_Button" xml:space="preserve">
+    <data name="Tag_FileName_Button" xml:space="preserve">
     <value>Filename</value>
   </data>
-  <data name="Tag_FileName_VisibleText" xml:space="preserve">
+    <data name="Tag_FileName_VisibleText" xml:space="preserve">
     <value>Filename</value>
   </data>
-  <data name="Tag_MonthLong_Button" xml:space="preserve">
+    <data name="Tag_MonthLong_Button" xml:space="preserve">
     <value>Month long (name)</value>
   </data>
-  <data name="Tag_MonthLong_VisibleText" xml:space="preserve">
+    <data name="Tag_MonthLong_VisibleText" xml:space="preserve">
     <value>Month long</value>
   </data>
-  <data name="Tag_MonthShort_Button" xml:space="preserve">
+    <data name="Tag_MonthShort_Button" xml:space="preserve">
     <value>Month short (name)</value>
   </data>
-  <data name="Tag_MonthShort_VisibleText" xml:space="preserve">
+    <data name="Tag_MonthShort_VisibleText" xml:space="preserve">
     <value>Month short</value>
   </data>
-  <data name="Tag_Month_Button" xml:space="preserve">
+    <data name="Tag_Month_Button" xml:space="preserve">
     <value>Month</value>
   </data>
-  <data name="Tag_Month_VisibleText" xml:space="preserve">
+    <data name="Tag_Month_VisibleText" xml:space="preserve">
     <value>Month</value>
   </data>
-  <data name="Tag_NewFolder_Button" xml:space="preserve">
+    <data name="Tag_NewFolder_Button" xml:space="preserve">
     <value>New folder</value>
   </data>
-  <data name="Tag_SequenceNum_Button" xml:space="preserve">
+    <data name="Tag_SequenceNum_Button" xml:space="preserve">
     <value>Number</value>
   </data>
-  <data name="Tag_SequenceNum_VisibleText" xml:space="preserve">
+    <data name="Tag_SequenceNum_VisibleText" xml:space="preserve">
     <value>File number</value>
   </data>
-  <data name="Tag_YearLong_Button" xml:space="preserve">
+    <data name="Tag_YearLong_Button" xml:space="preserve">
     <value>Year</value>
   </data>
-  <data name="Tag_YearLong_VisibleText" xml:space="preserve">
+    <data name="Tag_YearLong_VisibleText" xml:space="preserve">
     <value>Year long</value>
   </data>
-  <data name="Tag_YearShort_Button" xml:space="preserve">
+    <data name="Tag_YearShort_Button" xml:space="preserve">
     <value>Year short (YY)</value>
   </data>
-  <data name="Tag_YearShort_VisibleText" xml:space="preserve">
+    <data name="Tag_YearShort_VisibleText" xml:space="preserve">
     <value>Year short</value>
   </data>
-  <data name="ThumbnailLongerSide" xml:space="preserve">
+    <data name="ThumbnailLongerSide" xml:space="preserve">
     <value>Longer side</value>
   </data>
-  <data name="ThumbnailMaxSize" xml:space="preserve">
+    <data name="ThumbnailMaxSize" xml:space="preserve">
     <value>Maximum size</value>
   </data>
-  <data name="ThumbnailShorterSide" xml:space="preserve">
+    <data name="ThumbnailShorterSide" xml:space="preserve">
     <value>Shorter side</value>
   </data>
-  <data name="Update" xml:space="preserve">
+    <data name="Update" xml:space="preserve">
     <value>Update</value>
   </data>
-  <data name="UpdateDownload" xml:space="preserve">
+    <data name="UpdateDownload" xml:space="preserve">
     <value>Download manually</value>
   </data>
-  <data name="UpdateInstall" xml:space="preserve">
+    <data name="UpdateInstall" xml:space="preserve">
     <value>Install</value>
   </data>
-  <data name="Update_Error" xml:space="preserve">
+    <data name="Update_Error" xml:space="preserve">
     <value>Cannot get information about the availability of a newer version</value>
   </data>
-  <data name="Update_NewVersionAvailable" xml:space="preserve">
+    <data name="Update_NewVersionAvailable" xml:space="preserve">
     <value>A newer version is available</value>
   </data>
-  <data name="Update_NoNewVerison" xml:space="preserve">
+    <data name="Update_NoNewVerison" xml:space="preserve">
     <value>You have the latest version</value>
   </data>
-  <data name="UseDifferentLanguageForTags" xml:space="preserve">
+    <data name="UseDifferentLanguageForTags" xml:space="preserve">
     <value>Use different language for tags</value>
   </data>
-  <data name="Value" xml:space="preserve">
+    <data name="Value" xml:space="preserve">
     <value>Value</value>
   </data>
-  <data name="Yes" xml:space="preserve">
+    <data name="Yes" xml:space="preserve">
     <value>Yes</value>
   </data>
 </root>

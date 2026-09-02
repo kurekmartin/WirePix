@@ -1,148 +1,148 @@
-﻿using MaterialDesignThemes.Wpf;
-using System;
-using System.IO;
-using System.Reflection;
-using System.Windows;
-using System.Linq;
-using System.Globalization;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Resources;
 using System.Threading;
+using System.Windows;
+using MaterialDesignThemes.Wpf;
+using PhotoApp.Properties;
 
-namespace PhotoApp
+namespace PhotoApp;
+
+/// <summary>
+/// Interakční logika pro App.xaml
+/// </summary>
+public partial class App : Application
 {
-    /// <summary>
-    /// Interakční logika pro App.xaml
-    /// </summary>
-    public partial class App : Application
+    private static List<Tuple<string, string>> _availableLanguages = new();
+
+    private static Mutex _mutex = null;
+
+    protected override void OnStartup(StartupEventArgs e)
     {
-        private static List<Tuple<string, string>> _availableLanguages = new List<Tuple<string, string>>();
+        const string appName = "WirePix";
+        bool createdNew;
 
-        private static Mutex _mutex = null;
+        _mutex = new Mutex(initiallyOwned: true, name: appName, createdNew: out createdNew);
 
-        protected override void OnStartup(StartupEventArgs e)
+        if (!createdNew)
         {
-            const string appName = "WirePix";
-            bool createdNew;
-
-            _mutex = new Mutex(true, appName, out createdNew);
-
-            if (!createdNew)
-            {
-                Current.Shutdown();
-            }
-
-            base.OnStartup(e);
-        }
-        private void Application_Startup(object sender, StartupEventArgs e)
-        {
-            if (PhotoApp.Properties.Settings.Default.UpdateSettings)
-            {
-                PhotoApp.Properties.Settings.Default.Upgrade();
-                PhotoApp.Properties.Settings.Default.UpdateSettings = false;
-                PhotoApp.Properties.Settings.Default.Save();
-            }
-
-
-            SetLanguage();
-            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string mainFolder = "WirePix";
-            Resources.Add(PhotoApp.Properties.Keys.MainFolder, Path.Combine(appData,mainFolder));
-            Resources.Add(PhotoApp.Properties.Keys.TempFolder, Path.Combine(Path.GetTempPath(), mainFolder));
-            Resources.Add(PhotoApp.Properties.Keys.LogsFolder, Path.Combine(appData, mainFolder, "Logs"));
-            Resources.Add(PhotoApp.Properties.Keys.ProfilesFolder, Path.Combine(appData, mainFolder, "Profiles"));
-            Resources.Add(PhotoApp.Properties.Keys.DataFolder, Path.Combine(appData, mainFolder, "Data"));
-            Resources.Add(PhotoApp.Properties.Keys.CrashReportsFolder, Path.Combine(appData, mainFolder, "Crash Reports"));
-
-            var keys = Current.Resources.Keys.GetEnumerator();
-            while (keys.MoveNext())
-            {
-                string key = keys.Current.ToString();
-                if (key.Contains("Folder"))
-                {
-                    Directory.CreateDirectory(Current.Resources[key].ToString());
-                }
-            }
-
-            var files = Directory.GetFiles(Current.Resources[PhotoApp.Properties.Keys.TempFolder].ToString()).Where(x => x.EndsWith(".msi"));
-            foreach (var file in files)
-            {
-                File.Delete(file);
-            }
-
-            var logFolder = Current.Resources[PhotoApp.Properties.Keys.LogsFolder].ToString();
-            var maxLogs = PhotoApp.Properties.Settings.Default.MaxLogs;
-            var logFiles = new DirectoryInfo(logFolder);
-            var filesToDelete = logFiles.GetFiles().OrderByDescending(f => f.CreationTime).Skip(maxLogs);
-            foreach (var file in filesToDelete)
-            {
-                file.Delete();
-            }
-
-            SetThemeMode(PhotoApp.Properties.Settings.Default.DarkMode);
+            Current.Shutdown();
         }
 
-        public string Version
+        base.OnStartup(e: e);
+    }
+
+    private void Application_Startup(object sender, StartupEventArgs e)
+    {
+        if (Settings.Default.UpdateSettings)
         {
-            get
+            Settings.Default.Upgrade();
+            Settings.Default.UpdateSettings = false;
+            Settings.Default.Save();
+        }
+
+
+        SetLanguage();
+        string appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
+        var mainFolder = "WirePix";
+        Resources.Add(key: Keys.MainFolder, value: Path.Combine(path1: appData, path2: mainFolder));
+        Resources.Add(key: Keys.TempFolder, value: Path.Combine(path1: Path.GetTempPath(), path2: mainFolder));
+        Resources.Add(key: Keys.LogsFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Logs"));
+        Resources.Add(key: Keys.ProfilesFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Profiles"));
+        Resources.Add(key: Keys.DataFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Data"));
+        Resources.Add(key: Keys.CrashReportsFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Crash Reports"));
+        DownloadSettings.ProfileDirectory = Resources[key: Keys.ProfilesFolder].ToString();
+
+        IEnumerator keys = Current.Resources.Keys.GetEnumerator();
+        while (keys.MoveNext())
+        {
+            var key = keys.Current.ToString();
+            if (key.Contains(value: "Folder"))
             {
-                return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3);
+                Directory.CreateDirectory(path: Current.Resources[key: key].ToString());
             }
         }
 
-        public static void SetThemeMode(bool darkMode)
+        IEnumerable<string> files = Directory.GetFiles(path: Current.Resources[key: Keys.TempFolder].ToString()).Where(predicate: x => x.EndsWith(value: ".msi"));
+        foreach (string file in files)
         {
-            var paletteHelper = new PaletteHelper();
-            //Retrieve the app's existing theme
-            ITheme theme = paletteHelper.GetTheme();
-            if (darkMode)
+            File.Delete(path: file);
+        }
+
+        var logFolder = Current.Resources[key: Keys.LogsFolder].ToString();
+        int maxLogs = Settings.Default.MaxLogs;
+        var logFiles = new DirectoryInfo(path: logFolder);
+        IEnumerable<FileInfo> filesToDelete = logFiles.GetFiles().OrderByDescending(keySelector: f => f.CreationTime).Skip(count: maxLogs);
+        foreach (FileInfo file in filesToDelete)
+        {
+            file.Delete();
+        }
+
+        SetThemeMode(darkMode: Settings.Default.DarkMode);
+    }
+
+    public string Version => Assembly.GetEntryAssembly()?.GetName().Version?.ToString(fieldCount: 3);
+
+    public static void SetThemeMode(bool darkMode)
+    {
+        var paletteHelper = new PaletteHelper();
+        //Retrieve the app's existing theme
+        ITheme theme = paletteHelper.GetTheme();
+        if (darkMode)
+        {
+            theme.SetBaseTheme(baseTheme: Theme.Dark);
+        }
+        else
+        {
+            theme.SetBaseTheme(baseTheme: Theme.Light);
+        }
+
+        paletteHelper.SetTheme(theme: theme);
+        if (darkMode != Settings.Default.DarkMode)
+        {
+            Settings.Default.DarkMode = darkMode;
+            Settings.Default.Save();
+        }
+    }
+
+    public static void SetLanguage()
+    {
+        if (Settings.Default.Language != nameof(Languages.system))
+        {
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(name: Settings.Default.Language);
+        }
+        else
+        {
+            string language = CultureInfo.CurrentUICulture.Name.Split(separator: '-')[0];
+            Thread.CurrentThread.CurrentUICulture = new CultureInfo(name: language);
+        }
+
+        Console.WriteLine(format: "CurrentCulture is {0}.", arg0: CultureInfo.CurrentUICulture.Name);
+    }
+
+    public static List<Tuple<string, string>> GetAvailableLanguages()
+    {
+        if (_availableLanguages.Count() == 0)
+        {
+            ResourceSet res = Languages.ResourceManager.GetResourceSet(culture: CultureInfo.InvariantCulture, createIfNotExists: true, tryParents: false);
+            foreach (DictionaryEntry language in res)
             {
-                theme.SetBaseTheme(Theme.Dark);
-            }
-            else
-            {
-                theme.SetBaseTheme(Theme.Light);
-            }
-            paletteHelper.SetTheme(theme);
-            if (darkMode != PhotoApp.Properties.Settings.Default.DarkMode)
-            {
-                PhotoApp.Properties.Settings.Default.DarkMode = darkMode;
-                PhotoApp.Properties.Settings.Default.Save();
+                _availableLanguages.Add(item: new Tuple<string, string>(item1: language.Key.ToString(), item2: language.Value.ToString()));
             }
         }
 
-        public static void SetLanguage()
-        {
-            if (PhotoApp.Properties.Settings.Default.Language != nameof(PhotoApp.Properties.Languages.system))
-            {
-                System.Threading.Thread.CurrentThread.CurrentUICulture = new CultureInfo(PhotoApp.Properties.Settings.Default.Language);
-            }
-            else
-            {
-                string language = CultureInfo.CurrentUICulture.Name.Split('-')[0];
-                System.Threading.Thread.CurrentThread.CurrentUICulture = new CultureInfo(language);
-            }
-            Console.WriteLine("CurrentCulture is {0}.", CultureInfo.CurrentUICulture.Name);
-        }
+        return _availableLanguages;
+    }
 
-        public static List<Tuple<string, string>> GetAvailableLanguages()
-        {
-            if (_availableLanguages.Count() == 0)
-            {
-                var res = PhotoApp.Properties.Languages.ResourceManager.GetResourceSet(CultureInfo.InvariantCulture, true, false);
-                foreach (DictionaryEntry language in res)
-                {
-                    _availableLanguages.Add(new Tuple<string, string>(language.Key.ToString(), language.Value.ToString()));
-                }
-            }
-            return _availableLanguages;
-        }
-
-        protected override void OnExit(ExitEventArgs e)
-        {
-            PhotoApp.Properties.Settings.Default.LastVersion = Version;
-            PhotoApp.Properties.Settings.Default.Save();
-            base.OnExit(e);
-        }
+    protected override void OnExit(ExitEventArgs e)
+    {
+        Settings.Default.LastVersion = Version;
+        Settings.Default.Save();
+        base.OnExit(e: e);
     }
 }

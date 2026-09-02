@@ -2,31 +2,36 @@
 using System.Windows;
 using System.Windows.Data;
 
-namespace PhotoApp.Converters
+namespace PhotoApp.Converters;
+
+public class EnumToBoleanConverter : IValueConverter
 {
-    public class EnumToBoleanConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        var parameterString = parameter as string;
+        if (parameterString == null)
         {
-            string parameterString = parameter as string;
-            if (parameterString == null)
-                return DependencyProperty.UnsetValue;
-
-            if (Enum.IsDefined(value.GetType(), value) == false)
-                return DependencyProperty.UnsetValue;
-
-            object parameterValue = Enum.Parse(value.GetType(), parameterString);
-
-            return parameterValue.Equals(value);
+            return DependencyProperty.UnsetValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        if (Enum.IsDefined(enumType: value.GetType(), value: value) == false)
         {
-            string parameterString = parameter as string;
-            if (parameterString == null)
-                return DependencyProperty.UnsetValue;
-
-            return Enum.Parse(targetType, parameterString);
+            return DependencyProperty.UnsetValue;
         }
+
+        object parameterValue = Enum.Parse(enumType: value.GetType(), value: parameterString);
+
+        return parameterValue.Equals(obj: value);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+    {
+        var parameterString = parameter as string;
+        if (parameterString == null)
+        {
+            return DependencyProperty.UnsetValue;
+        }
+
+        return Enum.Parse(enumType: targetType, value: parameterString);
     }
 }

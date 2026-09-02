@@ -6,35 +6,34 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace PhotoApp.Converters
+namespace PhotoApp.Converters;
+
+internal class TagCodeToLabel : IValueConverter
 {
-    internal class TagCodeToLabel : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        string code, tag;
+        if (value is string)
         {
-            string code, tag;
-            if (value is string)
+            tag = code = value as string;
+            if (tag.Contains(value: "("))
             {
-                tag = code = value as string;
-                if (tag.Contains("("))
-                {
-                    code = Tags.RemoveParameter(tag);
-                    return $"{Tags.GetTag(code: code).VisibleText}({Tags.GetParameter(tag)})";
-                }
-                else
-                {
-                    return Tags.GetTag(code: code).VisibleText;
-                }
+                code = Tags.RemoveParameter(tag: tag);
+                return $"{Tags.GetTag(code: code).VisibleText}({Tags.GetParameter(visibleText: tag)})";
             }
             else
             {
-                return string.Empty;
+                return Tags.GetTag(code: code).VisibleText;
             }
         }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        else
         {
-            throw new NotImplementedException();
+            return string.Empty;
         }
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
     }
 }
