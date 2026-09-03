@@ -73,6 +73,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
 
         return new ImportPlan
         {
+            DiscoveredFilesTotal = files.Count,
             Files = result,
             TotalBytes = result.Sum(selector: item => item.Size ?? 0),
             Date = settings?.Date == null
@@ -90,7 +91,11 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(device);
-        var result = new ImportResult { FilesTotal = plan?.Files?.Count ?? 0 };
+        var result = new ImportResult
+        {
+            DiscoveredFilesTotal = plan?.DiscoveredFilesTotal ?? 0,
+            FilesTotal = plan?.Files?.Count ?? 0
+        };
         if (plan?.Files == null || plan.Files.Count == 0)
         {
             return result;

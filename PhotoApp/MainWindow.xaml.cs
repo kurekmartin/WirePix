@@ -381,7 +381,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 ImportPlan plan = await importSession.CreatePlanAsync(
                     SelectedDevice.Device, DownloadSettings, progress, operationCancellation.Token);
                 SelectedDevice.FileSearchStatus = plan.Files.Count > 0 ? FileSearchState.Ready : FileSearchState.Unknown;
-                lblResult.Text = $"{Properties.Resources.FilesFoundTotal}: {plan.Files.Count}\n" +
+                lblResult.Text = $"{Properties.Resources.FilesFoundTotal}: {plan.DiscoveredFilesTotal}\n" +
                                  $"{Properties.Resources.FilesToDownload}: {plan.Files.Count}";
                 btnShowLog.Visibility = Visibility.Collapsed;
             }
@@ -399,7 +399,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                     progress,
                     operationCancellation.Token);
                 SelectedDevice.FileSearchStatus = result.FilesTotal > 0 ? FileSearchState.Ready : FileSearchState.Unknown;
-                lblResult.Text = $"{Properties.Resources.FilesFoundTotal}: {result.FilesTotal}\n" +
+                lblResult.Text = $"{Properties.Resources.FilesFoundTotal}: {result.DiscoveredFilesTotal}\n" +
                                  $"{Properties.Resources.FilesDownloadedTotal}: {result.FilesDone}/{result.FilesTotal}\n" +
                                  $"{Properties.Resources.FilesDownloadErrorTotal}: {result.Errors}";
                 DeviceCatalog.RecordSuccessfulImport(startedAt, DownloadSettings, result);
