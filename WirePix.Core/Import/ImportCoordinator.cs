@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -86,6 +87,10 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         Directory.CreateDirectory(path: _tempFolder);
         _logger?.Start();
         var toDelete = new List<MediaItem>();
+        var importTimer = Stopwatch.StartNew();
+        var bytesCompleted = 0L;
+        TimeSpan estimatedRemaining = TimeSpan.Zero;
+        bool useByteEstimate = plan.TotalBytes > 0 && plan.Files.All(predicate: file => file.Size.HasValue);
         try
         {
             for (var index = 0; index < plan.Files.Count; index++)
@@ -96,8 +101,12 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                     stage: ImportStage.Downloading,
                     completed: index,
                     total: plan.Files.Count,
-                    currentFile: file.FileName));
+                    currentFile: file.FileName,
+                    bytesCompleted: bytesCompleted,
+                    bytesTotal: plan.TotalBytes,
+                    estimatedRemaining: estimatedRemaining));
                 string temp = Path.Combine(path1: _tempFolder, path2: Guid.NewGuid().ToString(format: "N"));
+                long processedBytes = file.Size ?? 0;
                 try
                 {
                     byte[] originalHash = null;
@@ -144,7 +153,10 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                             stage: ImportStage.GeneratingThumbnail,
                             completed: index,
                             total: plan.Files.Count,
-                            currentFile: file.FileName));
+                            currentFile: file.FileName,
+                            bytesCompleted: bytesCompleted,
+                            bytesTotal: plan.TotalBytes,
+                            estimatedRemaining: estimatedRemaining));
                     }
 
                     if (settings.Thumbnail && ThumbnailGenerator.IsImage(path: file.FileName))
@@ -213,11 +225,32 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                 {
                     if (File.Exists(path: temp))
                     {
+                        if (!file.Size.HasValue)
+                        {
+                            processedBytes = new FileInfo(fileName: temp).Length;
+                        }
+
                         File.Delete(path: temp);
                     }
                 }
+
+                bytesCompleted += processedBytes;
+                int completed = index + 1;
+                estimatedRemaining = useByteEstimate && bytesCompleted > 0
+                    ? EstimateRemaining(importTimer.Elapsed, bytesCompleted, plan.TotalBytes)
+                    : EstimateRemaining(importTimer.Elapsed, completed, plan.Files.Count);
+                progress?.Report(value: new ImportProgress(
+                    stage: ImportStage.Downloading,
+                    completed: completed,
+                    total: plan.Files.Count,
+                    currentFile: file.FileName,
+                    bytesCompleted: bytesCompleted,
+                    bytesTotal: plan.TotalBytes,
+                    estimatedRemaining: estimatedRemaining));
             }
 
+            importTimer.Restart();
+            estimatedRemaining = TimeSpan.Zero;
             foreach (MediaItem source in toDelete)
             {
                 cancellationToken.ThrowIfCancellationRequested();
@@ -225,9 +258,17 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                     stage: ImportStage.Deleting,
                     completed: result.Deleted,
                     total: toDelete.Count,
-                    currentFile: source.FileName));
+                    currentFile: source.FileName,
+                    estimatedRemaining: estimatedRemaining));
                 await device.DeleteAsync(source, cancellationToken).ConfigureAwait(false);
                 result.Deleted++;
+                estimatedRemaining = EstimateRemaining(importTimer.Elapsed, result.Deleted, toDelete.Count);
+                progress?.Report(value: new ImportProgress(
+                    stage: ImportStage.Deleting,
+                    completed: result.Deleted,
+                    total: toDelete.Count,
+                    currentFile: source.FileName,
+                    estimatedRemaining: estimatedRemaining));
             }
         }
         finally
@@ -240,6 +281,23 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
             completed: result.FilesDone,
             total: result.FilesTotal));
         return result;
+    }
+
+    private static TimeSpan EstimateRemaining(TimeSpan elapsed, long completed, long total)
+    {
+        long remaining = total - completed;
+        if (completed <= 0 || remaining <= 0 || elapsed <= TimeSpan.Zero)
+        {
+            return TimeSpan.Zero;
+        }
+
+        double estimatedTicks = elapsed.Ticks * (remaining / (double)completed);
+        if (!double.IsFinite(estimatedTicks) || estimatedTicks >= TimeSpan.MaxValue.Ticks)
+        {
+            return TimeSpan.MaxValue;
+        }
+
+        return TimeSpan.FromTicks(value: (long)estimatedTicks);
     }
 
     private static async Task<byte[]> HashDeviceItemAsync(

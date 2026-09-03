@@ -443,8 +443,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
         else
         {
-            string message = string.Format(Properties.Resources.DeviceFilesDoneCount, progress.Completed, progress.Total);
-            progressDialog.SetCurrentProgress(message, progress.Completed * 100 / progress.Total);
+            string message = progress.Stage == ImportStage.Deleting
+                ? string.Format(Properties.Resources.DeviceDeletingProgress, progress.Completed, progress.Total)
+                : string.Format(Properties.Resources.DeviceFilesDoneCount, progress.Completed, progress.Total);
+            progressDialog.SetCurrentProgress(
+                message,
+                progress.Completed * 100 / progress.Total,
+                progress.EstimatedRemaining);
         }
     }
 
