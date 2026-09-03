@@ -56,9 +56,12 @@ public interface IMediaDevice
     /// </summary>
     /// <remarks>
     /// Each media item must be returned once even when backend source locations overlap.
+    /// Recoverable directory failures are reported through <paramref name="progress"/>
+    /// and must not prevent sibling directories or sources from being inspected.
     /// This operation should only be attempted when <see cref="Status"/> is usable.
     /// </remarks>
     Task<IReadOnlyList<MediaItem>> GetMediaAsync(
+        IProgress<MediaDiscoveryUpdate>? progress,
         CancellationToken cancellationToken);
 
     /// <summary>
@@ -67,10 +70,13 @@ public interface IMediaDevice
     /// <remarks>
     /// The source must have originated from this device. Its identifier and display
     /// path must not be parsed or converted into local filesystem operations.
+    /// Recoverable directory failures are reported through <paramref name="progress"/>
+    /// and must not prevent sibling directories from being inspected.
     /// This operation should only be attempted when <see cref="Status"/> is usable.
     /// </remarks>
     Task<IReadOnlyList<MediaItem>> GetMediaAsync(
         MediaSource source,
+        IProgress<MediaDiscoveryUpdate>? progress,
         CancellationToken cancellationToken);
 
     /// <summary>

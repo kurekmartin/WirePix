@@ -89,15 +89,17 @@ internal sealed class WindowsMediaDevice : IMediaDevice
     }
 
     public Task<IReadOnlyList<MediaItem>> GetMediaAsync(
+        IProgress<MediaDiscoveryUpdate>? progress,
         CancellationToken cancellationToken)
     {
         return RunConnectedAsync(
-            operation: device => EnumerateMedia(device, sourceId: null, cancellationToken),
+            operation: device => EnumerateMedia(device, sourceId: null, progress, cancellationToken),
             cancellationToken);
     }
 
     public Task<IReadOnlyList<MediaItem>> GetMediaAsync(
         MediaSource source,
+        IProgress<MediaDiscoveryUpdate>? progress,
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(source);
@@ -107,7 +109,7 @@ internal sealed class WindowsMediaDevice : IMediaDevice
         }
 
         return RunConnectedAsync(
-            operation: device => EnumerateMedia(device, source.Id, cancellationToken),
+            operation: device => EnumerateMedia(device, source.Id, progress, cancellationToken),
             cancellationToken);
     }
 
@@ -172,6 +174,7 @@ internal sealed class WindowsMediaDevice : IMediaDevice
     private static IReadOnlyList<MediaItem> EnumerateMedia(
         MediaDevice device,
         string? sourceId,
+        IProgress<MediaDiscoveryUpdate>? progress,
         CancellationToken cancellationToken)
     {
         var result = new List<MediaItem>();
@@ -190,6 +193,8 @@ internal sealed class WindowsMediaDevice : IMediaDevice
                 device,
                 drive.RootDirectory.FullName,
                 dcimDirectories,
+                result.Count,
+                progress,
                 cancellationToken);
             foreach (string dcim in dcimDirectories)
             {
@@ -199,6 +204,7 @@ internal sealed class WindowsMediaDevice : IMediaDevice
                     SourceId(drive),
                     result,
                     seen,
+                    progress,
                     cancellationToken);
             }
         }
@@ -210,28 +216,42 @@ internal sealed class WindowsMediaDevice : IMediaDevice
         MediaDevice device,
         string path,
         List<string> result,
+        int filesFound,
+        IProgress<MediaDiscoveryUpdate>? progress,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        List<string> directories = [.. device.EnumerateDirectories(path)];
-        string? dcim = directories.FirstOrDefault(directory =>
-            string.Equals(
-                Path.GetFileName(directory.TrimEnd('\\', '/')),
-                "DCIM",
-                StringComparison.OrdinalIgnoreCase));
-        if (dcim != null)
+        progress?.Report(new MediaDiscoveryUpdate(path, filesFound));
+        try
         {
-            result.Add(dcim);
-            return;
-        }
-
-        foreach (string child in directories)
-        {
-            string name = Path.GetFileName(child.TrimEnd('\\', '/'));
-            if (!string.IsNullOrEmpty(name) && !name.StartsWith('.'))
+            List<string> directories = [.. device.EnumerateDirectories(path)];
+            string? dcim = directories.FirstOrDefault(directory =>
+                string.Equals(
+                    Path.GetFileName(directory.TrimEnd('\\', '/')),
+                    "DCIM",
+                    StringComparison.OrdinalIgnoreCase));
+            if (dcim != null)
             {
-                FindDcimDirectories(device, child, result, cancellationToken);
+                result.Add(dcim);
+                return;
             }
+
+            foreach (string child in directories)
+            {
+                string name = Path.GetFileName(child.TrimEnd('\\', '/'));
+                if (!string.IsNullOrEmpty(name) && !name.StartsWith('.'))
+                {
+                    FindDcimDirectories(device, child, result, filesFound, progress, cancellationToken);
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            progress?.Report(new MediaDiscoveryUpdate(path, filesFound, ex));
         }
     }
 
@@ -241,33 +261,47 @@ internal sealed class WindowsMediaDevice : IMediaDevice
         string sourceId,
         List<MediaItem> result,
         HashSet<string> seen,
+        IProgress<MediaDiscoveryUpdate>? progress,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        MediaDirectoryInfo directory = device.GetDirectoryInfo(path);
-        foreach (MediaFileInfo file in directory.EnumerateFiles("*"))
+        progress?.Report(new MediaDiscoveryUpdate(path, result.Count));
+        try
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            if (!string.IsNullOrEmpty(file.PersistentUniqueId) && seen.Add(file.PersistentUniqueId))
+            MediaDirectoryInfo directory = device.GetDirectoryInfo(path);
+            foreach (MediaFileInfo file in directory.EnumerateFiles("*"))
             {
-                DateTime? captured = CapturedAt(file);
-                result.Add(new MediaItem(
-                    file.PersistentUniqueId,
-                    sourceId,
-                    file.Name,
-                    Convert.ToInt64(file.Length),
-                    captured.HasValue ? new DateTimeOffset(captured.Value) : null,
-                    KindFrom(file.Name)));
+                cancellationToken.ThrowIfCancellationRequested();
+                if (!string.IsNullOrEmpty(file.PersistentUniqueId) && seen.Add(file.PersistentUniqueId))
+                {
+                    DateTime? captured = CapturedAt(file);
+                    result.Add(new MediaItem(
+                        file.PersistentUniqueId,
+                        sourceId,
+                        file.Name,
+                        Convert.ToInt64(file.Length),
+                        captured.HasValue ? new DateTimeOffset(captured.Value) : null,
+                        KindFrom(file.Name)));
+                }
+            }
+
+            progress?.Report(new MediaDiscoveryUpdate(path, result.Count));
+            foreach (string child in device.EnumerateDirectories(path))
+            {
+                string name = Path.GetFileName(child.TrimEnd('\\', '/'));
+                if (!string.IsNullOrEmpty(name) && !name.StartsWith('.'))
+                {
+                    EnumerateDirectory(device, child, sourceId, result, seen, progress, cancellationToken);
+                }
             }
         }
-
-        foreach (string child in device.EnumerateDirectories(path))
+        catch (OperationCanceledException)
         {
-            string name = Path.GetFileName(child.TrimEnd('\\', '/'));
-            if (!string.IsNullOrEmpty(name) && !name.StartsWith('.'))
-            {
-                EnumerateDirectory(device, child, sourceId, result, seen, cancellationToken);
-            }
+            throw;
+        }
+        catch (Exception ex)
+        {
+            progress?.Report(new MediaDiscoveryUpdate(path, result.Count, ex));
         }
     }
 

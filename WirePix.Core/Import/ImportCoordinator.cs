@@ -24,7 +24,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
     private readonly string _tempFolder = tempFolder ?? throw new ArgumentNullException(paramName: nameof(tempFolder));
     private readonly FileLogger _logger = logFolder == null ? null : new FileLogger(folder: logFolder);
 
-    public static async Task<ImportPlan> CreatePlanAsync(
+    public async Task<ImportPlan> CreatePlanAsync(
         IMediaDevice device,
         DownloadSettings settings,
         IProgress<ImportProgress> progress = null,
@@ -32,7 +32,19 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
     {
         ArgumentNullException.ThrowIfNull(device);
         progress?.Report(value: new ImportProgress(stage: ImportStage.Searching, completed: 0, total: 0));
-        IReadOnlyList<MediaItem> files = await device.GetMediaAsync(cancellationToken).ConfigureAwait(false);
+        _logger?.Start();
+        IReadOnlyList<MediaItem> files;
+        try
+        {
+            IProgress<MediaDiscoveryUpdate> discoveryProgress = _logger == null
+                ? null
+                : new DiscoveryProgress(logger: _logger);
+            files = await device.GetMediaAsync(discoveryProgress, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            _logger?.Stop();
+        }
 
         for (var index = 0; index < files.Count; index++)
         {
@@ -428,5 +440,19 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
     private static DateTime EffectiveDate(MediaItem file)
     {
         return file.CapturedAt?.LocalDateTime ?? default;
+    }
+
+    private sealed class DiscoveryProgress(FileLogger logger) : IProgress<MediaDiscoveryUpdate>
+    {
+        public void Report(MediaDiscoveryUpdate value)
+        {
+            if (value.Error != null)
+            {
+                logger.Add(
+                    message: $"Could not inspect device directory '{value.CurrentPath}'.{Environment.NewLine}{value.Error}",
+                    type: LogType.Error,
+                    function: nameof(CreatePlanAsync));
+            }
+        }
     }
 }

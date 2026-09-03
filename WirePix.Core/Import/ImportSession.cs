@@ -21,7 +21,7 @@ public sealed class ImportSession(ImportCoordinator coordinator)
         IProgress<ImportProgress> progress = null,
         CancellationToken cancellationToken = default)
     {
-        Plan = await ImportCoordinator.CreatePlanAsync(device, settings, progress, cancellationToken).ConfigureAwait(false);
+        Plan = await _coordinator.CreatePlanAsync(device, settings, progress, cancellationToken).ConfigureAwait(false);
         _criteria = ImportCriteria.From(device, settings);
         return Plan;
     }
