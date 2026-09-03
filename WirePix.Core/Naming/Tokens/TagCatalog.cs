@@ -33,7 +33,7 @@ public static class TagCatalog
 
     public static TagDefinition Get(string code)
     {
-        string normalized = NameTemplate.NormalizeCode(code: code);
+        string normalized = NameTemplate.NormalizeCode(code: NameTemplate.RemoveParameter(tag: code));
         return All.FirstOrDefault(predicate: x => x.Code == normalized);
     }
 
