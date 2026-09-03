@@ -1,17 +1,16 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Windows.Data;
 
 namespace PhotoApp.Converters;
 
-internal class ArrayToProgress : IValueConverter
+internal class StorageSpaceToProgressConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var array = value as double[];
-        if (array.Length >= 2 && array[0] > 0)
+        if (value is DeviceStorageSpace { TotalGigabytes: > 0 } space)
         {
-            return 100 - array[1] / array[0] * 100;
+            return 100 - space.AvailableGigabytes / space.TotalGigabytes * 100;
         }
 
         return 100;

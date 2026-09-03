@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Xml;
 using System.Xml.Serialization;
 using WirePix.Core.Models.Settings;
@@ -160,5 +161,14 @@ public sealed class ProfileStore(string directory)
     public string[] GetProfiles()
     {
         return Directory.Exists(path: _directory) ? Directory.GetFiles(path: _directory, searchPattern: "*.xml") : [];
+    }
+
+    public string[] GetProfileNames()
+    {
+        return GetProfiles()
+            .Select(Path.GetFileNameWithoutExtension)
+            .Where(name => !string.IsNullOrEmpty(name) && IsValid(name))
+            .OrderBy(name => name, StringComparer.CurrentCultureIgnoreCase)
+            .ToArray();
     }
 }

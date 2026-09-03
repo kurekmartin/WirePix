@@ -9,8 +9,9 @@ internal class ListToStringConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var list = (List<string>)value;
-        return string.Join(separator: "\n", value: list.ToArray());
+        return value is IEnumerable<string> list
+            ? string.Join(separator: "\n", values: list)
+            : string.Empty;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

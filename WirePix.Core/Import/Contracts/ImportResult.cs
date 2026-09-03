@@ -6,5 +6,4 @@ public sealed class ImportResult
     public int FilesTotal { get; internal set; }
     public int Errors { get; internal set; }
     public int Deleted { get; internal set; }
-    public bool Cancelled { get; internal set; }
 }

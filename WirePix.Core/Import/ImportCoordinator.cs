@@ -62,7 +62,9 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         {
             Files = result,
             TotalBytes = result.Sum(selector: item => item.Size ?? 0),
-            Date = settings?.Date
+            Date = settings?.Date == null
+                ? null
+                : new DateRange { Start = settings.Date.Start, End = settings.Date.End }
         };
     }
 
@@ -186,7 +188,8 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                             settings: settings,
                             relativePath: relativePath,
                             temp: temp,
-                            hash: originalHash))
+                            hash: originalHash,
+                            cancellationToken: cancellationToken))
                     {
                         throw new IOException(message: "Could not save file.");
                     }
@@ -196,6 +199,10 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
                     {
                         toDelete.Add(item: file);
                     }
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
                 }
                 catch (Exception ex)
                 {
@@ -241,13 +248,13 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         CancellationToken cancellationToken)
     {
         using var hash = MD5.Create();
-        using var destination = new CryptoStream(
+        await using var destination = new CryptoStream(
             Stream.Null,
             hash,
             CryptoStreamMode.Write,
             leaveOpen: true);
         await device.DownloadAsync(item, destination, cancellationToken).ConfigureAwait(false);
-        destination.FlushFinalBlock();
+        await destination.FlushFinalBlockAsync(cancellationToken);
         return hash.Hash ?? throw new CryptographicException("The device item hash could not be calculated.");
     }
 
@@ -274,7 +281,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         string hash,
         CancellationToken cancellationToken)
     {
-        var delay = TimeSpan.FromSeconds(value: 2);
+        TimeSpan delay = TimeSpan.FromSeconds(value: 2);
         for (var attempt = 0; ; attempt++)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -299,10 +306,15 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         DownloadSettings settings,
         string relativePath,
         string temp,
-        byte[] hash)
+        byte[] hash,
+        CancellationToken cancellationToken)
     {
-        foreach (string root in new[] { settings.Paths.Root, settings.Paths.Backup })
+        IEnumerable<string> roots = settings.Backup
+            ? new[] { settings.Paths.Root, settings.Paths.Backup }
+            : new[] { settings.Paths.Root };
+        foreach (string root in roots)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             if (string.IsNullOrEmpty(value: root))
             {
                 return true;
@@ -318,6 +330,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
             var copied = false;
             for (var attempt = 0; attempt < MaxAttempts && !copied; attempt++)
             {
+                cancellationToken.ThrowIfCancellationRequested();
                 File.Copy(sourceFileName: temp, destFileName: destination, overwrite: true);
                 copied = !settings.CheckFiles || FileOperations.Verify(expected: hash, path: destination);
             }

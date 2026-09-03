@@ -7,18 +7,12 @@ internal class IntToFileSearchStatusConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
     {
-        if ((int)value == Device.DEVICE_FILES_SEARCHING)
+        return value switch
         {
-            return Properties.Resources.FileSearchStatus_Searching;
-        }
-        else if ((int)value == Device.DEVICE_FILES_READY)
-        {
-            return Properties.Resources.FileSearchStatus_Ready;
-        }
-        else
-        {
-            return Properties.Resources.FileSearchStatus_Unknown;
-        }
+            FileSearchState.Searching => Properties.Resources.FileSearchStatus_Searching,
+            FileSearchState.Ready => Properties.Resources.FileSearchStatus_Ready,
+            _ => Properties.Resources.FileSearchStatus_Unknown
+        };
     }
 
     public object ConvertBack(object value, Type targetTypes, object parameter, System.Globalization.CultureInfo culture)

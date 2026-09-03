@@ -23,7 +23,7 @@
         <converters:IntToDeviceStatusConverter x:Key="IntToDeviceStatus" />
         <converters:IntToFileSearchStatusConverter x:Key="IntToFileSearchStatus" />
         <converters:ListToStringConverter x:Key="ListToString" />
-        <converters:ArrayToProgress x:Key="ArrToProgress" />
+        <converters:StorageSpaceToProgressConverter x:Key="StorageSpaceToProgress" />
         <converters:LastBackupConverter x:Key="LastBckp" />
         <converters:IndexToMargin x:Key="IndexToMarginConverter" />
         <converters:ListIndexToMargin x:Key="ItemIndexToMarginConverter" />
@@ -101,7 +101,7 @@
                                             Height="Auto">
                                     <StackPanel Orientation="Vertical" Margin="5,0">
                                         <ListBox x:Name="ListBoxDevices"
-                                                 ItemsSource="{Binding DeviceList.ConnectedDevicesInfo,UpdateSourceTrigger=PropertyChanged}"
+                                                 ItemsSource="{Binding DeviceCatalog.ConnectedDevicesInfo,UpdateSourceTrigger=PropertyChanged}"
                                                  HorizontalAlignment="Left" Height="100" VerticalAlignment="Top"
                                                  Width="Auto" MinWidth="150"
                                                  SelectionChanged="ListBoxDevices_SelectionChanged"
@@ -133,7 +133,7 @@
                                                          TextAlignment="Left"
                                                          MaxLength="20"
                                                          MaxLines="1"
-                                                         Text="{Binding DeviceList.SelectedDeviceInfo.Name,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                                         Text="{Binding DeviceCatalog.SelectedDeviceInfo.Name,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
                                                          TextChanged="lblDeviceName_TextChanged"
                                                          DockPanel.Dock="Right" Margin="5,0,0,0" />
                                             </DockPanel>
@@ -146,7 +146,7 @@
                                                            FontWeight="Bold" />
                                                 <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
                                                            x:Name="lblManu"
-                                                           Text="{Binding DeviceList.SelectedDevice.Manufacturer}"
+                                                           Text="{Binding SelectedDevice.Manufacturer}"
                                                            HorizontalAlignment="Left" VerticalAlignment="Center"
                                                            Margin="5,0,0,0" DockPanel.Dock="Right"
                                                            d:Text="manufacturer" />
@@ -156,7 +156,7 @@
                                                            Text="{x:Static p:Resources.DeviceState}" FontWeight="Bold" />
                                                 <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
                                                            x:Name="lblDeviceStatus"
-                                                           Text="{Binding DeviceList.SelectedDevice.Status,Converter={StaticResource IntToDeviceStatus},UpdateSourceTrigger=PropertyChanged}"
+                                                           Text="{Binding SelectedDevice.Status,Converter={StaticResource IntToDeviceStatus},UpdateSourceTrigger=PropertyChanged}"
                                                            Margin="5,0,0,0" DockPanel.Dock="Right"
                                                            d:Text="device state" />
                                             </DockPanel>
@@ -165,7 +165,7 @@
                                                            Text="{x:Static p:Resources.LastBackup}" FontWeight="Bold" />
                                                 <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
                                                            x:Name="lblLastBackup"
-                                                           Text="{Binding DeviceList.SelectedDeviceInfo.LastBackup,Converter={StaticResource LastBckp}}"
+                                                           Text="{Binding DeviceCatalog.SelectedDeviceInfo.LastBackup,Converter={StaticResource LastBckp}}"
                                                            DockPanel.Dock="Right" Margin="5,0,0,0"
                                                            d:Text="DD.MM.YYYY HH:MM:SS" />
                                             </DockPanel>
@@ -176,7 +176,7 @@
                                                            FontWeight="Bold" />
                                                 <TextBlock x:Name="tbMediaDir" HorizontalAlignment="Left"
                                                            TextWrapping="Wrap" VerticalAlignment="Top"
-                                                           Text="{Binding DeviceList.SelectedDevice.MediaDirectories,Converter={StaticResource ListToString}}"
+                                                           Text="{Binding SelectedDevice.MediaDirectories,Converter={StaticResource ListToString}}"
                                                            Margin="5,0,0,0" DockPanel.Dock="Right"
                                                            d:Text="PATH/TO/DCIM" />
                                             </DockPanel>
@@ -195,7 +195,7 @@
                                                            Style="{StaticResource MaterialDesignBody2TextBlock}" />
                                                 <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
                                                            x:Name="lblTotalSpace"
-                                                           Text="{Binding DeviceList.SelectedDevice.Space[0],StringFormat={}{0} GB}"
+                                                           Text="{Binding SelectedDevice.Space.TotalGigabytes,StringFormat={}{0} GB}"
                                                            HorizontalAlignment="Left" VerticalAlignment="Top"
                                                            Margin="2,0,0,0" />
                                             </StackPanel>
@@ -213,7 +213,7 @@
                                                         <TextBlock
                                                             Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                                             x:Name="lblFreeSpace"
-                                                            Text="{Binding DeviceList.SelectedDevice.Space[1],StringFormat={}{0} GB}"
+                                                            Text="{Binding SelectedDevice.Space.AvailableGigabytes,StringFormat={}{0} GB}"
                                                             VerticalAlignment="Top" HorizontalAlignment="Left"
                                                             FontSize="11"
                                                             d:Text="12345GB" DockPanel.Dock="Right" Margin="5,0,0,0" />
@@ -229,7 +229,7 @@
                                                         <TextBlock
                                                             Style="{StaticResource MaterialDesignCaptionTextBlock}"
                                                             x:Name="lblUsedSpace"
-                                                            Text="{Binding DeviceList.SelectedDevice.Space[2],StringFormat={}{0} GB}"
+                                                            Text="{Binding SelectedDevice.Space.UsedGigabytes,StringFormat={}{0} GB}"
                                                             VerticalAlignment="Top" HorizontalAlignment="Left"
                                                             FontSize="11"
                                                             d:Text="1234GB" DockPanel.Dock="Right" Margin="5,0,0,0" />
@@ -239,7 +239,7 @@
                                                              materialDesign:TransitionAssist.DisableTransitions="True"
                                                              HorizontalAlignment="Left" Height="6" Margin="0,5"
                                                              VerticalAlignment="Top" Width="253"
-                                                             Value="{Binding DeviceList.SelectedDevice.Space,Converter={StaticResource ArrToProgress},Mode=OneWay}"
+                                                             Value="{Binding SelectedDevice.Space,Converter={StaticResource StorageSpaceToProgress},Mode=OneWay}"
                                                              Background="#FF1DDA26" Foreground="#FFE63434"
                                                              BorderBrush="{x:Null}" BorderThickness="0"
                                                              d:Value="30" />
@@ -253,7 +253,7 @@
                                                            Style="{StaticResource MaterialDesignBody2TextBlock}" />
                                                 <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
                                                            x:Name="lblFileSearchStatus"
-                                                           Text="{Binding DeviceList.SelectedDevice.FileSearchStatus,Converter={StaticResource IntToFileSearchStatus}}" />
+                                                           Text="{Binding SelectedDevice.FileSearchStatus,Converter={StaticResource IntToFileSearchStatus}}" />
                                             </StackPanel>
                                         </StackPanel>
                                     </StackPanel>

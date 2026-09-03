@@ -10,49 +10,38 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Octokit;
 using WirePix.Devices.Contracts;
 using WirePix.Devices.Windows;
+using WirePix.Core.Devices;
+using WirePix.Core.Import;
+using WirePix.Core.Import.Contracts;
+using WirePix.Core.Naming.Templates;
+using WirePix.Core.Storage;
+using WirePix.Core.Validation;
 using Application = System.Windows.Application;
 using DateRange = WirePix.Core.Models.Settings.DateRange;
 
 namespace PhotoApp;
 
-public enum TaskType
-{
-    FindFiles,
-    CopyFiles,
-    GetFileTypes
-}
-
-public struct WorkerResult
-{
-    public WorkerResult(int code, TaskType task)
-    {
-        this.code = code;
-        this.task = task;
-    }
-
-    public int code;
-    public TaskType task;
-}
-
 public partial class MainWindow : Window, INotifyPropertyChanged
 {
     private readonly string logFolder = Application.Current.Resources[key: Properties.Keys.LogsFolder].ToString();
-    private static readonly string tmpFolder = Application.Current.Resources[key: Properties.Keys.TempFolder].ToString();
 
     public DownloadSettings DownloadSettings { get; set; }
     public List<string> Profiles { get; set; }
 
-    public DeviceList DeviceList { get; set; }
+    public DeviceCatalog DeviceCatalog { get; }
+    public DeviceViewModel SelectedDevice { get; private set; }
     private readonly IMediaDeviceProvider deviceProvider;
+    private readonly ProfileStore profileStore;
     public ProgressDialog progressDialog { get; private set; } = null;
-    private BackgroundWorker backgroundWorker = null;
-    private DateTime backupStart = new();
+    private ImportSession importSession;
+    private CancellationTokenSource operationCancellation;
 
 
     //dialog error
@@ -74,9 +63,11 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         DownloadSettings = new DownloadSettings();
         Profiles = new List<string>();
         deviceProvider = new WindowsMediaDeviceProvider();
-        DeviceList = new DeviceList(provider: deviceProvider);
-
-        DeviceList.Load();
+        profileStore = new ProfileStore(App.DataPaths.Profiles);
+        DeviceCatalog = new DeviceCatalog(
+            deviceProvider,
+            new DeviceHistoryStore(Path.Combine(App.DataPaths.Data, "Devices.xml")));
+        DeviceCatalog.Load();
 
         InitializeComponent();
 
@@ -131,8 +122,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         PropertyChanged?.Invoke(sender: this, e: new PropertyChangedEventArgs(propertyName: propertyName));
     }
 
-    private void ListBoxDevices_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void ListBoxDevices_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (SelectedDevice != null && ListBoxDevices.SelectedItem is DeviceInfo selectedInfo && selectedInfo.Id != SelectedDevice.Id)
+        {
+            operationCancellation?.Cancel();
+        }
+
         if (ListBoxDevices.SelectedItem != null)
         {
             tbSelectDeviceError.Visibility = Visibility.Collapsed;
@@ -141,12 +137,14 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             ListBoxDevices.BorderThickness = new Thickness(uniformLength: 1);
 
             //zmena vybraneho zarizeni
-            DeviceList.SelectDevice(index: ListBoxDevices.SelectedIndex);
-
-            //DeviceList.SelectedDevice.FileTypes();
+            DeviceCatalog.SelectDevice(index: ListBoxDevices.SelectedIndex);
+            await UpdateSelectedDeviceAsync();
         }
         else
         {
+            SelectedDevice = null;
+            importSession = null;
+            OnPropertyChanged(nameof(SelectedDevice));
             spDeviceInfo.Visibility = Visibility.Collapsed;
             ListBoxDevices.IsEnabled = true;
         }
@@ -158,7 +156,12 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     {
         try
         {
-            ListBoxDevices.SelectedIndex = await DeviceList.UpdateDevicesAsync();
+            int selectedIndex = await DeviceCatalog.RefreshAsync();
+            ListBoxDevices.SelectedIndex = selectedIndex;
+            if (selectedIndex >= 0 && !ReferenceEquals(SelectedDevice?.Device, DeviceCatalog.SelectedDevice))
+            {
+                await UpdateSelectedDeviceAsync();
+            }
         }
         catch (OperationCanceledException)
         {
@@ -177,14 +180,13 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void GetProfiles(string SelectProfile = "")
     {
-        var profilesPath = Application.Current.Resources[key: Properties.Keys.ProfilesFolder].ToString();
         string selectedProfile = SelectProfile;
         if (selectedProfile.Length == 0 && cbProfiles.SelectedItem != null)
         {
             selectedProfile = cbProfiles.SelectedItem.ToString();
         }
 
-        Profiles = Directory.GetFiles(path: profilesPath, searchPattern: "*.xml").Select(selector: f => Path.GetFileNameWithoutExtension(path: f)).Where(predicate: x => DownloadSettings.IsValid(profileName: x)).ToList();
+        Profiles = profileStore.GetProfileNames().ToList();
 
         OnPropertyChanged(propertyName: "Profiles");
 
@@ -200,45 +202,25 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
-    //vyhledani vsech souboru v adresari (hleda i v podadresarich)
-    private void FindFiles(object sender, DoWorkEventArgs e)
-    {
-        var worker = sender as BackgroundWorker;
-        DeviceList.SelectedDevice.GetFilesByDate(worker: worker, e: e, settings: DownloadSettings);
-    }
-
-    private void CopyFiles(object sender, DoWorkEventArgs e)
-    {
-        var worker = sender as BackgroundWorker;
-        DeviceList.SelectedDevice.CopyFiles(worker: worker, e: e, settings: DownloadSettings);
-    }
-
-    private void GetFileTypes(object sender, DoWorkEventArgs e)
-    {
-        var worker = sender as BackgroundWorker;
-        DeviceList.SelectedDevice.FileTypes(worker: worker, e: e);
-    }
-
     //obnovit seznam pripojenych zarizeni
     private void Refresh_Click(object sender, RoutedEventArgs e)
     {
         ListConnectedDevices();
     }
 
-    private void FindFiles_Click(object sender, RoutedEventArgs e)
+    private async void FindFiles_Click(object sender, RoutedEventArgs e)
     {
         if (CheckDeviceSelected())
         {
-            RunWorker(sender: sender, task: TaskType.FindFiles, showProgress: true);
+            await RunImportAsync(execute: false);
         }
     }
 
-    private void CopyFiles_Click(object sender, RoutedEventArgs e)
+    private async void CopyFiles_Click(object sender, RoutedEventArgs e)
     {
         if (CheckSettings())
         {
-            backupStart = DateTime.Now;
-            RunWorker(sender: sender, task: TaskType.CopyFiles, showProgress: true);
+            await RunImportAsync(execute: true);
         }
     }
 
@@ -282,96 +264,45 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private bool CheckSettings()
     {
-        var correct = true;
-
-        correct = CheckDeviceSelected();
-
-        if (DeviceList.SelectedDeviceInfo.Name == null || DeviceList.SelectedDeviceInfo.Name.Length == 0)
+        RemoveAllErrors();
+        IReadOnlyList<ImportValidationIssue> issues = ImportSettingsValidator.Validate(
+            DeviceCatalog.SelectedDevice,
+            DeviceCatalog.SelectedDeviceInfo,
+            DownloadSettings);
+        foreach (ImportValidationIssue issue in issues)
         {
-            SetErrorMessage(tb: tbDeviceNameError, message: Properties.Resources.DeviceNameEmpty);
-            correct = false;
+            ShowValidationIssue(issue.Code);
+        }
+        return issues.Count == 0;
+    }
+
+    private async Task UpdateSelectedDeviceAsync()
+    {
+        if (DeviceCatalog.SelectedDevice == null)
+        {
+            SelectedDevice = null;
+            importSession = null;
+            OnPropertyChanged(nameof(SelectedDevice));
+            return;
         }
 
-        if (DownloadSettings.Paths.Root == null || DownloadSettings.Paths.Root.Length == 0)
+        SelectedDevice = new DeviceViewModel(DeviceCatalog.SelectedDevice);
+        importSession = new ImportSession(new ImportCoordinator(App.DataPaths.Temp, App.DataPaths.Logs));
+        OnPropertyChanged(nameof(SelectedDevice));
+        try
         {
-            BtnError(button: btnMainFolder);
-            SetErrorMessage(tb: tbRootError, message: Properties.Resources.NoDownloadFolder);
-            correct = false;
+            await SelectedDevice.LoadAsync();
         }
-        else if (!Directory.Exists(path: DownloadSettings.Paths.Root))
+        catch
         {
-            BtnError(button: btnMainFolder);
-            SetErrorMessage(tb: tbRootError, message: Properties.Resources.FolderDoesNotExist);
-            correct = false;
+            // Device details are optional and can become unavailable after selection.
         }
-
-        if (DownloadSettings.Backup)
-        {
-            if (DownloadSettings.Paths.Backup == null || DownloadSettings.Paths.Backup.Length == 0)
-            {
-                BtnError(button: btnChooseBackupDest);
-                SetErrorMessage(tb: tbBackupError, message: Properties.Resources.NoBackupFolder);
-                correct = false;
-            }
-            else if (!Directory.Exists(path: DownloadSettings.Paths.Backup))
-            {
-                BtnError(button: btnChooseBackupDest);
-                SetErrorMessage(tb: tbBackupError, message: Properties.Resources.FolderDoesNotExist);
-                correct = false;
-            }
-        }
-
-
-        if (DownloadSettings.Paths.FolderTags == null || DownloadSettings.Paths.FolderTags.Count == 0)
-        {
-            BtnError(button: btnFolderStruct);
-            SetErrorMessage(tb: tbFolderStructError, message: Properties.Resources.NoFolderStructure);
-            correct = false;
-        }
-
-        if (DownloadSettings.Paths.FileTags == null || DownloadSettings.Paths.FileTags.Count == 0)
-        {
-            BtnError(button: btnFileStruct);
-            SetErrorMessage(tb: tbFileStructError, message: Properties.Resources.NoFileStructure);
-            correct = false;
-        }
-
-        if (DownloadSettings.Thumbnail)
-        {
-            if (DownloadSettings.Paths.Thumbnail == null || DownloadSettings.Paths.Thumbnail.Length == 0)
-            {
-                BtnError(button: btnChooseThumbDest);
-                SetErrorMessage(tb: tbThumbnailDestError, message: Properties.Resources.NoThumbnailFolder);
-                correct = false;
-            }
-            else if (!Directory.Exists(path: DownloadSettings.Paths.Thumbnail))
-            {
-                BtnError(button: btnChooseThumbDest);
-                SetErrorMessage(tb: tbThumbnailDestError, message: Properties.Resources.FolderDoesNotExist);
-                correct = false;
-            }
-
-            if (DownloadSettings.ThumbnailSettings.Value == 0)
-            {
-                SetErrorMessage(tb: tbThumbnailError, message: Properties.Resources.CannotBeZero);
-                correct = false;
-            }
-        }
-
-        if ((bool)cbDateRange.IsChecked && DownloadSettings.Date.Start > DownloadSettings.Date.End)
-        {
-            SetErrorMessage(tb: tbDateRangeError, message: Properties.Resources.DateRange_StartGreater);
-            correct = false;
-        }
-
-
-        return correct;
     }
 
     private bool CheckDeviceSelected()
     {
         var correct = true;
-        if (DeviceList.SelectedDevice == null)
+        if (DeviceCatalog.SelectedDevice == null)
         {
             ListBoxDevices.BorderBrush = errorBorder.BorderBrush;
             ListBoxDevices.BorderThickness = errorBorder.BorderThickness;
@@ -382,123 +313,142 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         return correct;
     }
 
+    private void ShowValidationIssue(ImportValidationCode code)
+    {
+        switch (code)
+        {
+            case ImportValidationCode.DeviceNotSelected:
+                CheckDeviceSelected();
+                break;
+            case ImportValidationCode.DeviceNameMissing:
+                SetErrorMessage(tbDeviceNameError, Properties.Resources.DeviceNameEmpty);
+                break;
+            case ImportValidationCode.RootMissing:
+                BtnError(btnMainFolder); SetErrorMessage(tbRootError, Properties.Resources.NoDownloadFolder);
+                break;
+            case ImportValidationCode.RootNotFound:
+                BtnError(btnMainFolder); SetErrorMessage(tbRootError, Properties.Resources.FolderDoesNotExist);
+                break;
+            case ImportValidationCode.BackupMissing:
+                BtnError(btnChooseBackupDest); SetErrorMessage(tbBackupError, Properties.Resources.NoBackupFolder);
+                break;
+            case ImportValidationCode.BackupNotFound:
+                BtnError(btnChooseBackupDest); SetErrorMessage(tbBackupError, Properties.Resources.FolderDoesNotExist);
+                break;
+            case ImportValidationCode.FolderTemplateMissing:
+                BtnError(btnFolderStruct); SetErrorMessage(tbFolderStructError, Properties.Resources.NoFolderStructure);
+                break;
+            case ImportValidationCode.FileTemplateMissing:
+                BtnError(btnFileStruct); SetErrorMessage(tbFileStructError, Properties.Resources.NoFileStructure);
+                break;
+            case ImportValidationCode.ThumbnailDirectoryMissing:
+                BtnError(btnChooseThumbDest); SetErrorMessage(tbThumbnailDestError, Properties.Resources.NoThumbnailFolder);
+                break;
+            case ImportValidationCode.ThumbnailDirectoryNotFound:
+                BtnError(btnChooseThumbDest); SetErrorMessage(tbThumbnailDestError, Properties.Resources.FolderDoesNotExist);
+                break;
+            case ImportValidationCode.ThumbnailSizeInvalid:
+                SetErrorMessage(tbThumbnailError, Properties.Resources.CannotBeZero);
+                break;
+            case ImportValidationCode.DateRangeInvalid:
+                SetErrorMessage(tbDateRangeError, Properties.Resources.DateRange_StartGreater);
+                break;
+        }
+    }
+
     private void SetErrorMessage(TextBlock tb, string message)
     {
         tb.Text = message;
         tb.Visibility = Visibility.Visible;
     }
 
-    //spusteni prace na pozadi podle typu ulohy
-    private void RunWorker(object sender, TaskType task, bool showProgress)
+    private async Task RunImportAsync(bool execute)
     {
-        backgroundWorker = new BackgroundWorker();
-        backgroundWorker.WorkerSupportsCancellation = true;
-        backgroundWorker.WorkerReportsProgress = showProgress;
-        backgroundWorker.ProgressChanged += worker_ProgressChanged;
-        backgroundWorker.RunWorkerCompleted += worker_RunWorkerCompleted;
-
-        if (showProgress)
-        {
-            DialogHost.Show(content: progressDialog, dialogIdentifier: "RootDialog");
-            progressDialog.btnCancel.Content = Properties.Resources.Cancel;
-        }
-
         if ((bool)cbNewFiles.IsChecked)
+            DownloadSettings.Date.Start = DeviceCatalog.SelectedDeviceInfo.LastBackup;
+
+        operationCancellation?.Dispose();
+        operationCancellation = new CancellationTokenSource();
+        DateTime startedAt = DateTime.Now;
+        SelectedDevice.FileSearchStatus = FileSearchState.Searching;
+        progressDialog.btnCancel.Content = Properties.Resources.Cancel;
+        _ = DialogHost.Show(progressDialog, "RootDialog");
+        var progress = new Progress<ImportProgress>(ReportImportProgress);
+        try
         {
-            DownloadSettings.Date.Start = DeviceList.SelectedDeviceInfo.LastBackup;
-        }
-
-        switch (task)
-        {
-            case TaskType.FindFiles:
-                backgroundWorker.DoWork += FindFiles;
-                break;
-            case TaskType.CopyFiles:
-                backgroundWorker.DoWork += CopyFiles;
-                break;
-            case TaskType.GetFileTypes:
-                backgroundWorker.DoWork += GetFileTypes;
-                break;
-        }
-
-        backgroundWorker.RunWorkerAsync();
-    }
-
-
-    //backgroundWorker update progress
-    private void worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-    {
-        var progress = (ProgressUpdateArgs)e.UserState;
-
-        progressDialog.SetCurrentTask(taskName: progress.taskName);
-
-        if (progress.indeterminateTask)
-        {
-            progressDialog.SetIndeterminateProgress();
-            progressDialog.SetProgressMessage(message: progress.progressText);
-        }
-        else
-        {
-            progressDialog.SetCurrentProgress(progressMessage: progress.progressText, progress: e.ProgressPercentage, time: progress.timeRemain);
-        }
-
-        progressDialog.SetCurrentDir(dirName: progress.currentTask);
-    }
-
-    private void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-    {
-        dhDialog.IsOpen = false;
-        if (e.Cancelled)
-        {
-            lblResult.Text = Properties.Resources.ResultCanceled;
-            return;
-        }
-
-        var result = (WorkerResult)e.Result;
-        if (result.code == RESULT_ERROR)
-        {
-            ErrorDialog(message: Properties.Resources.FileCheckError);
-            ListConnectedDevices();
-        }
-        else if (result.code == RESULT_OK)
-        {
-            int total = DeviceList.SelectedDevice.FilesTotal;
-            int downloaded = DeviceList.SelectedDevice.FilesDoneCount;
-            int toDownload = DeviceList.SelectedDevice.FilesToCopyCount;
-            int errors = DeviceList.SelectedDevice.Errors;
-            lblResult.Text = $"{Properties.Resources.FilesFoundTotal}: {total}\n";
-            if (result.task == TaskType.CopyFiles)
+            if (!execute)
             {
-                lblResult.Text += $"{Properties.Resources.FilesDownloadedTotal}: {downloaded}/{toDownload}\n" +
-                                  $"{Properties.Resources.FilesDownloadErrorTotal}: {errors}";
-                if (DownloadSettings.DownloadSelect == DownloadSelect.lastBackup && downloaded == toDownload)
-                {
-                    DeviceList.SelectedDeviceInfo.LastBackup = backupStart;
-                }
-
-                OnPropertyChanged(propertyName: "SelectedDeviceInfo");
-                DeviceList.Save();
-            }
-            else if (result.task == TaskType.FindFiles)
-            {
-                lblResult.Text += $"{Properties.Resources.FilesToDownload}: {toDownload}";
-            }
-
-            if (errors > 0)
-            {
-                btnShowLog.Visibility = Visibility.Visible;
+                ImportPlan plan = await importSession.CreatePlanAsync(
+                    SelectedDevice.Device, DownloadSettings, progress, operationCancellation.Token);
+                SelectedDevice.FileSearchStatus = plan.Files.Count > 0 ? FileSearchState.Ready : FileSearchState.Unknown;
+                lblResult.Text = $"{Properties.Resources.FilesFoundTotal}: {plan.Files.Count}\n" +
+                                 $"{Properties.Resources.FilesToDownload}: {plan.Files.Count}";
+                btnShowLog.Visibility = Visibility.Collapsed;
             }
             else
             {
-                btnShowLog.Visibility = Visibility.Collapsed;
+                ImportResult result = await importSession.ExecuteAsync(
+                    SelectedDevice.Device,
+                    DownloadSettings,
+                    new NamingContext
+                    {
+                        DeviceName = DeviceCatalog.SelectedDeviceInfo.Name,
+                        TagLanguage = Properties.Settings.Default.TagLanguage,
+                        UseTagLanguage = Properties.Settings.Default.UseDifferentLangForTags
+                    },
+                    progress,
+                    operationCancellation.Token);
+                SelectedDevice.FileSearchStatus = result.FilesTotal > 0 ? FileSearchState.Ready : FileSearchState.Unknown;
+                lblResult.Text = $"{Properties.Resources.FilesFoundTotal}: {result.FilesTotal}\n" +
+                                 $"{Properties.Resources.FilesDownloadedTotal}: {result.FilesDone}/{result.FilesTotal}\n" +
+                                 $"{Properties.Resources.FilesDownloadErrorTotal}: {result.Errors}";
+                DeviceCatalog.RecordSuccessfulImport(startedAt, DownloadSettings, result);
+                btnShowLog.Visibility = result.Errors > 0 ? Visibility.Visible : Visibility.Collapsed;
             }
+        }
+        catch (OperationCanceledException)
+        {
+            SelectedDevice.FileSearchStatus = FileSearchState.Unknown;
+            lblResult.Text = Properties.Resources.ResultCanceled;
+        }
+        catch
+        {
+            SelectedDevice.FileSearchStatus = FileSearchState.Unknown;
+            ErrorDialog(Properties.Resources.FileCheckError);
+            ListConnectedDevices();
+        }
+        finally
+        {
+            dhDialog.IsOpen = false;
         }
     }
 
-    public void worker_Cancel()
+    private void ReportImportProgress(ImportProgress progress)
     {
-        backgroundWorker.CancelAsync();
+        string task = progress.Stage switch
+        {
+            ImportStage.Searching => Properties.Resources.FileSearch,
+            ImportStage.Filtering => Properties.Resources.DeviceFileFilterDate,
+            ImportStage.Downloading => Properties.Resources.DeviceCopyingFiles,
+            ImportStage.GeneratingThumbnail => string.Format(Properties.Resources.DeviceGeneratingThumbnail, progress.CurrentFile ?? string.Empty),
+            ImportStage.Deleting => Properties.Resources.DeviceDeletingFilesTask,
+            _ => Properties.Resources.DeviceSortingFile
+        };
+        progressDialog.SetCurrentTask(task);
+        progressDialog.SetCurrentDir(progress.CurrentFile ?? string.Empty);
+        if (progress.Total == 0)
+        {
+            progressDialog.SetIndeterminateProgress();
+            progressDialog.SetProgressMessage(string.Empty);
+        }
+        else
+        {
+            string message = string.Format(Properties.Resources.DeviceFilesDoneCount, progress.Completed, progress.Total);
+            progressDialog.SetCurrentProgress(message, progress.Completed * 100 / progress.Total);
+        }
     }
+
+    public void worker_Cancel() => operationCancellation?.Cancel();
 
 
     //dialog struktura slozky
@@ -827,22 +777,24 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void Window_Closing(object sender, CancelEventArgs e)
     {
+        operationCancellation?.Cancel();
+        operationCancellation?.Dispose();
         deviceProvider.DevicesChanged -= DeviceProvider_DevicesChanged;
         if (deviceProvider is IDisposable disposableProvider)
         {
             disposableProvider.Dispose();
         }
 
-        DeviceList.Save();
-        ClearTemp();
+        DeviceCatalog.Save();
+        ApplicationDataMaintenance.ClearTemporaryFiles(App.DataPaths);
     }
 
     private void cbNewFiles_Checked(object sender, RoutedEventArgs e)
     {
         DownloadSettings.Date = new DateRange();
-        if (DeviceList.SelectedDevice != null)
+        if (DeviceCatalog.SelectedDevice != null)
         {
-            DownloadSettings.Date.Start = DeviceList.SelectedDeviceInfo.LastBackup;
+            DownloadSettings.Date.Start = DeviceCatalog.SelectedDeviceInfo.LastBackup;
         }
     }
 
@@ -876,15 +828,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         Process.Start(fileName: "explorer.exe", arguments: lastLog.FullName);
     }
 
-    public static void ClearTemp()
-    {
-        Parallel.ForEach(source: Directory.EnumerateFiles(path: tmpFolder).Where(predicate: x => !x.EndsWith(value: ".msi")), body: (file) => { File.Delete(path: file); });
-    }
-
     private void lblDeviceName_TextChanged(object sender, TextChangedEventArgs e)
     {
         var tb = (TextBox)sender;
-        if (DeviceList.SelectedDeviceIndex != -1 && tb.Text.Length == 0)
+        if (DeviceCatalog.SelectedDeviceIndex != -1 && tb.Text.Length == 0)
         {
             SetErrorMessage(tb: tbDeviceNameError, message: Properties.Resources.DeviceNameEmpty);
             ListBoxDevices.IsEnabled = false;
@@ -965,7 +912,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 SnackBar.MessageQueue.Enqueue(content: Properties.Resources.Update_NewVersionAvailable, actionContent: Properties.Resources.Show.ToUpper(), actionHandler: () => ShowUpdateDialog(release: release));
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
         }
     }

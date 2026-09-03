@@ -10,6 +10,7 @@ using System.Threading;
 using System.Windows;
 using MaterialDesignThemes.Wpf;
 using PhotoApp.Properties;
+using WirePix.Core.Storage;
 
 namespace PhotoApp;
 
@@ -21,6 +22,7 @@ public partial class App : Application
     private static List<Tuple<string, string>> _availableLanguages = new();
 
     private static Mutex _mutex = null;
+    public static ApplicationDataPaths DataPaths { get; private set; }
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -48,40 +50,15 @@ public partial class App : Application
 
 
         SetLanguage();
-        string appData = Environment.GetFolderPath(folder: Environment.SpecialFolder.ApplicationData);
-        var mainFolder = "WirePix";
-        Resources.Add(key: Keys.MainFolder, value: Path.Combine(path1: appData, path2: mainFolder));
-        Resources.Add(key: Keys.TempFolder, value: Path.Combine(path1: Path.GetTempPath(), path2: mainFolder));
-        Resources.Add(key: Keys.LogsFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Logs"));
-        Resources.Add(key: Keys.ProfilesFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Profiles"));
-        Resources.Add(key: Keys.DataFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Data"));
-        Resources.Add(key: Keys.CrashReportsFolder, value: Path.Combine(path1: appData, path2: mainFolder, path3: "Crash Reports"));
-        DownloadSettings.ProfileDirectory = Resources[key: Keys.ProfilesFolder].ToString();
-
-        IEnumerator keys = Current.Resources.Keys.GetEnumerator();
-        while (keys.MoveNext())
-        {
-            var key = keys.Current.ToString();
-            if (key.Contains(value: "Folder"))
-            {
-                Directory.CreateDirectory(path: Current.Resources[key: key].ToString());
-            }
-        }
-
-        IEnumerable<string> files = Directory.GetFiles(path: Current.Resources[key: Keys.TempFolder].ToString()).Where(predicate: x => x.EndsWith(value: ".msi"));
-        foreach (string file in files)
-        {
-            File.Delete(path: file);
-        }
-
-        var logFolder = Current.Resources[key: Keys.LogsFolder].ToString();
-        int maxLogs = Settings.Default.MaxLogs;
-        var logFiles = new DirectoryInfo(path: logFolder);
-        IEnumerable<FileInfo> filesToDelete = logFiles.GetFiles().OrderByDescending(keySelector: f => f.CreationTime).Skip(count: maxLogs);
-        foreach (FileInfo file in filesToDelete)
-        {
-            file.Delete();
-        }
+        DataPaths = ApplicationDataPaths.CreateDefault("WirePix");
+        Resources.Add(key: Keys.MainFolder, value: DataPaths.Main);
+        Resources.Add(key: Keys.TempFolder, value: DataPaths.Temp);
+        Resources.Add(key: Keys.LogsFolder, value: DataPaths.Logs);
+        Resources.Add(key: Keys.ProfilesFolder, value: DataPaths.Profiles);
+        Resources.Add(key: Keys.DataFolder, value: DataPaths.Data);
+        Resources.Add(key: Keys.CrashReportsFolder, value: DataPaths.CrashReports);
+        DownloadSettings.ProfileDirectory = DataPaths.Profiles;
+        ApplicationDataMaintenance.Prepare(DataPaths, Settings.Default.MaxLogs);
 
         SetThemeMode(darkMode: Settings.Default.DarkMode);
     }

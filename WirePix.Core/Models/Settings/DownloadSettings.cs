@@ -72,7 +72,8 @@ public sealed class DownloadSettings : ObservableObject
         }
     }
 
-    [XmlIgnore] public DownloadSelect DownloadSelect
+    [XmlIgnore]
+    public DownloadSelect DownloadSelect
     {
         get;
         set
