@@ -340,7 +340,7 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         CancellationToken cancellationToken)
     {
         TimeSpan delay = TimeSpan.FromSeconds(value: 2);
-        for (var attempt = 0; ; attempt++)
+        for (var attempt = 0;; attempt++)
         {
             cancellationToken.ThrowIfCancellationRequested();
             try
@@ -382,15 +382,38 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
             if (File.Exists(path: destination))
             {
                 destination = FileOperations.UniqueName(path: destination, sourcePath: temp);
+                if (File.Exists(path: destination))
+                {
+                    continue;
+                }
             }
 
-            Directory.CreateDirectory(path: Path.GetDirectoryName(path: destination) ?? root);
             var copied = false;
-            for (var attempt = 0; attempt < MaxAttempts && !copied; attempt++)
+            var ownsDestination = false;
+            try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                File.Copy(sourceFileName: temp, destFileName: destination, overwrite: true);
-                copied = !settings.CheckFiles || FileOperations.Verify(expected: hash, path: destination);
+                Directory.CreateDirectory(path: Path.GetDirectoryName(path: destination) ?? root);
+                if (destination != null)
+                {
+                    using (new FileStream(path: destination, mode: FileMode.CreateNew))
+                    {
+                        ownsDestination = true;
+                    }
+
+                    for (var attempt = 0; attempt < MaxAttempts && !copied; attempt++)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        File.Copy(sourceFileName: temp, destFileName: destination, overwrite: true);
+                        copied = !settings.CheckFiles || FileOperations.Verify(expected: hash, path: destination);
+                    }
+                }
+            }
+            finally
+            {
+                if (!copied && ownsDestination && File.Exists(path: destination))
+                {
+                    File.Delete(path: destination);
+                }
             }
 
             if (!copied)
