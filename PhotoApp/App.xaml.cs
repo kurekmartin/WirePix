@@ -22,6 +22,7 @@ public partial class App : Application
     private static List<Tuple<string, string>> _availableLanguages = new();
 
     private static Mutex _mutex = null;
+    public static App Instance => (App)Current;
     public static ApplicationDataPaths DataPaths { get; private set; }
 
     protected override void OnStartup(StartupEventArgs e)

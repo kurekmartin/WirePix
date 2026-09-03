@@ -26,7 +26,7 @@ public partial class AppInfoDialog : UserControl
     private async void btnCheckUpdate_Click(object sender, RoutedEventArgs e)
     {
         MaterialDesignThemes.Wpf.ButtonProgressAssist.SetIsIndicatorVisible(element: btnCheckUpdate, isIndicatorVisible: true);
-        Version currentVersion = Version.Parse(input: ((App)System.Windows.Application.Current).Version);
+        Version currentVersion = Version.Parse(input: App.Instance.Version);
 
         try
         {

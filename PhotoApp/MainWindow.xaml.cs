@@ -109,7 +109,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private void dhDialog_Loaded(object sender, RoutedEventArgs e)
     {
-        Version currentVersion = Version.Parse(input: ((App)Application.Current).Version);
+        Version currentVersion = Version.Parse(input: App.Instance.Version);
         Version lastRunVerison = Version.Parse(input: Properties.Settings.Default.LastVersion);
         if (currentVersion > lastRunVerison)
         {
@@ -900,7 +900,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void CheckNewVersion()
     {
-        Version currentVersion = Version.Parse(input: ((App)Application.Current).Version);
+        Version currentVersion = Version.Parse(input: App.Instance.Version);
         try
         {
             var github = new Octokit.GitHubClient(productInformation: new Octokit.ProductHeaderValue(name: "WirePix"));

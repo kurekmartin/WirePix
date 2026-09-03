@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:PhotoApp"
              xmlns:p="clr-namespace:PhotoApp.Properties"
              xmlns:UI="clr-namespace:PhotoApp.UIElements"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
@@ -21,7 +22,7 @@
                         <TextBlock Text=":" VerticalAlignment="Center"
                                    Style="{StaticResource MaterialDesignBody2TextBlock}" />
                         <TextBlock Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                   Text="{Binding Path=Version, Source={x:Static Application.Current}}" d:Text="1.0.0"
+                                   Text="{Binding Version, Source={x:Static local:App.Instance}}" d:Text="1.0.0"
                                    VerticalAlignment="Center" Margin="5,0" />
                         <Button x:Name="btnCheckUpdate" Content="{x:Static p:Resources.CheckUpdates}"
                                 Click="btnCheckUpdate_Click"

@@ -11,7 +11,7 @@ public partial class ChangelogDialog : UserControl
         InitializeComponent();
         svChangeScrollView.MaxHeight = parentHeight * 0.7;
         spChangelog.MaxWidth = parentWidth * 0.8;
-        tbVerison.Text = ((App)Application.Current).Version;
+        tbVerison.Text = App.Instance.Version;
         LoadChangelog();
     }
 

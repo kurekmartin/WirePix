@@ -3,10 +3,13 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:PhotoApp"
+    xmlns:deviceModels="clr-namespace:WirePix.Core.Models.Devices;assembly=WirePix.Core"
     xmlns:converters="clr-namespace:PhotoApp.Converters"
     xmlns:p="clr-namespace:PhotoApp.Properties"
     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" x:Class="PhotoApp.MainWindow"
     mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance Type=local:MainWindow, IsDesignTimeCreatable=False}"
     Title="WirePix"
     TextElement.Foreground="{DynamicResource MaterialDesignBody}"
     TextElement.FontWeight="Regular"
@@ -109,7 +112,9 @@
                                                  d:ItemsSource="{d:SampleData ItemCount=5}">
                                             <ListBox.ItemTemplate>
                                                 <DataTemplate>
-                                                    <TextBlock Text="{Binding Name}" />
+                                                    <TextBlock
+                                                        d:DataContext="{d:DesignInstance Type=deviceModels:DeviceInfo, IsDesignTimeCreatable=False}"
+                                                        Text="{Binding Name}" />
                                                 </DataTemplate>
                                             </ListBox.ItemTemplate>
                                         </ListBox>

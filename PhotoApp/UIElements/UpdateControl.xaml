@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:p="clr-namespace:PhotoApp.Properties"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:ui="clr-namespace:PhotoApp.UIElements"
              mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=ui:UpdateControl, IsDesignTimeCreatable=False}"
              Height="Auto"
              Width="Auto">
     <StackPanel Orientation="Vertical">

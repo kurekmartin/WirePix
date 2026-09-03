@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:p="clr-namespace:PhotoApp.Properties"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             mc:Ignorable="d" Width="Auto" Height="Auto" Loaded="UserControl_Loaded">
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=p:Settings, IsDesignTimeCreatable=False}"
+             Width="Auto" Height="Auto" Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisConverter" />
     </UserControl.Resources>

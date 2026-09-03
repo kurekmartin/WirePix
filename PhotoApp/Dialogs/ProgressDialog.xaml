@@ -6,7 +6,10 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:p="clr-namespace:PhotoApp.Properties"
              xmlns:converters="clr-namespace:PhotoApp.Converters"
-             mc:Ignorable="d" d:DesignWidth="800" Height="184.448" Loaded="UserControl_Loaded">
+             xmlns:local="clr-namespace:PhotoApp"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=local:MainWindow, IsDesignTimeCreatable=False}"
+             d:DesignWidth="800" Height="184.448" Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <converters:TimeSpanToString x:Key="TimeToString" />
     </UserControl.Resources>

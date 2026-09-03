@@ -6,7 +6,9 @@
              xmlns:p="clr-namespace:PhotoApp.Properties"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:PhotoApp.Converters"
-             mc:Ignorable="d">
+             xmlns:dialogs="clr-namespace:PhotoApp.Dialogs"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=dialogs:FileStructDialog, IsDesignTimeCreatable=False}">
     <UserControl.Resources>
         <converters:TagToValue x:Key="TagToValueConverter" />
         <converters:TagCodeToLabel x:Key="CodeToLabelConverter" />
@@ -78,7 +80,9 @@
                                   d:ItemsSource="{d:SampleData}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding ButtonLabel}"
+                                    <TextBlock
+                                               d:DataContext="{d:DesignInstance Type=dialogs:TagStruct, IsDesignTimeCreatable=False}"
+                                               Text="{Binding ButtonLabel}"
                                                Tag="{Binding Code}" />
                                 </DataTemplate>
                             </ComboBox.ItemTemplate>
@@ -103,13 +107,17 @@
                     <ItemsControl ItemsSource="{Binding Buttons}" d:ItemsSource="{d:SampleData ItemCount=4}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="{Binding ButtonGridSize.X}"
+                                <UniformGrid
+                                             d:DataContext="{d:DesignInstance Type=dialogs:FileStructDialog, IsDesignTimeCreatable=False}"
+                                             Columns="{Binding ButtonGridSize.X}"
                                              Rows="{Binding ButtonGridSize.Y}" />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <GroupBox Header="{Binding groupName}"
+                                <GroupBox
+                                          d:DataContext="{d:DesignInstance Type=dialogs:ButtonGroupStruct, IsDesignTimeCreatable=False}"
+                                          Header="{Binding groupName}"
                                           Margin="5">
                                     <ItemsControl ItemsSource="{Binding buttons}">
                                         <ItemsControl.ItemsPanel>
@@ -120,7 +128,9 @@
                                         </ItemsControl.ItemsPanel>
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Button Content="{Binding btnText}"
+                                                <Button
+                                                        d:DataContext="{d:DesignInstance Type=dialogs:ButtonStruct, IsDesignTimeCreatable=False}"
+                                                        Content="{Binding btnText}"
                                                         Tag="{Binding insertValue}"
                                                         Click="Button_Click"
                                                         Height="Auto"
