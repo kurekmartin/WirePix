@@ -88,6 +88,33 @@ internal sealed class WindowsMediaDevice : IMediaDevice
         return Task.FromResult(_sources);
     }
 
+    public Task<IReadOnlyList<string>> GetMediaDirectoriesAsync(
+        CancellationToken cancellationToken)
+    {
+        return RunConnectedAsync<IReadOnlyList<string>>(
+            operation: device =>
+            {
+                var result = new List<string>();
+                foreach (MediaDriveInfo drive in device.GetDrives())
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    if (drive.RootDirectory != null)
+                    {
+                        FindDcimDirectories(
+                            device,
+                            drive.RootDirectory.FullName,
+                            result,
+                            filesFound: 0,
+                            progress: null,
+                            cancellationToken);
+                    }
+                }
+
+                return result;
+            },
+            cancellationToken);
+    }
+
     public Task<IReadOnlyList<MediaItem>> GetMediaAsync(
         IProgress<MediaDiscoveryUpdate>? progress,
         CancellationToken cancellationToken)

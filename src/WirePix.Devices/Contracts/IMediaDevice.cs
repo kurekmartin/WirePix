@@ -52,6 +52,17 @@ public interface IMediaDevice
         CancellationToken cancellationToken);
 
     /// <summary>
+    /// Gets the backend-native paths of directories containing media.
+    /// </summary>
+    /// <remarks>
+    /// The returned paths are presentation data and must not be converted into local
+    /// filesystem operations. This operation should only be attempted when
+    /// <see cref="Status"/> is usable.
+    /// </remarks>
+    Task<IReadOnlyList<string>> GetMediaDirectoriesAsync(
+        CancellationToken cancellationToken);
+
+    /// <summary>
     /// Gets the media currently exposed by all sources on the device.
     /// </summary>
     /// <remarks>

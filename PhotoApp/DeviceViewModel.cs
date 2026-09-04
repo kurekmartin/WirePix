@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using WirePix.Core.Units;
@@ -64,7 +63,6 @@ public sealed class DeviceViewModel(IMediaDevice device) : ObservableObject
 
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
-        IReadOnlyList<MediaSource> sources = await Device.GetMediaSourcesAsync(cancellationToken);
-        MediaDirectories = sources.Select(source => source.DevicePath).ToList();
+        MediaDirectories = await Device.GetMediaDirectoriesAsync(cancellationToken);
     }
 }
