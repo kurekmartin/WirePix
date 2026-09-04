@@ -439,7 +439,10 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         if (progress.Total == 0)
         {
             progressDialog.SetIndeterminateProgress();
-            progressDialog.SetProgressMessage(string.Empty);
+            string message = progress.Stage == ImportStage.Searching
+                ? string.Format(Properties.Resources.DeviceFilesFound, progress.Completed)
+                : string.Empty;
+            progressDialog.SetProgressMessage(message);
         }
         else
         {

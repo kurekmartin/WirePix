@@ -36,24 +36,14 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         IReadOnlyList<MediaItem> files;
         try
         {
-            IProgress<MediaDiscoveryUpdate> discoveryProgress = _logger == null
+            IProgress<MediaDiscoveryUpdate> discoveryProgress = _logger == null && progress == null
                 ? null
-                : new DiscoveryProgress(logger: _logger);
+                : new DiscoveryProgress(logger: _logger, progress: progress);
             files = await device.GetMediaAsync(discoveryProgress, cancellationToken).ConfigureAwait(false);
         }
         finally
         {
             _logger?.Stop();
-        }
-
-        for (var index = 0; index < files.Count; index++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            progress?.Report(value: new ImportProgress(
-                stage: ImportStage.Searching,
-                completed: index + 1,
-                total: 0,
-                currentFile: files[index].FileName));
         }
 
         IEnumerable<MediaItem> selected = files;
@@ -447,17 +437,25 @@ public sealed class ImportCoordinator(string tempFolder, string logFolder = null
         return file.CapturedAt?.LocalDateTime ?? default;
     }
 
-    private sealed class DiscoveryProgress(FileLogger logger) : IProgress<MediaDiscoveryUpdate>
+    private sealed class DiscoveryProgress(
+        FileLogger logger,
+        IProgress<ImportProgress> progress) : IProgress<MediaDiscoveryUpdate>
     {
         public void Report(MediaDiscoveryUpdate value)
         {
             if (value.Error != null)
             {
-                logger.Add(
+                logger?.Add(
                     message: $"Could not inspect device directory '{value.CurrentPath}'.{Environment.NewLine}{value.Error}",
                     type: LogType.Error,
                     function: nameof(CreatePlanAsync));
             }
+
+            progress?.Report(value: new ImportProgress(
+                stage: ImportStage.Searching,
+                completed: value.FilesFound,
+                total: 0,
+                currentFile: value.CurrentPath));
         }
     }
 }
